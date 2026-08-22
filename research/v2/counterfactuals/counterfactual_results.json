@@ -1,0 +1,22 @@
+{
+  "experiment_id": "EXP-006-counterfactuals",
+  "champion_model": {
+    "model_version": "xgb-v2-champion",
+    "calibration_version": "uncalibrated",
+    "feature_version": "v2.0",
+    "threshold_version": "v2.0_eval_0.85"
+  },
+  "metrics": {
+    "evaluation_cases": 1000,
+    "validity_rate": 0.941,
+    "plausibility_pass_rate": 1.0,
+    "average_changed_features": 2.1,
+    "average_normalized_distance": 0.12,
+    "median_generation_latency_ms": 142
+  },
+  "safety": {
+    "policy_threshold_exposure_test": "PASSED",
+    "unsafe_value_redaction_test": "PASSED",
+    "unknown_feature_semantics_test": "PASSED"
+  }
+}
