@@ -1,0 +1,19 @@
+{
+  "graph_version": "v1.0.0",
+  "seed": 42,
+  "louvain_random_state": 100,
+  "threshold": 0.85,
+  "weights": {
+    "shared_device": 0.35,
+    "shared_ip": 0.25,
+    "shared_payment": 0.20,
+    "community_density": 0.20
+  },
+  "normalization": "min_max",
+  "generator_config": {
+    "population_size": 10000,
+    "normal_sharing_probability": 0.05,
+    "suspicious_cluster_count": 50,
+    "cluster_size_range": [3, 15]
+  }
+}

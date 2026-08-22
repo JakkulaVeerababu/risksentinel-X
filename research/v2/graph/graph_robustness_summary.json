@@ -1,0 +1,33 @@
+{
+  "experiment_ids": ["EXP-003-graph-multiseed", "EXP-004-graph-ablation", "EXP-005-graph-hardening"],
+  "baseline_mean_f1": 0.812,
+  "baseline_std_f1": 0.015,
+  "per_seed_results": [
+    {"seed": 11, "precision": 0.835, "recall": 0.790, "f1": 0.812},
+    {"seed": 23, "precision": 0.842, "recall": 0.801, "f1": 0.821},
+    {"seed": 37, "precision": 0.821, "recall": 0.785, "f1": 0.803},
+    {"seed": 51, "precision": 0.839, "recall": 0.795, "f1": 0.816},
+    {"seed": 67, "precision": 0.815, "recall": 0.778, "f1": 0.796},
+    {"seed": 79, "precision": 0.848, "recall": 0.810, "f1": 0.829},
+    {"seed": 101, "precision": 0.830, "recall": 0.782, "f1": 0.805},
+    {"seed": 131, "precision": 0.845, "recall": 0.805, "f1": 0.824},
+    {"seed": 151, "precision": 0.825, "recall": 0.780, "f1": 0.802},
+    {"seed": 181, "precision": 0.837, "recall": 0.792, "f1": 0.814}
+  ],
+  "ablations": [
+    {"signal": "None (Full Baseline)", "delta_f1": 0.000},
+    {"signal": "No Device", "delta_f1": -0.142},
+    {"signal": "No IP", "delta_f1": -0.085},
+    {"signal": "No Payment", "delta_f1": -0.061},
+    {"signal": "No Community Density", "delta_f1": -0.043}
+  ],
+  "stress_tests": {
+    "legitimate_sharing_high": {"precision": 0.758, "recall": 0.795, "f1": 0.776},
+    "suspicious_density_sparse": {"precision": 0.851, "recall": 0.612, "f1": 0.712}
+  },
+  "runtime_scaling_ms": {
+    "1x": 1420,
+    "2x": 3150,
+    "5x": 8900
+  }
+}

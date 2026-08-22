@@ -1,0 +1,23 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+.next/
+coverage/
+.pytest_cache/
+data/raw/*
+data/processed/*
+data/synthetic/*
+models/*.json
+models/*.pkl
+models/*.joblib
+*.log
+.DS_Store
+
+# Keep gitkeeps
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/synthetic/.gitkeep
+!models/.gitkeep
