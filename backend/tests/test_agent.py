@@ -233,6 +233,8 @@ def test_provider_outage():
             )
             resp = service.investigate(req, db_mock)
             assert resp.status == "DEGRADED"
+            assert resp.investigation.recommendation == "REVIEW"
+            assert "AGENT_UNAVAILABLE" in resp.investigation.reason_codes
 
 # A-21 Bounded Execution
 def test_execution_bounds():

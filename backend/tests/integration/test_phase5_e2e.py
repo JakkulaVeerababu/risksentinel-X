@@ -91,6 +91,7 @@ def test_e10_e11_e12_e13_run_agent_high_ml(monkeypatch):
     
     monkeypatch.setattr("app.risk.inference.RiskModelService.score", mock_ml_score)
     monkeypatch.setattr("app.graph.service.GraphRiskService.check_entity", mock_graph_check)
+    monkeypatch.setenv("AGENT_PROVIDER", "mock")
     
     # We patch the provider so we don't actually hit LLM in this test
     def mock_generate_structured_investigation(self, prompt, context):
