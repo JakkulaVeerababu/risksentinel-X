@@ -156,10 +156,14 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--base_path", type=str, default=None)
     args = parser.parse_args()
     
     # Update working dir if running from root
-    base_path = "data/synthetic" if Path("data").exists() else "../../data/synthetic"
+    if args.base_path:
+        base_path = args.base_path
+    else:
+        base_path = "data/synthetic" if Path("data").exists() else "../../data/synthetic"
     
     generator = SyntheticGraphGenerator(seed=args.seed, base_path=base_path)
     generator.generate_normal_population(num_customers=1000)

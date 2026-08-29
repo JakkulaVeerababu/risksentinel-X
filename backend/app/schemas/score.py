@@ -1,27 +1,27 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 class ScoreRequest(BaseModel):
     # This contract requires exactly what the IEEE-CIS model expects.
     # (Only a subset is modeled for Phase 1 baseline)
-    TransactionID: str
+    TransactionID: str = Field(..., max_length=255)
     TransactionDT: float
     TransactionAmt: float
-    ProductCD: str
+    ProductCD: str = Field(..., max_length=255)
     
     # Categoricals
     card1: Optional[float] = None
     card2: Optional[float] = None
     card3: Optional[float] = None
-    card4: Optional[str] = None
+    card4: Optional[str] = Field(None, max_length=255)
     card5: Optional[float] = None
-    card6: Optional[str] = None
+    card6: Optional[str] = Field(None, max_length=255)
     addr1: Optional[float] = None
     addr2: Optional[float] = None
-    P_emaildomain: Optional[str] = None
-    R_emaildomain: Optional[str] = None
-    DeviceType: Optional[str] = None
-    DeviceInfo: Optional[str] = None
+    P_emaildomain: Optional[str] = Field(None, max_length=255)
+    R_emaildomain: Optional[str] = Field(None, max_length=255)
+    DeviceType: Optional[str] = Field(None, max_length=255)
+    DeviceInfo: Optional[str] = Field(None, max_length=255)
     
     # Continuous metrics
     dist1: Optional[float] = None

@@ -1,0 +1,13 @@
+{
+  "requests_attempted": 111,
+  "initial_processing_responses": 1,
+  "idempotent_replay_responses": 105,
+  "conflicts": 0,
+  "db_rows": {
+    "transactions": 1,
+    "risk_scores": 1,
+    "investigations": 1,
+    "decisions": 1
+  },
+  "contradictory_decisions": 0
+}

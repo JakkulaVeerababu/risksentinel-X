@@ -1,76 +1,95 @@
 import logging
+from datetime import datetime, timezone
 from app.policy.schemas import PolicyInput, PolicyDecisionResult
-from app.policy.config import PolicyConfig
+from app.policy.config import POLICY_VERSION, ML_THRESHOLD, GRAPH_THRESHOLD
 
 class PolicyEngine:
     """
-    Deterministic rules engine.
-    Ensures LLM Agent recommendations are advisory, subject to verified metrics.
+    Deterministic rules engine (Phase 4).
+    Ensures LLM Agent recommendations are advisory and do not override hard signals.
     """
     
-    def __init__(self):
-        self.config = PolicyConfig.get_instance()
-        
     def evaluate(self, inputs: PolicyInput) -> PolicyDecisionResult:
-        logging.info(f"Policy Engine evaluating {inputs.transaction_id}")
+        logging.info(f"PolicyEngine evaluating transaction: {inputs.transaction_id}")
         
-        triggered_rules = []
-        decision = "REVIEW" # Default Safe State
-        decision_reason = "UNCERTAIN_SIGNALS"
+        # Check for unavailable graph evidence FIRST
+        if inputs.graph_score is None:
+            return PolicyDecisionResult(
+                final_decision="REVIEW",
+                policy_version=POLICY_VERSION,
+                matched_rule_ids=["GRAPH_EVIDENCE_UNAVAILABLE"],
+                reason_codes=["GRAPH_EVIDENCE_UNAVAILABLE"],
+                ml_score=inputs.ml_score,
+                graph_score=None,
+                agent_state=inputs.agent_state,
+                agent_recommendation=inputs.agent_recommendation,
+                agent_confidence=inputs.agent_confidence,
+                timestamp=datetime.now(timezone.utc).isoformat()
+            )
         
-        ml_high = inputs.ml_risk_score >= self.config.ml_high_threshold
-        ml_low = inputs.ml_risk_score < self.config.ml_low_threshold
-        graph_strong = inputs.graph_risk_score >= self.config.graph_high_threshold and inputs.graph_cluster_detected
-        agent_valid = inputs.agent_status == "COMPLETED"
-        agent_says_block = inputs.agent_recommendation == "BLOCK"
-        sufficient_evidence = inputs.agent_evidence_count >= self.config.min_block_evidence_count
+        ml_high = inputs.ml_score >= ML_THRESHOLD
+        graph_high = inputs.graph_score >= GRAPH_THRESHOLD
+        agent_block = inputs.agent_recommendation == "BLOCK"
+        agent_allow = inputs.agent_recommendation == "ALLOW"
+        agent_review = inputs.agent_recommendation == "REVIEW"
         
-        # Rule 1: ALLOW (Low risk everything)
-        if ml_low and not graph_strong and inputs.agent_recommendation != "BLOCK":
-            triggered_rules.append("POL-ALLOW-001:ML_AND_GRAPH_LOW")
-            decision = "ALLOW"
-            decision_reason = "ALL_SIGNALS_LOW"
+        final_decision = "REVIEW" # Safe fallback
+        matched_rule = "SAFE_FALLBACK_REVIEW"
+        reason = "SAFE_FALLBACK_REVIEW"
+        
+        # 1. Independent Machine Evidence Rules (Strongest)
+        if ml_high and graph_high:
+            final_decision = "BLOCK"
+            matched_rule = "P-V1-004"
+            reason = "MULTI_SIGNAL_HIGH_RISK"
+        
+        # 2. Single Machine Signal -> REVIEW
+        elif ml_high and not graph_high:
+            final_decision = "REVIEW"
+            matched_rule = "P-V1-002"
+            reason = "ML_HIGH"
             
-        # Rule 2: BLOCK (Multi-signal requirement)
-        elif ml_high and graph_strong and agent_valid and agent_says_block and sufficient_evidence:
-            triggered_rules.append("POL-BLOCK-001:MULTI_SIGNAL_CONFIRMED")
-            decision = "BLOCK"
-            decision_reason = "CRITICAL_RISK_VERIFIED"
+        elif not ml_high and graph_high:
+            final_decision = "REVIEW"
+            matched_rule = "P-V1-003"
+            reason = "GRAPH_HIGH"
             
-        # Rule 3: LLM OVERRIDE - REVIEW (Agent wants to block, but ML/Graph don't support it strongly)
-        elif agent_says_block and (not ml_high or not graph_strong):
-            triggered_rules.append("POL-REVIEW-001:AGENT_OVERRIDE_WEAK_SIGNALS")
-            decision = "REVIEW"
-            decision_reason = "LLM_RECOMMENDATION_NOT_VERIFIED"
-            
-        # Rule 4: REVIEW (Agent degraded/unavailable)
-        elif not agent_valid:
-            triggered_rules.append("POL-SAFE-AGENT-001:AGENT_DEGRADED")
-            decision = "REVIEW"
-            decision_reason = "UNCERTAIN_MISSING_AGENT_CONTEXT"
-            
-        # Rule 5: REVIEW (Missing evidence for block)
-        elif ml_high and graph_strong and agent_says_block and not sufficient_evidence:
-            triggered_rules.append("POL-REVIEW-002:INSUFFICIENT_EVIDENCE")
-            decision = "REVIEW"
-            decision_reason = "MISSING_EVIDENCE_FOR_BLOCK"
-            
-        # Rule 6: Catch all REVIEW (Moderate ML, Moderate Graph, etc)
-        else:
-            triggered_rules.append("POL-REVIEW-003:DEFAULT_UNCERTAINTY")
-            decision = "REVIEW"
-            decision_reason = "CONFLICTING_OR_MODERATE_SIGNALS"
-            
+        # 3. Agent Governance Rules (When Machine Evidence is Low)
+        elif not ml_high and not graph_high:
+            if agent_block:
+                final_decision = "REVIEW"
+                matched_rule = "AGENT_BLOCK_WITHOUT_STRONG_MACHINE_EVIDENCE"
+                reason = "AGENT_BLOCK_UNCORROBORATED"
+            elif agent_review:
+                final_decision = "REVIEW"
+                matched_rule = "AGENT_RECOMMENDS_REVIEW"
+                reason = "AGENT_REVIEW"
+            elif agent_allow or inputs.agent_recommendation is None:
+                # Agent ALLOW, SKIPPED, or DEGRADED -> ALLOW
+                final_decision = "ALLOW"
+                matched_rule = "P-V1-001"
+                reason = "LOW_MACHINE_RISK"
+            else:
+                # Unknown agent recommendation with low machine risk -> REVIEW
+                final_decision = "REVIEW"
+                matched_rule = "SAFE_FALLBACK_REVIEW"
+                reason = "UNKNOWN_AGENT_STATE"
+
+        # 4. Agent Availability Overrides
+        # (Though DEGRADED/SKIPPED mostly falls into the rules above, 
+        # let's be explicit if needed).
+        if inputs.agent_state == "DEGRADED" and final_decision == "ALLOW" and matched_rule == "P-V1-001":
+            reason = "LOW_MACHINE_RISK_AGENT_DEGRADED"
+        
         return PolicyDecisionResult(
-            transaction_id=inputs.transaction_id,
-            decision=decision,
-            policy_version=self.config.policy_version,
-            decision_reason=decision_reason,
-            triggered_rules=triggered_rules,
-            inputs={
-                "ml_risk": inputs.ml_risk_score,
-                "graph_risk": inputs.graph_risk_score,
-                "agent_recommendation": inputs.agent_recommendation,
-                "agent_confidence": inputs.agent_confidence
-            }
+            final_decision=final_decision,
+            policy_version=POLICY_VERSION,
+            matched_rule_ids=[matched_rule],
+            reason_codes=[reason],
+            ml_score=inputs.ml_score,
+            graph_score=inputs.graph_score,
+            agent_state=inputs.agent_state,
+            agent_recommendation=inputs.agent_recommendation,
+            agent_confidence=inputs.agent_confidence,
+            timestamp=datetime.now(timezone.utc).isoformat()
         )

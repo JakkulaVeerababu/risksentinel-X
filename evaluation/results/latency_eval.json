@@ -1,0 +1,22 @@
+{
+  "hardware": {
+    "cpu": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+    "ram": "24GB",
+    "os": "Windows 11",
+    "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU"
+  },
+  "skip_path": {
+    "n": 20,
+    "mean_ms": 189.67626094818115,
+    "median_ms": 163.29848766326904,
+    "p95_ms": 263.88983726501465
+  },
+  "ollama_canonical_e2e": {
+    "n": 5,
+    "mean_ms": 165.3524875640869,
+    "median_ms": 165.00210762023926,
+    "p95_ms": 171.8574047088623,
+    "min_ms": 158.87069702148438,
+    "max_ms": 172.66058921813965
+  }
+}

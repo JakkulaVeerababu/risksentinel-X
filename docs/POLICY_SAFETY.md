@@ -16,6 +16,6 @@ LLMs are prone to hallucination, hyper-sensitivity, and prompt injection. If an 
 - **Agent Output:** `BLOCK` (Confidence: 0.99, Reason: "High velocity anomaly detected")
 - **ML Risk Score:** `0.40`
 - **Graph Risk Score:** `0.20`
-- **Result:** Because the hard risk scores do not cross the absolute thresholds (e.g., `> 0.85`), the Policy Engine triggers `POL-REVIEW-001:AGENT_OVERRIDE_WEAK_SIGNALS`. The final decision is downgraded to `REVIEW`.
+- **Result:** Because the hard risk scores do not cross the absolute thresholds (ML ≥ 0.80 AND Graph ≥ 0.30), the Policy Engine matches rule `P-V1-003` and the final decision is downgraded to `REVIEW`.
 
 *Models detect. Graphs connect. Agents investigate. Policies decide.*

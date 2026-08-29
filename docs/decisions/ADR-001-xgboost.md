@@ -10,4 +10,4 @@
 
 **Tradeoffs:** XGBoost requires careful handling of class imbalance (`scale_pos_weight`) and tuning to avoid overfitting compared to simpler models.
 
-**Consequences:** A fast, performant, and easily explainable baseline risk score that achieved a 0.692 PR-AUC locally in under 200ms per inference.
+**Consequences:** A fast, performant, and easily explainable baseline risk score that achieved a 0.4810 Average Precision locally in under 200ms per inference.

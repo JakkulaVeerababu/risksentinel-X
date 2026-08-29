@@ -6,13 +6,34 @@ from app.core.config import settings
 from app.core.logging import setup_logging
 from app.schemas.domain import ErrorResponse, ErrorDetail
 
+from contextlib import asynccontextmanager
+from app.db.base import Base
+from app.db.session import engine
+import app.models.domain
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
+
 # Setup structured logging
 setup_logging()
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    openapi_url=f"/api/v1/openapi.json"
+    openapi_url=f"/api/v1/openapi.json",
+    lifespan=lifespan
+)
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Global exception handler for validation errors

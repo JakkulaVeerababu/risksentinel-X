@@ -1,0 +1,231 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Extreme Premium Dashboard Tokens (Razorpay-inspired) */
+    --background: #F5F7FB;
+    --surface: #FFFFFF;
+    --surface-secondary: #F8FAFC;
+    
+    --text-primary: #17233F;
+    --text-secondary: #5F6B80;
+    --text-muted: #8B95A7;
+    
+    --border: #E2E8F0;
+    --border-subtle: #F1F5F9;
+    --border-strong: #CBD5E1;
+    
+    --primary: #255DF5;
+    --primary-hover: #174BD4;
+    --primary-soft: #EDF3FF;
+    --primary-glow: rgba(37, 99, 235, 0.25);
+    
+    /* Semantic Risk Colors */
+    --success: #10B981;
+    --success-soft: #D1FAE5;
+    
+    --warning: #F59E0B;
+    --warning-soft: #FEF3C7;
+    
+    --danger: #EF4444;
+    --danger-soft: #FEE2E2;
+    
+    --info: #3B82F6;
+    --info-soft: #DBEAFE;
+    
+    /* Agentic / AI Workspaces (Dark Mode feel) */
+    --ai-background: #0B0F19;
+    --ai-surface: #111827;
+    --ai-border: rgba(255, 255, 255, 0.1);
+    --ai-text-primary: #F8FAFC;
+    --ai-text-secondary: #94A3B8;
+  }
+
+  html {
+    min-width: 320px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    overflow-x: hidden;
+    background: var(--background);
+  }
+
+  body {
+    min-height: 100vh;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    overflow-x: hidden;
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Tabular Numerals */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgba(37, 93, 245, 0.45);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .brand-wordmark-image,
+  .brand-mark-image {
+    display: block;
+    flex: none;
+    background-image: url('/risksentinel-x-logo.png');
+    background-repeat: no-repeat;
+  }
+
+  .brand-wordmark-image {
+    width: 190px;
+    height: 34px;
+    background-size: 220px 147px;
+    background-position: -15px -55px;
+  }
+
+  .brand-mark-image {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background-color: #fff;
+    background-size: 201px 134px;
+    background-position: -150px -49px;
+    box-shadow: 0 4px 14px rgba(37, 93, 245, .14);
+  }
+
+  .rsx-page {
+    animation: rsx-page-in .32s cubic-bezier(.22, 1, .36, 1) both;
+  }
+
+  .rsx-card {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .025), 0 10px 30px rgba(28, 49, 87, .04);
+  }
+
+  .rsx-card-interactive {
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+
+  .rsx-card-interactive:hover {
+    transform: translateY(-2px);
+    border-color: #cfdaec;
+    box-shadow: 0 12px 32px rgba(25, 42, 78, .08);
+  }
+
+  .rsx-eyebrow {
+    color: #255df5;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+
+  .rsx-grid {
+    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .rsx-blueprint {
+    background:
+      radial-gradient(circle at 85% 15%, rgba(105, 140, 255, .4), transparent 28%),
+      linear-gradient(135deg, #164be7 0%, #315df6 54%, #6d43ef 100%);
+  }
+
+  .balance { text-wrap: balance; }
+
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 9999px;
+  }
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+  }
+  
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+  
+  .ai-glass-effect {
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .premium-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), 0 12px 24px -4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .premium-shadow-hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px var(--primary-glow);
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+
+  .bg-grid-pattern {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+  }
+}
+
+@keyframes rsx-page-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

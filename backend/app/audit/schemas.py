@@ -4,16 +4,18 @@ from datetime import datetime
 import uuid
 
 class AuditEvent(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    transaction_id: str
-    event_type: str
-    component: str
+    event_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: datetime = Field(default_factory=datetime.utcnow)
+    actor: str = "SYSTEM"
+    service: str
+    event_type: str
+    resource_id: str
+    input_summary: Dict[str, Any] = {}
+    output_summary: Dict[str, Any] = {}
     model_version: Optional[str] = None
-    agent_version: Optional[str] = None
     policy_version: Optional[str] = None
-    simulation_id: Optional[str] = None
-    payload: Dict[str, Any] = {}
+    latency: Optional[float] = None
+    status: str = "SUCCESS"
 
 class AuditTimelineResponse(BaseModel):
     transaction_id: str

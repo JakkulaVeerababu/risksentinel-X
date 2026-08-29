@@ -1,6 +1,7 @@
 import time
 import logging
 from typing import List
+from sqlalchemy.orm import Session
 
 from app.agent.schemas import (
     InvestigationRequest, 
@@ -47,16 +48,53 @@ class InvestigationService:
             output=output
         )
 
-    def investigate(self, request: InvestigationRequest) -> InvestigationResponse:
+    def investigate(self, request: InvestigationRequest, db: Session) -> InvestigationResponse:
         logging.info(f"Starting Investigation for {request.transaction_id}")
         
-        # 1. Deterministic Execution of the EXACTLY TWO tools
-        tcr_history = self._run_tool(AgentTools.get_transaction_history, request.customer_id)
+        from app.agent.gate import InvestigationGate
+        from app.models.domain import InvestigationModel
+        import json
+        
+        # 1. Deterministic Gate
+        if not InvestigationGate.should_investigate(request.ml_risk_score, request.graph_risk_score):
+            logging.info(f"Investigation SKIPPED for {request.transaction_id}")
+            
+            # Persist skipped state
+            inv = InvestigationModel(
+                transaction_id=request.transaction_id,
+                agent_state="SKIPPED",
+                recommendation=None,
+                confidence=None,
+                reason_codes=[],
+                evidence=[]
+            )
+            db.add(inv)
+            try:
+                db.commit()
+            except Exception as e:
+                logging.error(f"Failed to persist SKIPPED investigation: {e}")
+                db.rollback()
+                
+            return InvestigationResponse(
+                transaction_id=request.transaction_id,
+                status="SKIPPED",
+                provider_info="none",
+                tool_calls=[],
+                investigation=InvestigationResult(
+                    recommendation="ALLOW", # Advisory safe fallback when skipped
+                    confidence=1.0,
+                    reason_codes=[],
+                    evidence=[]
+                )
+            )
+
+        # 2. Deterministic Execution of the EXACTLY TWO tools
+        tcr_history = self._run_tool(AgentTools.get_transaction_history, request.customer_id, db)
         tcr_graph = self._run_tool(AgentTools.get_graph_context, request.graph_entity_id)
         
         tool_calls = [tcr_history, tcr_graph]
         
-        # 2. Build Bounded Context for the LLM
+        # 3. Build Bounded Context for the LLM
         context = {
             "transaction_history": tcr_history.output if tcr_history.status == "success" else {},
             "graph_context": tcr_graph.output if tcr_graph.status == "success" else {}
@@ -64,7 +102,7 @@ class InvestigationService:
         
         investigation_status = "COMPLETED"
         
-        # 3. Request LLM Analysis
+        # 4. Request LLM Analysis
         try:
             import os
             if os.getenv("SIMULATE_AGENT_FAILURE") == "true":
@@ -75,7 +113,7 @@ class InvestigationService:
                 context=context
             )
             
-            # 4. Strict Deterministic Validation
+            # 5. Strict Deterministic Validation
             validated_result = DeterministicValidator.validate_and_filter(raw_result, context)
             
         except (TimeoutError, ValueError, RuntimeError) as e:
@@ -88,8 +126,6 @@ class InvestigationService:
                 evidence=[]
             )
             
-        # Strip output from ToolCallRecords to prevent bloat in the final response 
-        # (Though Phase 3 instructions say tool_calls can be included, usually we drop the full payload)
         clean_tool_calls = []
         for tc in tool_calls:
             clean_tool_calls.append(ToolCallRecord(
@@ -97,6 +133,24 @@ class InvestigationService:
                 status=tc.status, 
                 duration_ms=tc.duration_ms
             ))
+            
+        # 6. Persist Investigation
+        inv = InvestigationModel(
+            transaction_id=request.transaction_id,
+            agent_state=investigation_status,
+            recommendation=validated_result.recommendation.value if hasattr(validated_result.recommendation, 'value') else str(validated_result.recommendation),
+            confidence=validated_result.confidence,
+            reason_codes=[rc.value if hasattr(rc, 'value') else str(rc) for rc in validated_result.reason_codes],
+            evidence=[e.model_dump() for e in validated_result.evidence],
+            provider=self.provider.provider_info,
+            tool_calls=[tc.model_dump() for tc in clean_tool_calls]
+        )
+        db.add(inv)
+        try:
+            db.commit()
+        except Exception as e:
+            logging.error(f"Failed to persist investigation: {e}")
+            db.rollback()
             
         return InvestigationResponse(
             transaction_id=request.transaction_id,

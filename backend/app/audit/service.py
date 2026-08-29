@@ -1,43 +1,79 @@
 import logging
-from typing import List, Dict, Optional
+from typing import List, Optional
+from sqlalchemy.orm import Session
 from app.audit.schemas import AuditEvent
+from app.models.domain import AuditEventModel
 
 class AuditService:
     """
     Append-only audit trail service.
-    In a real system, this writes to the `audit_events` Postgres table.
-    For this prototype MVP execution environment, we mock an in-memory store.
+    Writes to the `audit_events` Postgres/SQLite table using SQLAlchemy.
     """
     
-    _store: Dict[str, List[AuditEvent]] = {}
-
     @classmethod
-    def record_event(cls, event: AuditEvent):
+    def record_event(cls, db: Session, event: AuditEvent):
         """Append an event to the immutable audit log."""
         try:
-            if event.transaction_id not in cls._store:
-                cls._store[event.transaction_id] = []
-            
             # Ensure no chain-of-thought is passed in the payload
-            if "chain_of_thought" in event.payload or "internal_reasoning" in event.payload:
+            if "chain_of_thought" in event.input_summary or "internal_reasoning" in event.input_summary:
+                raise ValueError("Security violation: LLM chain-of-thought cannot be committed to audit.")
+            if "chain_of_thought" in event.output_summary or "internal_reasoning" in event.output_summary:
                 raise ValueError("Security violation: LLM chain-of-thought cannot be committed to audit.")
                 
-            cls._store[event.transaction_id].append(event)
-            logging.info(f"AUDIT [{event.event_type}]: TX {event.transaction_id} by {event.component}")
+            payload = {
+                "event_id": event.event_id,
+                "actor": event.actor,
+                "input_summary": event.input_summary,
+                "output_summary": event.output_summary,
+                "model_version": event.model_version,
+                "policy_version": event.policy_version,
+                "latency": event.latency,
+                "status": event.status
+            }
+            
+            db_event = AuditEventModel(
+                transaction_id=event.resource_id,
+                timestamp=event.timestamp,
+                event_type=event.event_type,
+                component=event.service,
+                payload=payload
+            )
+            db.add(db_event)
+            db.commit()
+            logging.info(f"AUDIT [{event.event_type}]: TX {event.resource_id} by {event.service}")
         except Exception as e:
             # Audit failure behavior: Do not fabricate success
-            logging.error(f"CRITICAL: Failed to persist audit event for {event.transaction_id}: {str(e)}")
-            # In a production system, this might push to a dead-letter queue or alert on-call
+            db.rollback()
+            logging.error(f"CRITICAL: Failed to persist audit event for {event.resource_id}: {str(e)}")
             
     @classmethod
-    def get_transaction_timeline(cls, transaction_id: str) -> List[AuditEvent]:
+    def _map_to_schema(cls, e: AuditEventModel) -> AuditEvent:
+        payload = e.payload or {}
+        return AuditEvent(
+            event_id=payload.get("event_id", f"migrated-{e.id}"),
+            timestamp=e.timestamp,
+            actor=payload.get("actor", "SYSTEM"),
+            service=e.component,
+            event_type=e.event_type,
+            resource_id=e.transaction_id,
+            input_summary=payload.get("input_summary", payload), # Fallback to full payload for legacy events
+            output_summary=payload.get("output_summary", {}),
+            model_version=payload.get("model_version"),
+            policy_version=payload.get("policy_version"),
+            latency=payload.get("latency"),
+            status=payload.get("status", "SUCCESS")
+        )
+            
+    @classmethod
+    def get_transaction_timeline(cls, db: Session, transaction_id: str) -> List[AuditEvent]:
         """Retrieve chronological events for a specific transaction."""
-        events = cls._store.get(transaction_id, [])
-        return sorted(events, key=lambda x: x.timestamp)
+        db_events = db.query(AuditEventModel).filter(AuditEventModel.transaction_id == transaction_id).order_by(AuditEventModel.timestamp.asc()).all()
+        return [cls._map_to_schema(e) for e in db_events]
 
     @classmethod
     def query_events(
         cls, 
+        db: Session,
         transaction_id: Optional[str] = None, 
         decision: Optional[str] = None,
         reason_code: Optional[str] = None,
@@ -46,38 +82,39 @@ class AuditService:
         offset: int = 0
     ) -> List[AuditEvent]:
         """Audit Explorer search with filtering and pagination."""
-        all_events = []
-        for tx_events in cls._store.values():
-            all_events.extend(tx_events)
+        query = db.query(AuditEventModel).order_by(AuditEventModel.timestamp.desc())
+        
+        if transaction_id:
+            query = query.filter(AuditEventModel.transaction_id == transaction_id)
             
-        # Sort chronologically descending for explorer
-        all_events.sort(key=lambda x: x.timestamp, reverse=True)
+        db_events = query.all()
         
         filtered = []
-        for ev in all_events:
-            # 1. Filter by transaction_id
-            if transaction_id and transaction_id not in ev.transaction_id:
-                continue
-                
-            # 2. Filter by Decision (FINAL_DECISION_CREATED event payload)
+        for e in db_events:
+            ev = cls._map_to_schema(e)
+            
+            # Application-level filtering for JSON payloads for cross-database compatibility (SQLite/Postgres)
             if decision:
                 if ev.event_type != "FINAL_DECISION_CREATED":
                     continue
-                if ev.payload.get("decision") != decision:
+                if ev.output_summary.get("decision") != decision and e.payload.get("decision") != decision:
                     continue
                     
-            # 3. Filter by Reason Code
             if reason_code:
                 if ev.event_type not in ["AGENT_RECOMMENDATION_CREATED", "FINAL_DECISION_CREATED"]:
                     continue
-                if reason_code not in ev.payload.get("reason_codes", []) and reason_code not in ev.payload.get("triggered_rules", []):
+                rcs = ev.output_summary.get("reason_codes", []) + ev.output_summary.get("triggered_rules", [])
+                legacy_rcs = e.payload.get("reason_codes", []) + e.payload.get("triggered_rules", [])
+                if reason_code not in rcs and reason_code not in legacy_rcs:
                     continue
                     
-            # 4. Filter by Synthetic (TRANSACTION_RECEIVED event)
             if is_synthetic is not None:
                 if ev.event_type != "TRANSACTION_RECEIVED":
                     continue
-                if ev.payload.get("is_synthetic", False) != is_synthetic:
+                is_syn = ev.input_summary.get("is_synthetic", False)
+                if not is_syn and "is_synthetic" in e.payload:
+                    is_syn = e.payload.get("is_synthetic", False)
+                if is_syn != is_synthetic:
                     continue
                     
             filtered.append(ev)

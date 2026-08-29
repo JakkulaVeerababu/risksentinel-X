@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from app.schemas.score import ScoreRequest, ScoreResponse
-from app.risk.inference import RiskModelService
+from app.risk.inference import RiskModelService, ModelArtifactError
 
 router = APIRouter()
 
@@ -29,6 +29,16 @@ def score_transaction(request: ScoreRequest):
             transaction_id=request.TransactionID,
             risk_score=risk_score,
             model_version=service.version
+        )
+    except ModelArtifactError as e:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": {
+                    "code": "MODEL_NOT_AVAILABLE",
+                    "message": str(e)
+                }
+            }
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to score transaction: {str(e)}")

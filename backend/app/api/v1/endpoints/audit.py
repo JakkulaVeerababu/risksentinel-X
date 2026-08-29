@@ -1,5 +1,7 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
+from sqlalchemy.orm import Session
 from typing import Optional, List
+from app.db.session import get_db
 from app.audit.service import AuditService
 from app.audit.schemas import AuditTimelineResponse, AuditEvent
 
@@ -12,10 +14,12 @@ async def search_audit_events(
     reason_code: Optional[str] = Query(None, description="Filter by reason code"),
     is_synthetic: Optional[bool] = Query(None, description="Filter by synthetic transactions"),
     limit: int = Query(50, ge=1, le=100),
-    offset: int = Query(0, ge=0)
+    offset: int = Query(0, ge=0),
+    db: Session = Depends(get_db)
 ):
     """Audit Explorer API endpoint."""
     return AuditService.query_events(
+        db=db,
         transaction_id=transaction_id,
         decision=decision,
         reason_code=reason_code,
@@ -25,8 +29,8 @@ async def search_audit_events(
     )
 
 @router.get("/{transaction_id}", response_model=AuditTimelineResponse)
-async def get_audit_timeline(transaction_id: str):
-    events = AuditService.get_transaction_timeline(transaction_id)
+async def get_audit_timeline(transaction_id: str, db: Session = Depends(get_db)):
+    events = AuditService.get_transaction_timeline(db, transaction_id)
     if not events:
         raise HTTPException(status_code=404, detail="Audit timeline not found for transaction")
     return AuditTimelineResponse(

@@ -10,7 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "15432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -23,13 +23,16 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/risksentinel
-      - AGENT_PROVIDER=mock
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@postgres:5432/risksentinel
+      - AGENT_PROVIDER=ollama
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
       - ./backend/app:/app/app
+      - ./models:/app/models:ro
+      - ./data:/app/data:ro
 
   frontend:
     build:

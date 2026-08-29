@@ -6,9 +6,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app/ app/
-COPY models/ models/
 COPY tests/ tests/
-COPY scripts/ scripts/
 
 ENV PYTHONPATH=/app
 

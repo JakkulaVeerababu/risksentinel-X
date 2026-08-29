@@ -1,0 +1,10 @@
+{
+  "unsafe_silent_allow_count": "0/5",
+  "failure_cases": [
+    "ML: Handled gracefully to DEGRADED",
+    "Graph: Handled gracefully to DEGRADED",
+    "Agent: Handled gracefully to DEGRADED",
+    "Policy: Handled gracefully to FAILED",
+    "DB: Handled gracefully to FAILED"
+  ]
+}

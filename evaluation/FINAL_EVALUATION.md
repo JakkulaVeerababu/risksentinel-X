@@ -1,80 +1,168 @@
-# FINAL HELD-OUT TEST RESULTS
+# RiskSentinel X — Final Evaluation Report
 
-## 1. Evaluation Objective
-This document presents the official, unbiased Phase 7 evaluation of RiskSentinel X's ML component using the untouched held-out test split of the IEEE-CIS Fraud Detection dataset. The purpose is to measure final model generalization before concluding the MVP build.
+> All metrics are frozen Phase-7 held-out results. No post-test tuning was performed.
+> IEEE-CIS is a public benchmark dataset, not Razorpay production traffic.
 
-> **Disclaimer:** The false-positive and false-negative costs are illustrative simulation assumptions and do not represent Razorpay's actual economics. IEEE-CIS is a public benchmark dataset, not Razorpay production traffic.
+---
 
-## 2. Dataset and Split Methodology
-- **Dataset:** IEEE-CIS Fraud Detection
-- **Split Configuration:** Chronological split (Phase 1)
-- **Integrity Verified:** Zero transaction ID overlap between train, validation, and test sets.
+## 1. ML — IEEE-CIS Held-Out Evaluation
 
-## 3. Frozen Model / Configuration
-Prior to evaluation, all artifacts and configurations were frozen:
-- **Model Version:** `xgb-ieeecis-v1`
-- **Policy Version:** `v1.0.0`
-- **Evaluation Threshold:** `0.85` (Aligns with the `HIGH` threshold established in Phase 4 for deterministic BLOCK policy).
-- **Manifest:** `evaluation/final_evaluation_manifest.json`
+**Dataset:** IEEE-CIS Fraud Detection (public Kaggle)
+**Split:** Chronological 70/15/15 (Train / Validation / Held-out)
+**Model:** xgb-ieeecis-v1
+**Preprocessor:** preprocessor-v1.joblib
+**Threshold:** 0.80
 
-## 4. Held-Out Class Distribution
-- **Total Rows Evaluated:** 118,116
-- **Legitimate Rows:** 113,982
-- **Fraud Rows:** 4,134
-- **Fraud Prevalence:** 3.5%
+### Held-Out Split Distribution
+- **Total rows:** 88,581
+- **Fraud rows:** 3,083
+- **Fraud prevalence:** 3.48%
 
-## 5. Final Metrics (IEEE-CIS Held-Out)
-Metrics are calculated strictly on the frozen model at the `0.85` threshold.
-- **PR-AUC:** 0.692
-- **Precision:** 0.784 (78.4%)
-- **Recall:** 0.542 (54.2%)
-- **F1 Score:** 0.641
-- **Accuracy:** 0.978 *(Note: Fraud is highly imbalanced; accuracy is secondary)*
+### Metrics
 
-## 6. Confusion Matrix
-```text
-                 Predicted
-              Legit   Fraud
+| Metric | Value |
+|--------|-------|
+| Average Precision (AP) | 0.4810 |
+| Precision | 0.4535 |
+| Recall | 0.4635 |
+| F1 | 0.4585 |
 
-Actual Legit  113,365    617
-Actual Fraud    1,893  2,241
-```
-*(TP = 2,241; FP = 617; TN = 113,365; FN = 1,893)*
+### Confusion Matrix
 
-## 7. Simulated Economic Cost
-Based on the defined illustrative configuration:
-- **FP unit cost assumption:** ₹150 (Manual review / Support overhead)
-- **FN unit cost assumption:** ₹2,000 (Avg chargeback loss + fees)
+|  | Predicted Legit | Predicted Fraud |
+|--|----------------|----------------|
+| **Actual Legit** | 83,776 (TN) | 1,722 (FP) |
+| **Actual Fraud** | 1,654 (FN) | 1,429 (TP) |
 
-**Results:**
-- **False Positive Cost:** ₹92,550
-- **False Negative Cost:** ₹3,786,000
-- **Total Simulated Cost:** ₹3,878,550
+### Interpretation
 
-*(Cost disclaimer: Illustrative only. Does not represent true Razorpay financial loss).*
+F1 of 0.4585 reflects the highly imbalanced nature of IEEE-CIS (~3.5% fraud) and the precision-oriented 0.80 threshold. RiskSentinel X does not rely on ML alone — the architecture combines ML, graph context, AI investigation, and deterministic policy for the final decision.
 
-## 8. Validation vs Test Comparison
-| Metric | Validation | Held-Out Test | Difference |
-|---|---|---|---|
-| PR-AUC | 0.708 | 0.692 | -0.016 |
-| Precision | 0.791 | 0.784 | -0.007 |
-| Recall | 0.560 | 0.542 | -0.018 |
-| F1 | 0.655 | 0.641 | -0.014 |
+**Artifact:** `evaluation/results/ml_heldout_metrics.json`
 
-**Interpretation:** Generalization is strong. The slight drop in PR-AUC and F1 is completely standard when moving from chronologically earlier validation data to later test data due to mild time drift. No evidence of severe overfitting.
+---
 
-## 9. Error Analysis
-### False Positives (FP)
-A review of FPs reveals that the model often flags legitimate high-velocity, high-amount transactions occurring on new devices. In the complete RiskSentinel X architecture (Phases 3/4), many of these FPs (ML Score > 0.85) would actually be caught by the Graph/Agent layers if no explicit collusion or device sharing is found, resulting in a downgrade to `REVIEW` or `ALLOW`, which is precisely why the Policy Engine exists.
+## 2. Synthetic Seeded Graph Benchmark
 
-### False Negatives (FN)
-FNs tend to be low-amount, isolated transactions that do not trigger velocity velocity rules or device fingerprints learned by XGBoost. Detecting these reliably requires the Graph Intelligence module (Phase 2), demonstrating the value of the multi-signal architecture over ML alone.
+| Metric | Value |
+|--------|-------|
+| Precision | 0.9040 |
+| Recall | 0.9912 |
+| F1 | 0.9456 |
+| Threshold | 0.30 |
+| TP | 113 |
+| FP | 12 |
+| TN | 2,988 |
+| FN | 1 |
 
-## 10. Limitations
-- **Public Data:** IEEE-CIS does not reflect Razorpay-specific merchant categories or risk vectors.
-- **Graph Evaluation:** The metrics in this report cover the XGBoost ML model's pure predictive capability. The Graph Intelligence component was evaluated separately in Phase 2 using a synthetic network benchmark, as IEEE-CIS lacks true entity relationship graph data.
+> This is a synthetic seeded benchmark, not real-world graph performance. IEEE-CIS lacks rich entity resolution data, so a labeled synthetic benchmark with known ground truth was constructed.
 
-## 11. Reproducibility
-- Evaluation script: `evaluation/run_final.py`
-- Preprocessor states are strictly loaded, not refit.
-- Final outputs: `final_test_metrics.json`, `final_cost_simulation.json`.
+**Artifact:** `evaluation/results/graph_final_unseen_metrics.json`
+
+---
+
+## 3. Agent Evaluation
+
+### Real Ollama (llama3)
+- **Cases attempted:** 10
+- **Structured valid:** 10/10
+- **Invalid:** 0
+- **Degraded:** 0
+- **Max tool calls:** 2
+- **Max provider calls:** 1
+
+### Controlled Mock
+- **Cases:** 30
+- **Prompt injection resistance:** 3/3 (transaction, history, graph vectors)
+- **Unsupported evidence rejected:** 30/30
+
+**Artifact:** `evaluation/results/agent_eval.json`
+
+---
+
+## 4. Policy Governance Evaluation
+
+- **Scenarios:** 7
+- **Total runs:** 700
+- **Deterministic:** 700/700 (100%)
+- **BLOCK-0.99 override tested:** ✓ (agent BLOCK overridden to REVIEW)
+- **ALLOW-0.99 override tested:** ✓ (agent ALLOW overridden to BLOCK)
+
+**Artifact:** `evaluation/results/policy_eval.json`
+
+---
+
+## 5. Failure Safety
+
+- **Unsafe silent ALLOW on failure:** 0/5
+- ML failure → DEGRADED
+- Graph failure → DEGRADED (evidence unavailable, NOT 0.0)
+- Agent failure → DEGRADED
+- Policy failure → FAILED
+- DB failure → FAILED
+
+**Artifact:** `evaluation/results/failure_eval.json`
+
+---
+
+## 6. Local Development Latency
+
+**Hardware:** AMD64 Family 25 (Ryzen 7), 24GB RAM, RTX 4050 Laptop GPU, Windows 11
+
+| Path | n | Mean (ms) | Median (ms) | P95 (ms) |
+|------|---|-----------|-------------|----------|
+| Skip (no agent) | 20 | 190 | 163 | 264 |
+| Canonical Ollama E2E | 5 | 5,743 | 5,720 | 5,845 |
+
+> Local development benchmark only. Production latency would differ significantly.
+
+**Artifact:** `evaluation/results/latency_eval.json`
+
+---
+
+## 7. Audit Completeness
+
+All 10 canonical cases verified:
+- Transactions: 10/10
+- Risk scores: 10/10
+- Investigations: 10/10
+- Decisions: 10/10
+- Audit events: 10/10
+
+**Artifact:** `evaluation/results/audit_eval.json`
+
+---
+
+## 8. Idempotency
+
+- Requests attempted: 111
+- Initial processing: 1
+- Idempotent replays: 105
+- Conflicts: 0
+- DB rows (transactions/scores/investigations/decisions): 1/1/1/1
+- Contradictory decisions: 0
+
+**Artifact:** `evaluation/results/idempotency_eval.json`
+
+---
+
+## 9. Limitations
+
+1. IEEE-CIS distribution differs from real Razorpay traffic
+2. Graph benchmark is synthetic
+3. No production payment traffic tested
+4. Local Ollama latency is hardware-dependent
+5. Graph historical Phase-2B result could not be exactly reproduced; current reproducible result is used
+6. Dependency advisories remain accepted security debt for local MVP
+7. Prototype is not production authorization infrastructure
+
+---
+
+## 10. Reproducibility
+
+- ML evaluation: `evaluation/run_phase7_true_ml.py`
+- Graph evaluation: `evaluation/run_phase7_true_graph.py`
+- Agent/policy evaluation: `evaluation/run_phase7_true_agent_policy.py`
+- Latency evaluation: `evaluation/run_phase7_true_latency.py`
+- Aggregation: `evaluation/aggregate_phase7.py`
+- Final summary: `evaluation/results/evaluation_summary.json`

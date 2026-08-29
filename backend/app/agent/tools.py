@@ -2,6 +2,7 @@ import pandas as pd
 from typing import Dict, Any
 import logging
 from pathlib import Path
+from sqlalchemy.orm import Session
 
 from app.graph.service import GraphRiskService
 from app.graph.schemas import GraphCheckResponse
@@ -9,35 +10,49 @@ from app.graph.schemas import GraphCheckResponse
 class AgentTools:
     
     @staticmethod
-    def get_transaction_history(customer_id: str) -> Dict[str, Any]:
+    def get_transaction_history(customer_id: str, db: Session) -> Dict[str, Any]:
         """
         Tool 1: Retrieve bounded transaction history and velocity metrics.
-        In a real system, this queries the PostgreSQL database.
-        For Phase 3 MVP, we simulate reading from the raw dataset or return controlled synthetic data.
+        Queries the real PostgreSQL database for the given customer's recent transactions.
         """
         logging.info(f"Tool Execute: get_transaction_history for {customer_id}")
         
-        # Simulate deterministic retrieval
-        # If we were querying DB: SELECT count(*), avg(amount) WHERE customer = customer_id
+        from app.models.domain import TransactionModel
         
-        # We will return deterministic mock history based on customer_id hash for demo reproducibility
-        # This keeps the tool functional without requiring live postgres connection for the demo test
-        cid_hash = hash(customer_id) % 100
+        # Query recent transactions for this customer, ordered by newest first, limited to 20
+        recent_txs = db.query(TransactionModel).filter(
+            TransactionModel.customer_id == customer_id
+        ).order_by(TransactionModel.timestamp.desc()).limit(20).all()
         
-        # Base logic:
-        tx_count = (cid_hash % 10) + 1
-        recent_tx = min(tx_count, (cid_hash % 3) + 1)
-        avg_amt = float(500 + (cid_hash * 10))
-        max_amt = float(avg_amt + (cid_hash * 5))
-        prev_flags = 1 if cid_hash > 80 else 0
+        tx_count = len(recent_txs)
+        recent_tx_count = tx_count # Bounded by 20 anyway
+        
+        if tx_count > 0:
+            avg_amt = sum(tx.amount for tx in recent_txs) / tx_count
+            max_amt = max(tx.amount for tx in recent_txs)
+        else:
+            avg_amt = 0.0
+            max_amt = 0.0
+            
+        previous_flagged_events = sum(1 for tx in recent_txs if tx.decision in ["BLOCK", "REVIEW"])
+        
+        transactions_list = []
+        for tx in recent_txs:
+            transactions_list.append({
+                "transaction_id": tx.transaction_id,
+                "amount": tx.amount,
+                "timestamp": tx.timestamp.isoformat() if tx.timestamp else None,
+                "decision": tx.decision
+            })
         
         return {
             "customer_id": customer_id,
             "transaction_count": tx_count,
-            "recent_transaction_count": recent_tx,
+            "recent_transaction_count": recent_tx_count,
             "average_amount": avg_amt,
             "max_amount": max_amt,
-            "previous_flagged_events": prev_flags
+            "previous_flagged_events": previous_flagged_events,
+            "transactions": transactions_list
         }
 
     @staticmethod

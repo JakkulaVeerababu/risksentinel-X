@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from typing import List, Optional, Literal, Dict, Any
 from enum import Enum
 
@@ -25,6 +25,15 @@ class EvidenceItem(BaseModel):
         description="The tool or component that provided this evidence"
     )
 
+    @model_validator(mode='before')
+    @classmethod
+    def normalize_observed(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            observed = data.get("observed")
+            if isinstance(observed, (bool, int, float)):
+                data["observed"] = str(observed)
+        return data
+
 class InvestigationResult(BaseModel):
     recommendation: RecommendationEnum = Field(description="Advisory recommendation: ALLOW, REVIEW, or BLOCK")
     confidence: float = Field(ge=0.0, le=1.0, description="Agent's self-reported confidence in the recommendation (0 to 1)")
@@ -39,7 +48,7 @@ class ToolCallRecord(BaseModel):
 
 class InvestigationResponse(BaseModel):
     transaction_id: str
-    status: Literal["COMPLETED", "DEGRADED", "FAILED_VALIDATION"]
+    status: Literal["COMPLETED", "DEGRADED", "FAILED_VALIDATION", "SKIPPED"]
     provider_info: str
     tool_calls: List[ToolCallRecord]
     investigation: InvestigationResult
@@ -51,3 +60,4 @@ class InvestigationRequest(BaseModel):
     # Simulating internal context retrieval for MVP
     amount: float = 0.0 
     ml_risk_score: float = 0.0
+    graph_risk_score: Optional[float] = None

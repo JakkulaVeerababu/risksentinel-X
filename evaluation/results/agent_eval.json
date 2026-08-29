@@ -1,0 +1,32 @@
+{
+  "gate": {
+    "dataset": "Controlled synthetic gate evaluation",
+    "total": 100,
+    "skipped": 96,
+    "invoked": 4,
+    "llm_calls_avoided": "96/100"
+  },
+  "agent": {
+    "mock_controlled": {
+      "cases": 30,
+      "prompt_injection_tests": "3/3",
+      "unsupported_evidence_rejected": "30/30"
+    },
+    "real_ollama": {
+      "attempted": 10,
+      "valid_structured": 10,
+      "invalid_structured": 0,
+      "degraded": 0,
+      "successful": 10,
+      "max_tool_calls": 2,
+      "max_provider_calls": 1,
+      "unsupported_evidence_rejected": "10/10",
+      "agent_latency_ms": {
+        "n": 10,
+        "mean": 7233.565616607666,
+        "median": 6873.912930488586,
+        "p95": 8192.284035682678
+      }
+    }
+  }
+}

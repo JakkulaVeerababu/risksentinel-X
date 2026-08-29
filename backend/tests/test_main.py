@@ -26,10 +26,18 @@ def test_read_health():
     assert data["service"] == "RiskSentinel X"
 
 def test_api_v1_health():
+    from app.db.session import get_db
+    class MockSession:
+        def execute(self, *args, **kwargs):
+            return True
+    
+    app.dependency_overrides[get_db] = lambda: MockSession()
     response = client.get("/api/v1/health")
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "ok"
+    assert data["status"] == "healthy"
+    assert data["database"] == "healthy"
+    app.dependency_overrides.clear()
 
 def test_invalid_api_input_receives_valid_error_response():
     # Test our global RequestValidationError handler

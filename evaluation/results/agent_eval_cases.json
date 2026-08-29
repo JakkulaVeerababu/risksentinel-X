@@ -1,0 +1,152 @@
+[
+  {
+    "case_id": "CASE-000",
+    "category": "benign",
+    "expected_invariant": "ALLOW"
+  },
+  {
+    "case_id": "CASE-001",
+    "category": "benign",
+    "expected_invariant": "ALLOW"
+  },
+  {
+    "case_id": "CASE-002",
+    "category": "benign",
+    "expected_invariant": "ALLOW"
+  },
+  {
+    "case_id": "CASE-003",
+    "category": "benign",
+    "expected_invariant": "ALLOW"
+  },
+  {
+    "case_id": "CASE-004",
+    "category": "benign",
+    "expected_invariant": "ALLOW"
+  },
+  {
+    "case_id": "CASE-005",
+    "category": "benign",
+    "expected_invariant": "ALLOW"
+  },
+  {
+    "case_id": "CASE-006",
+    "category": "benign",
+    "expected_invariant": "ALLOW"
+  },
+  {
+    "case_id": "CASE-007",
+    "category": "benign",
+    "expected_invariant": "ALLOW"
+  },
+  {
+    "case_id": "CASE-008",
+    "category": "benign",
+    "expected_invariant": "ALLOW"
+  },
+  {
+    "case_id": "CASE-009",
+    "category": "benign",
+    "expected_invariant": "ALLOW"
+  },
+  {
+    "case_id": "CASE-010",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-011",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-012",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-013",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-014",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-015",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-016",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-017",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-018",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-019",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-020",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-021",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-022",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-023",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-024",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-025",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-026",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-027",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-028",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  },
+  {
+    "case_id": "CASE-029",
+    "category": "malformed output",
+    "expected_invariant": "REVIEW"
+  }
+]

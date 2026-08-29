@@ -1,35 +1,43 @@
-# RiskSentinel X - Demo Script
+# RiskSentinel X — 3-Minute Demo Script
 
-**Target Duration:** 5:00 minutes
+**Target Duration:** 3:00
 
-## 0:00–0:25 | Opening
-**Action:** Show the live dashboard.
-**Talk Track:** "Many fraud systems tell analysts that a transaction looks suspicious. RiskSentinel X investigates *why*. Models detect. Graphs connect. Agents investigate. Policies decide."
+---
 
-## 0:25–0:55 | Normal Transaction
-**Action:** Trigger a single, low-risk transaction. Expand the row.
-**Talk Track:** "Here is a standard transaction. The XGBoost ML score is low. The NetworkX Graph score is low. No investigation is necessary, and the deterministic policy immediately issues an ALLOW."
+## 0:00–0:20 | Problem
+**Action:** Show the dashboard.
+**Talk Track:** "Every fraud system gives you a score. But a score doesn't tell you *who* is connected, *what* the evidence is, or *whether* the AI is allowed to block a payment. RiskSentinel X investigates the full story — and keeps the AI on a leash."
 
-## 0:55–2:15 | Suspicious Pattern
-**Action:** Click the "Simulate Suspicious Collusion Pattern" button.
-**Talk Track:** "But fraud doesn't happen in a vacuum. I just simulated a collusion ring. As these transactions enter, the Graph engine detects shared IPs and devices, surfacing a hidden community. The graph risk spikes."
+## 0:20–0:40 | Architecture
+**Action:** Show the architecture diagram (README or slide).
+**Talk Track:** "The pipeline has six stages: Detect, Connect, Investigate, Explain, Decide, Audit. XGBoost scores. A graph engine finds shared devices and IPs. An AI agent investigates — but a deterministic policy makes the final call. Every decision is auditable."
 
-## 2:15–3:05 | Investigation
-**Action:** Expand one of the high-risk simulated rows. Show the Agent Investigation panel.
-**Talk Track:** "Instead of just blocking based on a black-box score, our AI Agent investigates. It executes exactly two bounded tools: `get_transaction_history` and `get_graph_context`. We expose the structured evidence and reason codes—not the LLM's hidden chain-of-thought. The AI recommends a BLOCK."
+## 0:40–1:05 | Scenario A — Safe Transaction
+**Action:** Submit a low-risk transaction. Expand the case detail.
+**Talk Track:** "Here's a normal transaction. ML score is low. Graph risk is low. The InvestigationGate *skips* the AI agent entirely — no LLM cost for obvious safe cases. Policy issues ALLOW immediately."
 
-## 3:05–3:35 | Policy Safety
-**Action:** Scroll to the Policy Decision section. Show a case where Agent=BLOCK but Policy=REVIEW (if applicable), or explain the boundary.
-**Talk Track:** "Crucially, the LLM has no unilateral blocking authority. The model can recommend BLOCK, but our deterministic Policy Engine requires multiple verified conditions to act. If the evidence is weak, Policy downgrades the LLM's recommendation to a safe REVIEW."
+**Judge takeaway:** "We avoid unnecessary LLM cost for obvious low-risk cases."
 
-## 3:35–4:15 | Evaluation
-**Action:** Open the metrics tab / show the README evaluation section.
-**Talk Track:** "These aren't just concepts. We evaluated RiskSentinel against an untouched, held-out test split of the public IEEE-CIS dataset. We achieved a PR-AUC of 0.692 and an F1 of 0.641, preventing millions in simulated false-negative costs."
+## 1:05–1:40 | Scenario C — Collusion Ring
+**Action:** Trigger the Simulate Suspicious Collusion Pattern button. Expand a high-risk case.
+**Talk Track:** "Now I'm simulating a collusion ring — shared devices, shared IPs, coordinated transactions. The graph engine detects the community structure. ML flags the anomaly. The AI agent investigates using two read-only tools: transaction history and graph context. It produces structured evidence and reason codes."
 
-## 4:15–4:40 | Audit
-**Action:** Open the transaction Audit Timeline.
-**Talk Track:** "Finally, everything is auditable. Every model version, tool call, piece of evidence, and policy rule is appended to an immutable timeline. Every decision can be reconstructed."
+**Judge takeaway:** "Fraud rings become visible rather than treating transactions independently."
 
-## 4:40–5:00 | Close
-**Action:** Return to main dashboard view.
-**Talk Track:** "RiskSentinel X moves fraud detection from a simple score to an auditable investigation workflow. Models detect. Graphs connect. Agents investigate. Policies decide. Thank you."
+## 1:40–2:10 | Scenario D — Governance Override
+**Action:** Show a case where Agent recommended BLOCK but Policy decided REVIEW.
+**Talk Track:** "This is the critical differentiator. The AI agent recommends BLOCK with high confidence. But the ML score is below 0.80 and the graph risk is below 0.30 — the hard evidence doesn't support it. The deterministic policy overrides the AI and downgrades to REVIEW. An LLM cannot autonomously block a transaction."
+
+**Judge takeaway:** "Agent recommendation ≠ final policy decision."
+
+## 2:10–2:30 | Audit Trail
+**Action:** Open the audit timeline for the governance override case.
+**Talk Track:** "Every step is logged chronologically: received, persisted, scored, graph checked, investigated, decided, audited. You can reconstruct exactly why any decision was made — the ML score, the graph risk, the agent's evidence, and the policy rule that fired."
+
+## 2:30–2:50 | Evaluation Evidence
+**Action:** Show the evaluation page or README metrics table.
+**Talk Track:** "All metrics are frozen held-out results — never tuned after testing. IEEE-CIS ML evaluation, synthetic graph benchmark, 10 real Ollama agent cases, 700/700 deterministic policy runs, 3/3 prompt injection vectors blocked. Every number is defensible."
+
+## 2:50–3:00 | Closing
+**Action:** Return to dashboard.
+**Talk Track:** "RiskSentinel X doesn't ask an AI to decide whom to block. It lets models detect, graphs connect, an agent investigate, and policy make the final auditable decision. Thank you."

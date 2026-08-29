@@ -3,8 +3,7 @@ from app.main import app
 
 client = TestClient(app)
 
-def test_score_endpoint_unavailable_model():
-    # Since we haven't trained a model in the CI environment, the service should handle this gracefully
+def test_score_endpoint_success():
     payload = {
         "TransactionID": "TX100",
         "TransactionDT": 86400,
@@ -14,10 +13,11 @@ def test_score_endpoint_unavailable_model():
     }
     response = client.post("/api/v1/score", json=payload)
     
-    assert response.status_code == 503
+    assert response.status_code == 200
     data = response.json()
-    assert "error" in data
-    assert data["error"]["code"] == "MODEL_NOT_AVAILABLE"
+    assert "risk_score" in data
+    # Check that model returns something close to 0.54426
+    assert 0.54 <= data["risk_score"] <= 0.55
 
 def test_score_validation_error():
     payload = {

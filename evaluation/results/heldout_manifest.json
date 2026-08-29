@@ -1,0 +1,20 @@
+{
+  "row_count": 88581,
+  "min_TransactionDT": 13151880,
+  "max_TransactionDT": 15811131,
+  "first_5_TransactionIDs": [
+    3488959,
+    3488960,
+    3488961,
+    3488962,
+    3488963
+  ],
+  "last_5_TransactionIDs": [
+    3577535,
+    3577536,
+    3577537,
+    3577538,
+    3577539
+  ],
+  "sha256_hash": "d10842f8bf53ee562a306c0b67b2605c63c4316a3215f75e695fa78f8e12d0e2"
+}

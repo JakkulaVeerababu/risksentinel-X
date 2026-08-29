@@ -1,0 +1,8 @@
+{
+  "scenarios": 7,
+  "total_runs": 700,
+  "deterministic_runs": 700,
+  "determinism_rate": 1.0,
+  "block_99_override_tested": true,
+  "allow_99_override_tested": true
+}

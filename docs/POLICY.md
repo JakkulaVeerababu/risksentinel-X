@@ -5,17 +5,17 @@ The Policy Engine enforces final decision making. Probabilistic ML/Graph scores 
 
 ## Source of Truth
 Threshold values are frozen based on the Phase 7 validation.
-**Version:** v1.0
-- ML LOW Threshold: `0.15`
-- ML HIGH Threshold: `0.85`
+**Version:** policy-v1
+- ML HIGH Threshold: `0.80`
+- Graph HIGH Threshold: `0.30`
 
 ## Safety Rule
-> Agent confidence alone cannot produce BLOCK. Automatic BLOCK requires multiple verified conditions (e.g., ML > 0.85 AND corroborating Graph/Agent evidence).
+> Agent confidence alone cannot produce BLOCK. Automatic BLOCK requires multiple verified conditions (ML ≥ 0.80 AND Graph ≥ 0.30). The agent is advisory only.
 
-## Conditions
-- **ALLOW:** ML Risk < 0.15 AND Graph Confidence < 0.70.
-- **REVIEW:** Missing evidence, degraded agent, or conflicting signals (e.g., ML=0.40, Agent=BLOCK).
-- **BLOCK:** ML Risk > 0.85 AND Agent confirms malicious activity.
+## Conditions (policy-v1)
+- **ALLOW:** ML Risk < 0.80 AND Graph Risk < 0.30 — low risk, no investigation needed.
+- **REVIEW:** ML ≥ 0.80 OR Graph ≥ 0.30, but not both — one strong signal triggers investigation.
+- **BLOCK:** ML ≥ 0.80 AND Graph ≥ 0.30 — multiple verified signals confirm high risk.
 
 ## Versioning
 Policy updates should NEVER overwrite existing versions silently. Use `policy-v2`, `policy-v3` to ensure the Audit trail remains immutably consistent for historical transactions.

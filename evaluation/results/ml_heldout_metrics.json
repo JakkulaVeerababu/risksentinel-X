@@ -1,0 +1,25 @@
+{
+  "dataset": "IEEE-CIS Fraud Detection",
+  "split": "chronological held-out",
+  "rows": 88581,
+  "fraud_rows": 3083,
+  "fraud_prevalence": 0.03480430340592226,
+  "model_version": "xgb-ieeecis-v1",
+  "threshold": 0.8,
+  "preprocessor_version": "preprocessor-v1.joblib",
+  "evaluated_at": "2026-08-29T15:22:10.505322",
+  "git_revision": "1b912ea73e601b7e0fb9011877773ec7e98b75f3",
+  "tree_state": "dirty",
+  "metrics": {
+    "AP": 0.48101125067473927,
+    "precision": 0.4535068232307204,
+    "recall": 0.46350956860201104,
+    "F1": 0.4584536413217838,
+    "TP": 1429,
+    "FP": 1722,
+    "TN": 83776,
+    "FN": 1654,
+    "FPR": 0.02014082200753234,
+    "FNR": 0.536490431397989
+  }
+}

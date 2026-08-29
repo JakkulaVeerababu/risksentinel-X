@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 from app.graph.builder import GraphBuilder
-from app.graph.community import CommunityDetector
+from app.graph.community_detection import CommunityDetector
 from app.graph.features import GraphFeatureExtractor
 from app.graph.risk import GraphRiskCalculator
 

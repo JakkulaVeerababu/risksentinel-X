@@ -1,0 +1,145 @@
+{
+  "git_revision": "1b912ea73e601b7e0fb9011877773ec7e98b75f3",
+  "tree_state": "DIRTY",
+  "timestamp": "2026-08-29T15:41:44.181500",
+  "ml": {
+    "dataset": "IEEE-CIS Fraud Detection",
+    "split": "chronological held-out",
+    "rows": 88581,
+    "fraud_rows": 3083,
+    "fraud_prevalence": 0.03480430340592226,
+    "model_version": "xgb-ieeecis-v1",
+    "threshold": 0.8,
+    "preprocessor_version": "preprocessor-v1.joblib",
+    "evaluated_at": "2026-08-29T15:22:10.505322",
+    "git_revision": "1b912ea73e601b7e0fb9011877773ec7e98b75f3",
+    "tree_state": "dirty",
+    "metrics": {
+      "AP": 0.48101125067473927,
+      "precision": 0.4535068232307204,
+      "recall": 0.46350956860201104,
+      "F1": 0.4584536413217838,
+      "TP": 1429,
+      "FP": 1722,
+      "TN": 83776,
+      "FN": 1654,
+      "FPR": 0.02014082200753234,
+      "FNR": 0.536490431397989
+    }
+  },
+  "graph": {
+    "seeds": [
+      101,
+      102,
+      103
+    ],
+    "threshold": 0.3,
+    "TP": 113,
+    "FP": 12,
+    "TN": 2988,
+    "FN": 1,
+    "precision": 0.904,
+    "recall": 0.9912280701754386,
+    "f1": 0.9456066945606694,
+    "config_verified": {
+      "device_w": 0.1,
+      "ip_w": 0.1,
+      "pi_w": 0.2,
+      "density_th": 0.05,
+      "density_w": 0.4
+    }
+  },
+  "agent": {
+    "gate": {
+      "dataset": "Controlled synthetic gate evaluation",
+      "total": 100,
+      "skipped": 96,
+      "invoked": 4,
+      "llm_calls_avoided": "96/100"
+    },
+    "agent": {
+      "mock_controlled": {
+        "cases": 30,
+        "prompt_injection_tests": "3/3",
+        "unsupported_evidence_rejected": "30/30"
+      },
+      "real_ollama": {
+        "attempted": 10,
+        "valid_structured": 10,
+        "invalid_structured": 0,
+        "degraded": 0,
+        "successful": 10,
+        "max_tool_calls": 2,
+        "max_provider_calls": 1,
+        "unsupported_evidence_rejected": "10/10",
+        "agent_latency_ms": {
+          "n": 10,
+          "mean": 7233.565616607666,
+          "median": 6873.912930488586,
+          "p95": 8192.284035682678
+        }
+      }
+    }
+  },
+  "policy": {
+    "scenarios": 7,
+    "total_runs": 700,
+    "deterministic_runs": 700,
+    "determinism_rate": 1.0,
+    "block_99_override_tested": true,
+    "allow_99_override_tested": true
+  },
+  "failures": {
+    "unsafe_silent_allow_count": "0/5",
+    "failure_cases": [
+      "ML: Handled gracefully to DEGRADED",
+      "Graph: Handled gracefully to DEGRADED",
+      "Agent: Handled gracefully to DEGRADED",
+      "Policy: Handled gracefully to FAILED",
+      "DB: Handled gracefully to FAILED"
+    ]
+  },
+  "latency": {
+    "hardware": {
+      "cpu": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+      "ram": "24GB",
+      "os": "Windows 11",
+      "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU"
+    },
+    "skip_path": {
+      "n": 20,
+      "mean_ms": 189.67626094818115,
+      "median_ms": 163.29848766326904,
+      "p95_ms": 263.88983726501465
+    },
+    "ollama_canonical_e2e": {
+      "n": 5,
+      "mean_ms": 5743.4704303741455,
+      "median_ms": 5719.517707824707,
+      "p95_ms": 5845.054054260254,
+      "min_ms": 5667.258501052856,
+      "max_ms": 5871.178865432739
+    }
+  },
+  "audit": {
+    "total_cases": 10,
+    "transactions": "10/10",
+    "risk_scores": "10/10",
+    "investigations": "10/10",
+    "decisions": "10/10",
+    "audit_events": "10/10"
+  },
+  "idempotency": {
+    "requests_attempted": 111,
+    "initial_processing_responses": 1,
+    "idempotent_replay_responses": 105,
+    "conflicts": 0,
+    "db_rows": {
+      "transactions": 1,
+      "risk_scores": 1,
+      "investigations": 1,
+      "decisions": 1
+    },
+    "contradictory_decisions": 0
+  }
+}

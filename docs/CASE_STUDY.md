@@ -2,7 +2,7 @@
 > Combining tabular ML, graph intelligence, bounded AI investigation, deterministic policy, and auditability.
 
 ## Executive Summary
-A fraud model can identify suspicious activity, but human analysts require context to make blocking decisions. RiskSentinel X bridges this gap by orchestrating an evidence-driven pipeline. It processes transactions through an XGBoost anomaly detector and a NetworkX graph intelligence layer. A bounded AI agent then synthesizes structured evidence using strict tool limits. Crucially, the system decouples probabilistic LLM reasoning from enforcement: the LLM recommends, but a deterministic Policy Engine decides. Evaluated on a quarantined 15% split of the IEEE-CIS benchmark, the ML layer achieved a 0.692 PR-AUC. The primary limitation is the prototype-scale in-memory graph infrastructure, which requires distributed graph technology (e.g., Neo4j) for production volumes.
+A fraud model can identify suspicious activity, but human analysts require context to make blocking decisions. RiskSentinel X bridges this gap by orchestrating an evidence-driven pipeline. It processes transactions through an XGBoost anomaly detector and a NetworkX graph intelligence layer. A bounded AI agent then synthesizes structured evidence using strict tool limits. Crucially, the system decouples probabilistic LLM reasoning from enforcement: the LLM recommends, but a deterministic Policy Engine decides. Evaluated on a quarantined 15% split of the IEEE-CIS benchmark, the ML layer achieved a 0.4810 Average Precision. The primary limitation is the prototype-scale in-memory graph infrastructure, which requires distributed graph technology (e.g., Neo4j) for production volumes.
 
 ## Problem Statement
 Fraud models produce risk scores (e.g., "0.89 probability of fraud"), leaving risk analysts to manually hunt for the underlying context. RiskSentinel bridges the prediction to an actionable investigation, structuring evidence, enforcing policy, and writing to an immutable audit log.
@@ -43,10 +43,10 @@ The system uses the public IEEE-CIS Fraud Detection dataset to demonstrate tabul
 
 ### Held-Out Evaluation Results
 (Metrics sourced from `evaluation/final_test_metrics.json`)
-- **PR-AUC:** 0.692
-- **Precision:** 0.784
-- **Recall:** 0.542
-- **F1:** 0.641
+- **Average Precision:** 0.4810
+- **Precision:** 0.4535
+- **Recall:** 0.4635
+- **F1:** 0.4585
 
 ## Graph Intelligence
 Transaction-level ML naturally misses cross-entity linkages (e.g., shared IPs). Because IEEE-CIS lacks labeled relationship networks, we generated a synthetic relationship graph with planted suspicious structures (e.g., device reuse) to benchmark our NetworkX and Louvain community detection implementation.
@@ -57,7 +57,7 @@ The LLM agent is strictly bounded to two tools: `get_transaction_history` and `g
 
 ## Deterministic Policy
 **LLM recommends. Policy decides.**
-Automatic blocking requires hard ML risk scores (e.g., >0.85) AND verified agent evidence. High agent confidence alone cannot produce a `BLOCK` decision.
+Automatic blocking requires ML ≥ 0.80 AND Graph ≥ 0.30. High agent confidence alone cannot produce a `BLOCK` decision.
 
 ## Auditability
 Operational systems need verifiable evidence, not private chain-of-thought model reasoning. The PostgreSQL audit log stores exact ML scores, executed tool payloads, synthesized evidence, and the deterministic policy trace.

@@ -1,26 +1,33 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Literal, Dict, Any
+from enum import Enum
 from app.agent.schemas import InvestigationResult
 
-class PolicyDecisionEnum(str, Literal):
+class PolicyDecisionEnum(str, Enum):
     ALLOW = "ALLOW"
     REVIEW = "REVIEW"
     BLOCK = "BLOCK"
 
 class PolicyInput(BaseModel):
     transaction_id: str
-    ml_risk_score: float = Field(ge=0.0, le=1.0)
-    graph_risk_score: float = Field(ge=0.0, le=1.0)
-    graph_cluster_detected: bool
-    agent_status: str
-    agent_recommendation: str
-    agent_confidence: float = Field(ge=0.0, le=1.0)
-    agent_evidence_count: int
+    ml_score: float = Field(ge=0.0, le=1.0)
+    ml_model_version: Optional[str]
+    graph_score: Optional[float] = Field(None, ge=0.0, le=1.0)
+    graph_version: Optional[str]
+    agent_state: str
+    agent_recommendation: Optional[str]
+    agent_confidence: Optional[float] = Field(None, ge=0.0, le=1.0)
+    agent_reason_codes: Optional[List[str]] = None
+    validated_agent_evidence: Optional[List[Dict[str, Any]]] = None
     
 class PolicyDecisionResult(BaseModel):
-    transaction_id: str
-    decision: Literal["ALLOW", "REVIEW", "BLOCK"]
+    final_decision: Literal["ALLOW", "REVIEW", "BLOCK"]
     policy_version: str
-    decision_reason: str
-    triggered_rules: List[str]
-    inputs: Dict[str, Any]
+    matched_rule_ids: List[str]
+    reason_codes: List[str]
+    ml_score: float
+    graph_score: Optional[float]
+    agent_state: str
+    agent_recommendation: Optional[str]
+    agent_confidence: Optional[float]
+    timestamp: str

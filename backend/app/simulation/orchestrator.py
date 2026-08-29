@@ -25,11 +25,12 @@ class SimulationOrchestrator:
             
             # 1. TRANSACTION RECEIVED
             AuditService.record_event(AuditEvent(
-                transaction_id=tx_id,
+                resource_id=tx_id,
                 event_type="TRANSACTION_RECEIVED",
-                component="Gateway",
-                simulation_id=simulation_id,
-                payload={"amount": tx["amount"], "customer": tx["customer_id"], "is_synthetic": True}
+                service="Transaction Service",
+                input_summary={"amount": tx["amount"], "customer": tx["customer_id"], "is_synthetic": True},
+                output_summary={"status": "ACCEPTED"},
+                latency=delay_ms
             ))
             await self._publish("transaction_received", tx_id, {
                 "amount": tx["amount"], "customer": tx["customer_id"], "timestamp": tx["timestamp"], "is_synthetic": True
@@ -40,11 +41,13 @@ class SimulationOrchestrator:
             base_risk = 0.3 + (idx * 0.1)
             ml_risk = min(base_risk + 0.1, 0.95)
             AuditService.record_event(AuditEvent(
-                transaction_id=tx_id,
+                resource_id=tx_id,
                 event_type="ML_SCORE_CREATED",
-                component="MLService",
+                service="ML Engine",
                 model_version="xgb-ieeecis-v1-sim",
-                payload={"risk_score": ml_risk}
+                input_summary={"features_used": 15},
+                output_summary={"risk_score": ml_risk},
+                latency=delay_ms * 1.5
             ))
             await self._publish("ml_scored", tx_id, {"risk_score": ml_risk, "version": "xgb-ieeecis-v1-sim"})
             await asyncio.sleep(delay_ms / 1000.0)
@@ -53,10 +56,12 @@ class SimulationOrchestrator:
             graph_risk = min(0.1 + (idx * 0.2), 0.98)
             cluster_detected = graph_risk > 0.6
             AuditService.record_event(AuditEvent(
-                transaction_id=tx_id,
+                resource_id=tx_id,
                 event_type="GRAPH_ANALYSIS_COMPLETED",
-                component="GraphService",
-                payload={"graph_risk": graph_risk, "cluster_detected": cluster_detected}
+                service="Graph Engine",
+                input_summary={"customer_id": tx["customer_id"]},
+                output_summary={"graph_risk": graph_risk, "cluster_detected": cluster_detected},
+                latency=delay_ms * 3.2
             ))
             await self._publish("graph_completed", tx_id, {"graph_risk": graph_risk, "cluster_detected": cluster_detected, "connected_customers": idx + 1})
             await asyncio.sleep(delay_ms / 1000.0)
@@ -92,11 +97,13 @@ class SimulationOrchestrator:
             decision_result = self.policy_engine.evaluate(policy_input)
             
             AuditService.record_event(AuditEvent(
-                transaction_id=tx_id,
+                resource_id=tx_id,
                 event_type="FINAL_DECISION_CREATED",
-                component="PolicyEngine",
+                service="Policy Engine",
                 policy_version="v1.0.0",
-                payload={"decision": decision_result.decision, "reason": decision_result.reason, "triggered_rules": decision_result.triggered_rules}
+                input_summary={"ml_risk": ml_risk, "graph_risk": graph_risk, "ai_recommendation": recommendation},
+                output_summary={"decision": decision_result.decision, "reason": decision_result.reason, "triggered_rules": decision_result.triggered_rules},
+                latency=delay_ms * 0.5
             ))
             await self._publish("policy_decision", tx_id, {
                 "decision": decision_result.decision, "reason": decision_result.reason,

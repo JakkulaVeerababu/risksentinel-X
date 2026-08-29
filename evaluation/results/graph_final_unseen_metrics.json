@@ -1,0 +1,22 @@
+{
+  "seeds": [
+    101,
+    102,
+    103
+  ],
+  "threshold": 0.3,
+  "TP": 113,
+  "FP": 12,
+  "TN": 2988,
+  "FN": 1,
+  "precision": 0.904,
+  "recall": 0.9912280701754386,
+  "f1": 0.9456066945606694,
+  "config_verified": {
+    "device_w": 0.1,
+    "ip_w": 0.1,
+    "pi_w": 0.2,
+    "density_th": 0.05,
+    "density_w": 0.4
+  }
+}

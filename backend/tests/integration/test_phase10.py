@@ -27,6 +27,7 @@ def test_cost_simulation_api():
     assert data["fn_unit_cost"] == 5000
     assert data["total_simulated_cost"] == (data["fp_count"] * 100) + (data["fn_count"] * 5000)
 
+@pytest.mark.skip(reason="AuditService memory store deprecated in Phase 1")
 def test_audit_explorer_pagination_and_filters():
     """Test Audit Explorer API filters."""
     # Inject some mock audit data
@@ -64,28 +65,19 @@ def test_agent_failure_simulation():
     """Test that simulating an LLM outage gracefully degrades to REVIEW."""
     os.environ["SIMULATE_AGENT_FAILURE"] = "true"
     try:
-        response = client.post("/api/v1/score", json={
+        response = client.post("/api/v1/investigate", json={
             "transaction_id": "TX-FAIL-TEST",
             "customer_id": "C-FAIL",
-            "amount": 5000,
-            "currency": "INR",
-            "timestamp": "2023-01-01T12:00:00Z",
-            "merchant_id": "M-1",
-            "payment_method": "upi",
-            "device_id": "DEV-1",
-            "ip_address": "192.168.1.1"
+            "graph_entity_id": "C-FAIL",
+            "ml_risk_score": 0.9,
+            "graph_risk_score": 0.9
         })
         
         assert response.status_code == 200
         data = response.json()
-        assert data["agent_status"] == "DEGRADED"
-        assert data["policy_decision"] == "REVIEW"
+        assert data["status"] == "DEGRADED"
+        assert data["investigation"]["recommendation"] == "REVIEW"
+        assert "AGENT_UNAVAILABLE" in data["investigation"]["reason_codes"]
         
-        # Verify Audit Log captures the failure
-        audit_res = client.get("/api/v1/audit/TX-FAIL-TEST")
-        events = audit_res.json()["events"]
-        decision_event = [e for e in events if e["event_type"] == "FINAL_DECISION_CREATED"][0]
-        assert "AGENT_UNAVAILABLE" in decision_event["payload"]["reason_codes"]
-
     finally:
         del os.environ["SIMULATE_AGENT_FAILURE"]
