@@ -62,7 +62,7 @@ export default function AuditPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-heading-lg text-heading-lg text-text-primary ">Audit Trail</h1>
+          <h1 className="text-heading-lg text-text-primary ">Audit Trail</h1>
           <p className="text-label-sm text-text-secondary">Trace every risk signal, recommendation, policy evaluation and analyst action.</p>
         </div>
         
@@ -90,7 +90,7 @@ export default function AuditPage() {
               {m.icon}
               <span className={m.color ? m.color : ''}>{m.label}</span>
             </div>
-            <div className={`text-display-lg text-display-md tabular-nums ${m.color || 'text-text-primary'}`}>
+            <div className={`text-[25px] font-semibold tracking-[-.04em] tabular-nums ${m.color || 'text-text-primary'}`}>
               {m.value}
             </div>
           </div>
@@ -165,10 +165,10 @@ export default function AuditPage() {
                 {events.map((evt) => (
                   <tr key={evt.id} onClick={() => setSelectedEvent(evt.id)} className={`transition-colors cursor-pointer group ${evt.isSelected ? 'bg-primary-soft/50' : 'hover:bg-surface-secondary/50'}`}>
                     <td className={`p-4 border-l-[3px] ${evt.isSelected ? 'border-l-primary' : 'border-l-transparent group-hover:border-l-border-strong'}`}>
-                      <span className="text-label-sm text-mono-sm text-mono-sm font-mono text-text-secondary">{evt.time}</span>
+                      <span className="text-label-sm text-mono-sm font-mono text-text-secondary">{evt.time}</span>
                     </td>
                     <td className="p-4">
-                      <span className="text-label-sm text-mono-sm text-mono-sm font-mono text-text-secondary">{evt.id}</span>
+                      <span className="text-label-sm text-mono-sm font-mono text-text-secondary">{evt.id}</span>
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-3">
@@ -182,7 +182,7 @@ export default function AuditPage() {
                       <span className={`text-label-sm font-medium ${evt.isOverride ? 'font-semibold text-warning' : evt.actorType === 'model' ? 'text-info' : 'text-text-primary'}`}>{evt.action}</span>
                     </td>
                     <td className="p-4">
-                      <a className="text-label-sm text-mono-sm text-mono-sm font-mono font-semibold text-primary hover:underline" href="#">{evt.entity}</a>
+                      <a className="text-label-sm text-mono-sm font-mono font-semibold text-primary hover:underline" href="#">{evt.entity}</a>
                     </td>
                     <td className="p-4 text-label-sm text-text-primary max-w-[200px] truncate" title={evt.evidence}>
                       {evt.actorType === 'model' ? (
@@ -190,7 +190,7 @@ export default function AuditPage() {
                           <div className="w-16 h-2 bg-surface-secondary border border-border rounded-full overflow-hidden">
                             <div className="h-full bg-danger w-[94%]"></div>
                           </div>
-                          <span className="text-mono-sm text-mono-sm font-mono">{evt.evidence}</span>
+                          <span className="text-mono-sm font-mono">{evt.evidence}</span>
                         </div>
                       ) : (
                         evt.evidence
@@ -201,7 +201,7 @@ export default function AuditPage() {
                         {evt.decision}
                       </span>
                     </td>
-                    <td className="p-4 text-label-sm text-mono-sm text-mono-sm font-mono text-text-secondary">{evt.version}</td>
+                    <td className="p-4 text-label-sm text-mono-sm font-mono text-text-secondary">{evt.version}</td>
                   </tr>
                 ))}
               </tbody>
@@ -217,11 +217,11 @@ export default function AuditPage() {
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
                   <span className="text-caption font-semibold uppercase text-text-muted">Audit Event</span>
-                  <span className="text-caption text-mono-sm text-mono-sm font-mono font-semibold text-text-secondary bg-surface border border-border px-2 py-1 rounded shadow-sm">evt_RSX_98214</span>
+                  <span className="text-caption text-mono-sm font-mono font-semibold text-text-secondary bg-surface border border-border px-2 py-1 rounded shadow-sm">evt_RSX_98214</span>
                 </div>
                 <h2 className="text-heading-lg font-semibold text-text-primary ">Decision Enforced</h2>
                 <div className="flex items-center gap-2 text-caption text-text-secondary mt-1">
-                  <Calendar className="h-4 w-4" /> 28 Aug 2026 <span className="mx-1">•</span> <span className="text-mono-sm text-mono-sm font-mono font-semibold text-text-primary">12:40:19.214 PM</span>
+                  <Calendar className="h-4 w-4" /> 28 Aug 2026 <span className="mx-1">•</span> <span className="text-mono-sm font-mono font-semibold text-text-primary">12:40:19.214 PM</span>
                 </div>
               </div>
               <button onClick={() => setSelectedEvent(null)} className="h-8 w-8 rounded-lg flex items-center justify-center text-text-muted hover:bg-surface hover:text-text-primary shadow-sm transition-colors border border-transparent hover:border-border">
@@ -238,11 +238,11 @@ export default function AuditPage() {
                 <div className="bg-surface border border-border rounded-xl p-5 shadow-sm grid grid-cols-2 gap-5">
                   <div>
                     <span className="block text-caption font-semibold uppercase text-text-muted mb-2">Entity</span>
-                    <a href="#" className="text-label-sm text-mono-sm text-mono-sm font-mono font-semibold text-primary hover:underline">pay_PM71JD29</a>
+                    <a href="#" className="text-label-sm text-mono-sm font-mono font-semibold text-primary hover:underline">pay_PM71JD29</a>
                   </div>
                   <div>
                     <span className="block text-caption font-semibold uppercase text-text-muted mb-2">Policy</span>
-                    <span className="text-label-sm text-mono-sm text-mono-sm font-mono font-semibold text-text-primary">risk-policy-v12</span>
+                    <span className="text-label-sm text-mono-sm font-mono font-semibold text-text-primary">risk-policy-v12</span>
                   </div>
                   <div className="col-span-2 pt-4 border-t border-border">
                     <span className="block text-caption font-semibold uppercase text-text-muted mb-2">Matched Rule</span>
@@ -263,7 +263,7 @@ export default function AuditPage() {
                     <div className="absolute -left-[27px] top-1 w-4 h-4 rounded-full bg-surface border-2 border-border z-10"></div>
                     <div className="flex justify-between items-start mb-1.5">
                       <span className="text-label-sm font-semibold text-text-primary">Risk Score Generated</span>
-                      <span className="text-caption text-mono-sm text-mono-sm font-mono text-text-secondary">12:40:18.981</span>
+                      <span className="text-caption text-mono-sm font-mono text-text-secondary">12:40:18.981</span>
                     </div>
                     <div className="flex items-center gap-2 text-caption text-text-secondary">
                       <ShieldAlert className="h-4 w-4 text-info" /> Model v7 • Score: 94/100
@@ -274,7 +274,7 @@ export default function AuditPage() {
                     <div className="absolute -left-[27px] top-1 w-4 h-4 rounded-full bg-surface border-2 border-border z-10"></div>
                     <div className="flex justify-between items-start mb-1.5">
                       <span className="text-label-sm font-semibold text-text-primary">Cluster Association Detected</span>
-                      <span className="text-caption text-mono-sm text-mono-sm font-mono text-text-secondary">12:40:19.033</span>
+                      <span className="text-caption text-mono-sm font-mono text-text-secondary">12:40:19.033</span>
                     </div>
                     <div className="flex items-center gap-2 text-caption text-text-secondary">
                       <Network className="h-4 w-4 text-text-muted" /> Graph v4 • Risk 0.96
@@ -287,7 +287,7 @@ export default function AuditPage() {
                     </div>
                     <div className="flex justify-between items-start mb-1.5">
                       <span className="text-label-sm font-semibold text-primary">Recommendation Generated</span>
-                      <span className="text-caption text-mono-sm text-mono-sm font-mono text-primary">12:40:19.175</span>
+                      <span className="text-caption text-mono-sm font-mono text-primary">12:40:19.175</span>
                     </div>
                     <div className="flex items-center gap-2 text-caption text-text-secondary bg-surface border border-border p-3 rounded-lg shadow-sm mt-2">
                       <Activity className="h-4 w-4 text-primary" /> Sentinel AI v3 • Recommended BLOCK (94% Conf.)
@@ -300,7 +300,7 @@ export default function AuditPage() {
                     </div>
                     <div className="flex justify-between items-start mb-1.5">
                       <span className="text-label-sm font-semibold text-text-primary">Decision Enforced</span>
-                      <span className="text-caption text-mono-sm text-mono-sm font-mono font-semibold text-text-primary">12:40:19.214</span>
+                      <span className="text-caption text-mono-sm font-mono font-semibold text-text-primary">12:40:19.214</span>
                     </div>
                     <div className="flex items-center gap-2 text-caption text-text-secondary">
                       <Gavel className="h-4 w-4 text-text-muted" /> Policy v12 • Enforced BLOCK
@@ -322,7 +322,7 @@ export default function AuditPage() {
                     <FileJson className="h-6 w-6" />
                   </div>
                   <div>
-                    <div className="text-label-sm text-mono-sm text-mono-sm font-mono font-semibold text-text-primary">evidence-snapshot-18492</div>
+                    <div className="text-label-sm text-mono-sm font-mono font-semibold text-text-primary">evidence-snapshot-18492</div>
                     <div className="text-caption text-text-secondary mt-1">12 items captured at evaluation</div>
                   </div>
                 </div>
@@ -341,14 +341,14 @@ export default function AuditPage() {
                 ].map((item, i) => (
                   <div key={i} className="flex justify-between items-center border-b border-border pb-2 last:border-0">
                     <span className="text-caption font-semibold uppercase text-text-muted">{item.label}</span>
-                    <span className="text-caption text-mono-sm text-mono-sm font-mono font-semibold text-text-primary">{item.val}</span>
+                    <span className="text-caption text-mono-sm font-mono font-semibold text-text-primary">{item.val}</span>
                   </div>
                 ))}
               </div>
               <div className="flex items-center justify-between bg-surface-secondary border border-border p-3 rounded-xl shadow-sm">
                 <div className="flex items-center gap-3">
                   <span className="text-caption font-semibold uppercase text-text-muted">Correlation ID</span>
-                  <span className="text-caption text-mono-sm text-mono-sm font-mono font-semibold text-text-primary bg-surface border border-border px-2 py-1 rounded shadow-sm">corr_18492</span>
+                  <span className="text-caption text-mono-sm font-mono font-semibold text-text-primary bg-surface border border-border px-2 py-1 rounded shadow-sm">corr_18492</span>
                 </div>
                 <button className="text-text-muted hover:text-text-primary transition-colors hover:bg-surface p-1.5 rounded" title="Copy ID">
                   <Copy className="h-4 w-4" />

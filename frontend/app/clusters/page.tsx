@@ -41,10 +41,9 @@ export default function FraudClustersPage() {
           ["Active clusters", "4", "+2 today", "text-[#255df5]", "bg-[#edf3ff]"],
           ["Linked identities", "38", "Across 17 devices", "text-[#7446d8]", "bg-[#f3edff]"],
           ["At-risk exposure", "₹10.8L", "₹4.82L critical", "text-[#d14338]", "bg-[#fff0ef]"],
-          ["Contained today", "7", "₹6.24L protected", "text-[#07845a]", "bg-[#ebfaf4]"],
-        ].map(([label, value, helper, tone, surface]) => (
-          <div key={label} className="rsx-card p-4 sm:p-5">
-            <div className={`mb-3 flex h-8 w-8 items-center justify-center rounded-lg ${surface} ${tone}`}><ShieldAlert className="h-4 w-4" /></div>
+          ["Contained today", "7", "₹6.24L protected", "text-[#315efb]", "bg-[#edf3ff]"],
+        ].map(([label, value, helper, tone, surface], index) => (
+          <div key={label} className={`rsx-card border-t-2 p-4 sm:p-5 ${index === 0 ? "border-t-[#315efb]" : index === 1 ? "border-t-[#7558c9]" : index === 2 ? "border-t-[#d5473e]" : "border-t-[#315efb]"}`}>
             <p className="text-[10px] font-bold uppercase tracking-[.1em] text-[#8993a4]">{label}</p>
             <p className="mt-1.5 text-[23px] font-bold tracking-[-.04em] text-[#17233f]">{value}</p>
             <p className="mt-1 text-[10px] font-semibold text-[#7d8798]">{helper}</p>
@@ -66,34 +65,45 @@ export default function FraudClustersPage() {
               return (
                 <button key={cluster.id} onClick={() => setSelectedId(cluster.id)} className={`w-full p-4 text-left transition-colors ${active ? "bg-[#f3f7ff]" : "hover:bg-[#fafbfd]"}`}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0"><div className="flex items-center gap-2"><span className="font-mono text-[10px] font-bold text-[#255df5]">{cluster.id}</span><span className={`rounded-full px-2 py-0.5 text-[8px] font-extrabold uppercase ${cluster.severity === "Critical" ? "bg-[#fff0ef] text-[#cf3c32]" : cluster.severity === "High" ? "bg-[#fff6e9] text-[#b76400]" : "bg-[#edf3ff] text-[#255df5]"}`}>{cluster.severity}</span></div><p className="mt-2 truncate text-[12px] font-bold text-[#27334b]">{cluster.title}</p></div>
+                    <div className="min-w-0"><div className="flex items-center gap-2"><span className="font-mono text-[10px] font-bold text-[#255df5]">{cluster.id}</span><span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase ${cluster.severity === "Critical" ? "bg-[#fff0ef] text-[#cf3c32]" : cluster.severity === "High" ? "bg-[#fff6e9] text-[#b76400]" : "bg-[#edf3ff] text-[#255df5]"}`}>{cluster.severity}</span></div><p className="mt-2 truncate text-[12px] font-bold text-[#27334b]">{cluster.title}</p></div>
                     <span className="text-[18px] font-black" style={{ color: cluster.color }}>{cluster.score}</span>
                   </div>
-                  <div className="mt-3 grid grid-cols-3 gap-2 text-[9px] text-[#7c8799]"><span><strong className="block text-[11px] text-[#465268]">{cluster.accounts}</strong>accounts</span><span><strong className="block text-[11px] text-[#465268]">{cluster.transactions}</strong>payments</span><span><strong className="block text-[11px] text-[#465268]">{cluster.exposure}</strong>exposure</span></div>
-                  <div className="mt-3 flex items-center justify-between border-t border-[#e8edf5] pt-2.5"><span className="truncate text-[9px] font-medium text-[#7f8a9c]">{cluster.signal}</span><span className="flex items-center gap-1 text-[8px] text-[#9ba4b3]"><Clock3 className="h-3 w-3" />{cluster.updated}</span></div>
+                  <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] text-[#7c8799]"><span><strong className="block text-[11px] text-[#465268]">{cluster.accounts}</strong>accounts</span><span><strong className="block text-[11px] text-[#465268]">{cluster.transactions}</strong>payments</span><span><strong className="block text-[11px] text-[#465268]">{cluster.exposure}</strong>exposure</span></div>
+                  <div className="mt-3 flex items-center justify-between border-t border-[#e8edf5] pt-2.5"><span className="truncate text-[10px] font-medium text-[#7f8a9c]">{cluster.signal}</span><span className="flex items-center gap-1 text-[10px] text-[#9ba4b3]"><Clock3 className="h-3 w-3" />{cluster.updated}</span></div>
                 </button>
               );
             })}
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-[#1e2b49] bg-[#0b1020] shadow-[0_16px_45px_rgba(13,21,39,.14)]">
-          <div className="flex flex-col gap-3 border-b border-white/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div><div className="flex items-center gap-2"><span className="font-mono text-[10px] font-bold text-[#7ca3ff]">{selected.id}</span><span className="rounded-full border border-[#e5484d]/30 bg-[#e5484d]/10 px-2 py-0.5 text-[8px] font-black uppercase text-[#ff7d75]">{selected.severity}</span></div><h2 className="mt-1.5 text-[16px] font-bold text-white">{selected.title}</h2></div>
-            <button onClick={() => setContained((items) => items.includes(selected.id) ? items : [...items, selected.id])} className={`inline-flex h-9 items-center justify-center gap-2 rounded-lg px-3 text-[10px] font-bold transition-colors ${contained.includes(selected.id) ? "bg-[#0f8a61] text-white" : "bg-white text-[#17233f] hover:bg-[#eef3ff]"}`}>{contained.includes(selected.id) ? <><CheckCircle2 className="h-4 w-4" /> Cluster contained</> : <><Ban className="h-4 w-4" /> Contain cluster</>}</button>
+        <div className="overflow-hidden rounded-2xl border border-[#dce4f0] bg-white shadow-[0_16px_45px_rgba(29,55,95,.08)]">
+          <div className="flex flex-col gap-3 border-b border-[#e6ebf3] bg-[linear-gradient(100deg,#ffffff_0%,#f7f9ff_68%,#eef3ff_100%)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] font-bold text-[#255df5]">{selected.id}</span>
+                <span className="rounded-full border border-[#f4cbc7] bg-[#fff0ef] px-2 py-0.5 text-[10px] font-black uppercase text-[#cf3c32]">{selected.severity}</span>
+              </div>
+              <h2 className="mt-1.5 text-[16px] font-bold text-[#16213a]">{selected.title}</h2>
+            </div>
+            <button onClick={() => setContained((items) => items.includes(selected.id) ? items : [...items, selected.id])} className={`inline-flex h-9 items-center justify-center gap-2 rounded-lg border px-3 text-[10px] font-bold shadow-sm transition-all ${contained.includes(selected.id) ? "border-[#315efb] bg-[#edf3ff] text-[#255df5]" : "border-[#315efb] bg-[#315efb] text-white hover:bg-[#244fe0]"}`}>{contained.includes(selected.id) ? <><CheckCircle2 className="h-4 w-4" /> Cluster contained</> : <><Ban className="h-4 w-4" /> Contain cluster</>}</button>
           </div>
 
-          <div className="grid lg:grid-cols-[minmax(0,1fr)_260px]">
-            <div className="rsx-grid relative min-h-[390px] overflow-hidden border-b border-white/10 lg:border-b-0 lg:border-r">
-              <svg className="absolute inset-0 h-full w-full opacity-45" viewBox="0 0 600 390" preserveAspectRatio="none" aria-hidden="true"><line x1="300" y1="170" x2="126" y2="90" stroke="#6c8fea"/><line x1="300" y1="170" x2="468" y2="78" stroke="#6c8fea"/><line x1="300" y1="170" x2="108" y2="280" stroke="#6c8fea"/><line x1="300" y1="170" x2="492" y2="273" stroke="#6c8fea"/><line x1="126" y1="90" x2="108" y2="280" stroke="#523dac" strokeDasharray="5 6"/><line x1="468" y1="78" x2="492" y2="273" stroke="#b86d27" strokeDasharray="5 6"/></svg>
-              {entityNodes.map((node) => <div key={node.label} className="absolute -translate-x-1/2 -translate-y-1/2 text-center" style={{ left: node.x, top: node.y }}><span className={`mx-auto flex ${node.size} items-center justify-center rounded-full border border-white/15 shadow-[0_0_26px_rgba(80,115,255,.22)] ${node.tone}`}><node.icon className="h-5 w-5" /></span><span className="mt-2 block rounded bg-[#0b1020]/75 px-1.5 py-0.5 font-mono text-[8px] font-bold text-[#d9e1f2] backdrop-blur">{node.label}</span></div>)}
-              <div className="absolute bottom-4 left-4 flex items-center gap-3 rounded-lg border border-white/10 bg-[#11182b]/85 px-3 py-2 text-[8px] font-semibold text-[#98a7c2] backdrop-blur"><span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-[#255df5]" /> Device</span><span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-white" /> Identity</span><span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-[#7446d8]" /> Network</span></div>
+          <div className="grid lg:grid-cols-[minmax(0,1fr)_272px]">
+            <div className="rsx-grid relative min-h-[390px] overflow-hidden border-b border-[#e6ebf3] bg-[#fbfcff] lg:border-b-0 lg:border-r">
+              <div className="absolute left-5 top-5 rounded-full border border-[#dfe6f3] bg-white/90 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] text-[#6d7890] shadow-sm backdrop-blur">Relationship map</div>
+              <svg className="absolute inset-0 h-full w-full" viewBox="0 0 600 390" preserveAspectRatio="none" aria-hidden="true"><line x1="300" y1="170" x2="126" y2="90" stroke="#9ab5f6" strokeWidth="1.5"/><line x1="300" y1="170" x2="468" y2="78" stroke="#9ab5f6" strokeWidth="1.5"/><line x1="300" y1="170" x2="108" y2="280" stroke="#9ab5f6" strokeWidth="1.5"/><line x1="300" y1="170" x2="492" y2="273" stroke="#9ab5f6" strokeWidth="1.5"/><line x1="126" y1="90" x2="108" y2="280" stroke="#b5a6e8" strokeDasharray="5 6"/><line x1="468" y1="78" x2="492" y2="273" stroke="#e6b878" strokeDasharray="5 6"/></svg>
+              {entityNodes.map((node) => <div key={node.label} className="absolute -translate-x-1/2 -translate-y-1/2 text-center" style={{ left: node.x, top: node.y }}><span className={`mx-auto flex ${node.size} items-center justify-center rounded-full border border-[#d7dfed] shadow-[0_8px_22px_rgba(56,83,140,.14)] ring-4 ring-white ${node.tone}`}><node.icon className="h-5 w-5" /></span><span className="mt-2 block rounded-md border border-[#e4e9f1] bg-white/95 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#344158] shadow-sm backdrop-blur">{node.label}</span></div>)}
+              <div className="absolute bottom-4 left-4 flex items-center gap-3 rounded-lg border border-[#dfe6f1] bg-white/90 px-3 py-2 text-[10px] font-semibold text-[#68758b] shadow-sm backdrop-blur"><span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-[#255df5]" /> Device</span><span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full border border-[#aeb9ca] bg-white" /> Identity</span><span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-[#7446d8]" /> Network</span></div>
             </div>
-            <aside className="p-5">
-              <p className="text-[9px] font-black uppercase tracking-[.14em] text-[#6f82a5]">AI assessment</p>
-              <p className="mt-3 text-[12px] leading-5 text-[#c9d4e9]">The same device fingerprint authenticated 11 accounts before attempting high-value payments within a 17-minute window.</p>
-              <div className="mt-5 space-y-3">{[["Risk confidence", `${selected.score}%`], ["Potential exposure", selected.exposure], ["Linked payments", String(selected.transactions)], ["First observed", "28 Aug · 21:42"]].map(([label,value]) => <div key={label} className="flex items-center justify-between border-b border-white/10 pb-3"><span className="text-[9px] font-semibold text-[#7587a8]">{label}</span><span className="text-[10px] font-bold text-white">{value}</span></div>)}</div>
-              <Link href="/investigations" className="mt-5 flex items-center justify-between rounded-lg border border-[#4668bd]/40 bg-[#1b2b55]/60 px-3 py-2.5 text-[10px] font-bold text-[#a9c0ff] hover:bg-[#23376b]">Open investigation <ArrowUpRight className="h-3.5 w-3.5" /></Link>
+            <aside className="bg-[#fbfcff] p-5">
+              <div className="flex items-center gap-2 text-[#255df5]"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#edf3ff]"><ShieldAlert className="h-4 w-4" /></span><p className="text-[10px] font-black uppercase tracking-[.14em]">AI assessment</p></div>
+              <p className="mt-4 text-[12px] leading-5 text-[#4f5c72]">The same device fingerprint authenticated 11 accounts before attempting high-value payments within a 17-minute window.</p>
+              <div className="mt-5 rounded-xl border border-[#e0e6f0] bg-white p-4 shadow-sm">
+                <div className="flex items-end justify-between"><span className="text-[10px] font-bold uppercase tracking-[.08em] text-[#8993a5]">Risk confidence</span><span className="text-[24px] font-black tracking-[-.04em] text-[#d14338]">{selected.score}%</span></div>
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#edf0f5]"><div className="h-full rounded-full bg-[linear-gradient(90deg,#ff8a80,#d14338)]" style={{ width: `${selected.score}%` }} /></div>
+              </div>
+              <div className="mt-4 space-y-3">{[["Potential exposure", selected.exposure], ["Linked payments", String(selected.transactions)], ["First observed", "28 Aug · 21:42"]].map(([label,value]) => <div key={label} className="flex items-center justify-between border-b border-[#e7ebf2] pb-3"><span className="text-[10px] font-semibold text-[#7c8799]">{label}</span><span className="text-[10px] font-bold text-[#263249]">{value}</span></div>)}</div>
+              <Link href="/investigations" className="mt-5 flex items-center justify-between rounded-lg border border-[#cddafd] bg-[#edf3ff] px-3 py-2.5 text-[10px] font-bold text-[#255df5] transition-colors hover:border-[#aec3fb] hover:bg-[#e4edff]">Open investigation <ArrowUpRight className="h-3.5 w-3.5" /></Link>
             </aside>
           </div>
         </div>

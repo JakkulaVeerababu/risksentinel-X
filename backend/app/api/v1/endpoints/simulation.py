@@ -3,9 +3,8 @@ import logging
 from datetime import datetime
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import Dict, Optional
 from pydantic import BaseModel
-from typing import Dict
-
 from app.db.session import get_db
 from app.models.domain import TransactionModel, InvestigationModel, RiskScoreModel
 from app.simulation.generator import ScenarioGenerator
@@ -24,7 +23,7 @@ class RunScenarioResponse(BaseModel):
     devices: int
     ips: int
     decisions: Dict[str, int]
-    investigation_id: str = None
+    investigation_id: Optional[str] = None
     ml_risk_avg: float
     graph_risk_avg: float
 
@@ -80,20 +79,9 @@ def run_scenario(request: RunScenarioRequest, db: Session = Depends(get_db)):
             transaction_id=tx_data["transaction_id"],
             timestamp=datetime.fromtimestamp(tx_data["timestamp"]),
             amount=tx_data["amount"],
-            currency=tx_data["currency"],
-            merchant_id=tx_data["merchant_id"],
-            merchant_name=tx_data["merchant_name"],
             customer_id=tx_data["customer_id"],
-            customer_age_days=tx_data["customer_age_days"],
-            payment_method=tx_data["payment_method"],
-            device_id=tx_data["device_id"],
-            ip_address=tx_data["ip_address"],
-            country=tx_data["country"],
-            city=tx_data["city"],
-            velocity_5m=tx_data.get("velocity_5m", 0),
             ml_risk_score=ml_risk,
-            graph_risk_score=graph_risk,
-            graph_cluster_id="CL-SIM-999" if graph_risk > 0.8 else None
+            graph_risk_score=graph_risk
         )
         db.add(tx_model)
         db.commit()
@@ -131,26 +119,8 @@ def run_scenario(request: RunScenarioRequest, db: Session = Depends(get_db)):
         decisions_count[final_decision] = decisions_count.get(final_decision, 0) + 1
         last_tx_id = tx_data["transaction_id"]
         
-    # See if an investigation was created for the last transaction
+    # The frontend only uses the simulation response values
     inv = None
-    if last_tx_id:
-        # Since PolicyService.evaluate_decision might not have created one because it relies on the hash,
-        # let's explicitly create one if the scenario blocked or reviewed and no investigation exists.
-        if decisions_count.get("BLOCK", 0) > 0 or decisions_count.get("REVIEW", 0) > 0:
-            inv = db.query(InvestigationModel).filter(InvestigationModel.transactions.contains(last_tx_id)).first()
-            if not inv:
-                # Force create
-                inv = InvestigationModel(
-                    case_id=f"CAS-{uuid.uuid4().hex[:8].upper()}",
-                    title=f"Auto-generated for {request.scenario_type}",
-                    severity="CRITICAL" if decisions_count.get("BLOCK", 0) > 0 else "MEDIUM",
-                    transactions=[t["transaction_id"] for t in tx_data_list],
-                    exposure=sum(t["amount"] for t in tx_data_list),
-                    trigger="Simulated Scenario Trigger",
-                    status="OPEN"
-                )
-                db.add(inv)
-                db.commit()
 
     return RunScenarioResponse(
         scenario=request.scenario_type,

@@ -138,11 +138,17 @@ export async function fetchRiskCase(transactionId: string): Promise<PipelineResp
 }
 
 export async function startSimulation(scenario_type: string, transaction_count = 5): Promise<any> {
-  // NOTE: Depending on router config, might be /simulations/run_scenario or /simulation/run_scenario
-  const response = await apiFetch("/simulations/run_scenario", { 
-    method: "POST", 
-    headers: { "Content-Type": "application/json" }, 
-    body: JSON.stringify({ scenario_type, transaction_count }) 
+  const mapping: Record<string, string> = {
+    "normal_customer": "Normal Customer",
+    "high_value_anomaly": "High-Value Anomaly",
+    "device_velocity_attack": "Device Velocity Attack",
+    "coordinated_fraud_ring": "Coordinated Fraud Ring"
+  };
+  const backendScenarioType = mapping[scenario_type] || scenario_type;
+  const response = await apiFetch("/simulations/run_scenario", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ scenario_type: backendScenarioType, transaction_count })
   });
   return await response.json();
 }
@@ -154,10 +160,10 @@ export async function fetchPolicies(): Promise<Policy[]> {
 }
 
 export async function createPolicy(policyData: any): Promise<Policy> {
-  const response = await apiFetch("/policies/", { 
-    method: "POST", 
-    headers: { "Content-Type": "application/json" }, 
-    body: JSON.stringify(policyData) 
+  const response = await apiFetch("/policies/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(policyData)
   });
   return await response.json();
 }
@@ -184,19 +190,19 @@ export async function fetchInvestigation(caseId: string): Promise<Investigation>
 }
 
 export async function updateInvestigationStatus(caseId: string, status: string): Promise<any> {
-  const response = await apiFetch(`/investigations/${caseId}/status`, { 
-    method: "PUT", 
-    headers: { "Content-Type": "application/json" }, 
-    body: JSON.stringify({ status }) 
+  const response = await apiFetch(`/investigations/${caseId}/status`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status })
   });
   return await response.json();
 }
 
 export async function updateInvestigationAssignee(caseId: string, assignee: string): Promise<any> {
-  const response = await apiFetch(`/investigations/${caseId}/assignee`, { 
-    method: "PUT", 
-    headers: { "Content-Type": "application/json" }, 
-    body: JSON.stringify({ assignee }) 
+  const response = await apiFetch(`/investigations/${caseId}/assignee`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ assignee })
   });
   return await response.json();
 }
@@ -222,18 +228,7 @@ export async function processTransaction(txData: any): Promise<any> {
 }
 
 export async function aiChatStream(messages: any[], onChunk: (chunk: string) => void): Promise<void> {
-  // Dummy stream for demo purposes
-  const responseText = "The live AI service is currently in degraded mode, but ML, graph and policy evidence remain operational in this demo. Based on the evidence, the recommended action is to BLOCK the transaction.";
-  
-  return new Promise((resolve) => {
-    let i = 0;
-    const interval = setInterval(() => {
-      onChunk(responseText.charAt(i));
-      i++;
-      if (i >= responseText.length) {
-        clearInterval(interval);
-        resolve();
-      }
-    }, 20);
-  });
+  const msg = "AI chat is not part of the current MVP";
+  onChunk(msg);
+  return Promise.resolve();
 }

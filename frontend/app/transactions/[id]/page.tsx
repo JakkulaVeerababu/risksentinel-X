@@ -25,11 +25,11 @@ export default function TransactionDetailPage() {
           fetchRiskCase(transactionId),
           fetchAuditTimeline(transactionId).catch(() => ({ events: [] }))
         ]);
-        
+
         if (!caseRes || (caseRes as any).error) {
           throw new Error((caseRes as any).error || "Failed to load transaction data");
         }
-        
+
         setData(caseRes);
         setTimeline(auditRes.events || []);
       } catch (err: any) {
@@ -59,14 +59,14 @@ export default function TransactionDetailPage() {
   }
 
   const { transaction, ml, graph, agent, policy } = data;
-  
+
   // Helpers
   const decisionColor = (dec: string) => {
     if (dec === "BLOCK") return "text-danger bg-danger-soft border-danger/20";
     if (dec === "REVIEW") return "text-warning bg-warning-soft border-warning/20";
     return "text-success bg-success-soft border-success/20";
   };
-  
+
   const riskColor = (score: number, threshold: number) => {
     if (score >= threshold) return "text-danger";
     if (score >= threshold * 0.7) return "text-warning";
@@ -109,9 +109,9 @@ export default function TransactionDetailPage() {
               </span>
             </div>
             <div className="w-full h-2 bg-border-subtle rounded-full overflow-hidden mb-6">
-              <div 
-                className={`h-full ${ml.risk_score >= 0.8 ? 'bg-danger' : ml.risk_score >= 0.4 ? 'bg-warning' : 'bg-success'}`} 
-                style={{ width: `${Math.min(100, Math.max(0, ml.risk_score * 100))}%` }} 
+              <div
+                className={`h-full ${ml.risk_score >= 0.8 ? 'bg-danger' : ml.risk_score >= 0.4 ? 'bg-warning' : 'bg-success'}`}
+                style={{ width: `${Math.min(100, Math.max(0, ml.risk_score * 100))}%` }}
               />
             </div>
             <div className="text-sm space-y-2 text-text-secondary">
@@ -130,16 +130,22 @@ export default function TransactionDetailPage() {
           <div className="p-5 flex-1">
             <div className="flex justify-between items-end mb-2">
               <span className="text-sm text-text-secondary">Graph Score</span>
-              <span className={`text-3xl font-bold tabular-nums ${riskColor(graph.risk_score, 0.3)}`}>
-                {(graph.risk_score * 100).toFixed(1)}%
-              </span>
+              {graph.risk_score === null ? (
+                <span className="text-sm font-bold text-text-muted italic">Unavailable</span>
+              ) : (
+                <span className={`text-3xl font-bold tabular-nums ${riskColor(graph.risk_score, 0.3)}`}>
+                  {(graph.risk_score * 100).toFixed(1)}%
+                </span>
+              )}
             </div>
-            <div className="w-full h-2 bg-border-subtle rounded-full overflow-hidden mb-6">
-              <div 
-                className={`h-full ${graph.risk_score >= 0.3 ? 'bg-danger' : 'bg-success'}`} 
-                style={{ width: `${Math.min(100, Math.max(0, graph.risk_score * 100))}%` }} 
-              />
-            </div>
+            {graph.risk_score !== null && (
+              <div className="w-full h-2 bg-border-subtle rounded-full overflow-hidden mb-6">
+                <div
+                  className={`h-full ${graph.risk_score >= 0.3 ? 'bg-danger' : 'bg-success'}`}
+                  style={{ width: `${Math.min(100, Math.max(0, graph.risk_score * 100))}%` }}
+                />
+              </div>
+            )}
             <div className="text-sm space-y-2 text-text-secondary">
               <p>Cluster Detected: <span className={`font-semibold ${graph.cluster_detected ? 'text-danger' : 'text-success'}`}>{graph.cluster_detected ? "Yes" : "No"}</span></p>
               {graph.cluster_detected && (

@@ -4,14 +4,13 @@
 
 @layer base {
   :root {
-    /* Extreme Premium Dashboard Tokens (Razorpay-inspired) */
     --background: #F5F7FB;
     --surface: #FFFFFF;
     --surface-secondary: #F8FAFC;
     
-    --text-primary: #17233F;
-    --text-secondary: #5F6B80;
-    --text-muted: #8B95A7;
+    --text-primary: #111A2D;
+    --text-secondary: #5E6878;
+    --text-muted: #89929F;
     
     --border: #E2E8F0;
     --border-subtle: #F1F5F9;
@@ -23,8 +22,8 @@
     --primary-glow: rgba(37, 99, 235, 0.25);
     
     /* Semantic Risk Colors */
-    --success: #10B981;
-    --success-soft: #D1FAE5;
+    --success: #315EFB;
+    --success-soft: #EDF3FF;
     
     --warning: #F59E0B;
     --warning-soft: #FEF3C7;
@@ -90,29 +89,36 @@
 }
 
 @layer utilities {
-  .brand-wordmark-image,
-  .brand-mark-image {
-    display: block;
-    flex: none;
-    background-image: url('/risksentinel-x-logo.png');
-    background-repeat: no-repeat;
+  .brand-wordmark {
+    display: inline-flex;
+    align-items: baseline;
+    color: #071936;
+    font-size: 25px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: -.055em;
+    line-height: 1;
+    white-space: nowrap;
   }
 
-  .brand-wordmark-image {
-    width: 190px;
-    height: 34px;
-    background-size: 220px 147px;
-    background-position: -15px -55px;
+  .brand-x {
+    margin-left: .035em;
+    color: #315efb;
+    font-size: 1.06em;
+    font-weight: 850;
+    letter-spacing: -.07em;
   }
 
-  .brand-mark-image {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background-color: #fff;
-    background-size: 201px 134px;
-    background-position: -150px -49px;
-    box-shadow: 0 4px 14px rgba(37, 93, 245, .14);
+  .brand-wordmark-compact {
+    font-size: 19px;
+  }
+
+  .brand-wordmark-inverse {
+    color: #fff;
+  }
+
+  .brand-wordmark-inverse .brand-x {
+    color: #6f95ff;
   }
 
   .rsx-page {
@@ -121,9 +127,9 @@
 
   .rsx-card {
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 10px;
     background: #fff;
-    box-shadow: 0 1px 2px rgba(16, 24, 40, .025), 0 10px 30px rgba(28, 49, 87, .04);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .025);
   }
 
   .rsx-card-interactive {
@@ -131,9 +137,9 @@
   }
 
   .rsx-card-interactive:hover {
-    transform: translateY(-2px);
-    border-color: #cfdaec;
-    box-shadow: 0 12px 32px rgba(25, 42, 78, .08);
+    transform: translateY(-1px);
+    border-color: #c9d1cc;
+    box-shadow: 0 7px 22px rgba(25, 42, 52, .055);
   }
 
   .rsx-eyebrow {
@@ -145,14 +151,27 @@
   }
 
   .rsx-grid {
-    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(76, 101, 155, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(76, 101, 155, .055) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 
   .rsx-blueprint {
     background:
-      radial-gradient(circle at 85% 15%, rgba(105, 140, 255, .4), transparent 28%),
-      linear-gradient(135deg, #164be7 0%, #315df6 54%, #6d43ef 100%);
+      linear-gradient(120deg, transparent 0 44%, rgba(58, 105, 245, .11) 44% 54%, transparent 54% 62%, rgba(113, 76, 232, .10) 62% 70%, transparent 70%),
+      linear-gradient(135deg, #f5f7ff 0%, #eef3ff 52%, #f2efff 100%);
+  }
+
+  .rsx-editorial-grid {
+    background-image:
+      linear-gradient(rgba(19, 31, 48, .045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(19, 31, 48, .045) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .rsx-diagonal-wash {
+    background:
+      linear-gradient(118deg, transparent 0 48%, rgba(44, 94, 244, .09) 48% 55%, transparent 55% 63%, rgba(116, 70, 216, .09) 63% 70%, transparent 70%),
+      #f8faff;
   }
 
   .balance { text-wrap: balance; }

@@ -43,7 +43,7 @@ function riskStyle(level: RiskLevel) {
 function decisionStyle(decision: string) {
   if (decision === "BLOCK") return "border-[#ffd0d4] bg-[#fff0f1] text-[#d52d39]";
   if (decision === "REVIEW") return "border-[#d6e3ff] bg-[#eef4ff] text-[#255df5]";
-  return "border-[#ccefe2] bg-[#eafaf4] text-[#0c8b61]";
+  return "border-[#cdd9f8] bg-[#edf3ff] text-[#315efb]";
 }
 
 function DecisionIcon({ decision }: { decision: string }) {
@@ -109,7 +109,7 @@ export default function TransactionsPage() {
       <section className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="mb-3 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#255df5]">Payment intelligence</div>
-          <div className="flex flex-wrap items-center gap-3"><h1 className="text-[34px] font-semibold leading-tight tracking-[-.04em] text-[#0c1d3a] sm:text-[40px]">Transactions</h1><span className="inline-flex items-center gap-2 rounded-full border border-[#ccefe2] bg-[#ebfaf4] px-3 py-1 text-[11px] font-bold text-[#0d8d63]"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#18b67f]" />Live</span></div>
+          <div className="flex flex-wrap items-center gap-3"><h1 className="text-[34px] font-semibold leading-tight tracking-[-.04em] text-[#0c1d3a] sm:text-[40px]">Transactions</h1></div>
           <p className="mt-2 max-w-[720px] text-[14px] leading-6 text-[#67748b]">Monitor every payment decision, isolate elevated risk and open the full evidence trail without losing context.</p>
         </div>
         <div className="flex flex-wrap gap-2.5">
@@ -130,7 +130,7 @@ export default function TransactionsPage() {
         <div className="border-b border-[#e7ebf1] px-4 pt-4 sm:px-5 sm:pt-5">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="hide-scrollbar flex max-w-full gap-1 overflow-x-auto rounded-xl bg-[#f3f6fa] p-1">
-              {tabs.map((tab) => <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex shrink-0 items-center gap-2 rounded-lg px-3.5 py-2 text-[12px] font-bold transition ${activeTab === tab.id ? "bg-white text-[#255df5] shadow-[0_2px_8px_rgba(31,52,94,.08)]" : "text-[#6f7b8f] hover:text-[#25334c]"}`}>{tab.label}<span className={`rounded-md px-1.5 py-0.5 text-[9px] ${activeTab === tab.id ? "bg-[#edf3ff] text-[#255df5]" : "bg-[#e8ecf2] text-[#8791a3]"}`}>{tab.count}</span></button>)}
+              {tabs.map((tab) => <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex shrink-0 items-center gap-2 rounded-lg px-3.5 py-2 text-[12px] font-bold transition ${activeTab === tab.id ? "bg-white text-[#255df5] shadow-[0_2px_8px_rgba(31,52,94,.08)]" : "text-[#6f7b8f] hover:text-[#25334c]"}`}>{tab.label}<span className={`rounded-md px-1.5 py-0.5 text-[10px] ${activeTab === tab.id ? "bg-[#edf3ff] text-[#255df5]" : "bg-[#e8ecf2] text-[#8791a3]"}`}>{tab.count}</span></button>)}
             </div>
             <div className="relative w-full xl:w-[360px]"><Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#909aab]" /><input value={query} onChange={(event) => setQuery(event.target.value)} className="h-10 w-full rounded-xl border border-[#dde4ed] bg-[#f9fbfd] pl-10 pr-4 text-[12px] font-medium text-[#25334c] outline-none transition placeholder:text-[#9ba5b5] focus:border-[#7fa0ff] focus:bg-white focus:ring-4 focus:ring-[#255df5]/10" placeholder="Search payment or customer" /></div>
           </div>
@@ -160,9 +160,13 @@ export default function TransactionsPage() {
                   <td className="px-5 py-4"><div className="flex items-center gap-3"><span className={`h-8 w-1 rounded-full ${level === "Critical" ? "bg-[#e5484d]" : level === "High" ? "bg-[#f2a11a]" : level === "Medium" ? "bg-[#4d7ff2]" : "bg-[#d7dee8]"}`} /><div className="min-w-0"><Link href={`/transactions/${tx.transaction_id}`} className="truncate font-mono text-[11px] font-bold text-[#255df5] hover:underline">{tx.transaction_id}</Link></div></div></td>
                   <td className="px-4 py-4"><div className="flex min-w-0 items-center gap-3"><div className="min-w-0"><p className="truncate text-[12px] font-bold text-[#26334b]">{tx.customer_id}</p></div></div></td>
                   <td className="px-4 py-4"><p className="text-[12px] font-bold text-[#182641] tabular-nums">₹{tx.amount?.toLocaleString()}</p></td>
-                  <td className="px-4 py-4"><div className="flex items-center gap-2.5"><span className={`text-[16px] font-bold tabular-nums ${scorePct >= 80 ? "text-[#d72d38]" : scorePct >= 60 ? "text-[#bd7209]" : "text-[#178b66]"}`}>{scorePct}</span><div className="min-w-0"><span className={`inline-flex rounded-md border px-2 py-0.5 text-[9px] font-extrabold uppercase ${riskStyle(level)}`}>{level}</span><div className="mt-1.5 h-1 w-16 overflow-hidden rounded-full bg-[#e7ebf1]"><div className={`h-full rounded-full ${scorePct >= 80 ? "bg-[#e5484d]" : scorePct >= 60 ? "bg-[#f0a11c]" : "bg-[#18a879]"}`} style={{ width: `${scorePct}%` }} /></div></div></div></td>
+                  <td className="px-4 py-4"><div className="flex items-center gap-2.5"><span className={`text-[16px] font-bold tabular-nums ${scorePct >= 80 ? "text-[#d72d38]" : scorePct >= 60 ? "text-[#bd7209]" : "text-[#315efb]"}`}>{scorePct}</span><div className="min-w-0"><span className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] font-extrabold uppercase ${riskStyle(level)}`}>{level}</span><div className="mt-1.5 h-1 w-16 overflow-hidden rounded-full bg-[#e7ebf1]"><div className={`h-full rounded-full ${scorePct >= 80 ? "bg-[#e5484d]" : scorePct >= 60 ? "bg-[#f0a11c]" : "bg-[#4d7ff2]"}`} style={{ width: `${scorePct}%` }} /></div></div></div></td>
                   <td className="px-4 py-4">
-                    <span className={`text-[16px] font-bold tabular-nums ${(tx.graph_risk||0) >= 0.8 ? "text-[#d72d38]" : (tx.graph_risk||0) >= 0.3 ? "text-[#bd7209]" : "text-[#178b66]"}`}>{Math.round((tx.graph_risk||0) * 100)}</span>
+                    {tx.graph_risk === null ? (
+                      <span className="text-[12px] font-bold text-[#8e98a9] italic">N/A</span>
+                    ) : (
+                      <span className={`text-[16px] font-bold tabular-nums ${tx.graph_risk >= 0.8 ? "text-[#d72d38]" : tx.graph_risk >= 0.3 ? "text-[#bd7209]" : "text-[#315efb]"}`}>{Math.round(tx.graph_risk * 100)}</span>
+                    )}
                   </td>
                   <td className="px-4 py-4"><span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[10px] font-extrabold uppercase ${decisionStyle(tx.decision || "PENDING")}`}><DecisionIcon decision={tx.decision || "PENDING"} />{tx.decision || "PENDING"}</span></td>
                   <td className="px-4 py-4 text-right"><p className="font-mono text-[10px] font-semibold text-[#778399]">{tx.timestamp ? timeAgo(tx.timestamp) : ""}</p><Link href={`/transactions/${tx.transaction_id}`} aria-label={`Open ${tx.transaction_id}`} className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-md text-[#8e98a9] opacity-0 transition hover:bg-[#eaf0fa] group-hover:opacity-100"><MoreHorizontal className="h-4 w-4" /></Link></td>
@@ -178,7 +182,7 @@ export default function TransactionsPage() {
         <div className="flex flex-col gap-3 border-t border-[#e6eaf0] bg-[#fbfcfe] px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5"><p className="text-[11px] font-semibold text-[#778399]">Showing {filtered.length} transactions</p><div className="flex items-center gap-2"><button disabled className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#dfe5ed] bg-white text-[#a1a9b6] disabled:opacity-60"><ChevronLeft className="h-4 w-4" /></button><span className="px-2 text-[11px] font-bold text-[#46536a]">Page 1</span><button className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#dfe5ed] bg-white text-[#536178] transition hover:bg-[#f3f6fa] disabled:opacity-60" disabled><ChevronRight className="h-4 w-4" /></button></div></div>
       </section>
 
-      {notice && <div className="fixed bottom-6 right-6 z-[140] flex items-center gap-3 rounded-xl border border-[#dce3ed] bg-white px-5 py-3.5 text-[12px] font-bold text-[#2e3b53] shadow-[0_18px_50px_rgba(22,40,74,.18)]"><Check className="h-4 w-4 text-[#13a675]" />{notice}</div>}
+      {notice && <div className="fixed bottom-6 right-6 z-[140] flex items-center gap-3 rounded-xl border border-[#dce3ed] bg-white px-5 py-3.5 text-[12px] font-bold text-[#2e3b53] shadow-[0_18px_50px_rgba(22,40,74,.18)]"><Check className="h-4 w-4 text-[#315efb]" />{notice}</div>}
     </div>
   );
 }

@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import {
-  ArrowDownRight,
-  ArrowUpRight,
   CalendarDays,
   ChevronDown,
   ChevronRight,
@@ -85,7 +83,7 @@ export default function DashboardPage() {
     { label: "Transactions analysed", value: m.transactions_analysed.toLocaleString(), helper: "Last 24h", change: "--", direction: "up", tone: "blue" },
     { label: "High-risk detected", value: metricsData.distribution.high + metricsData.distribution.critical, helper: "Critical & High", change: "--", direction: "up", tone: "amber" },
     { label: "Automatically blocked", value: m.blocked.toLocaleString(), helper: `₹${(m.fraud_prevented / 100000).toFixed(1)}L exposure stopped`, change: "--", direction: "up", tone: "red" },
-    { label: "Loss prevented", value: `₹${(m.fraud_prevented / 100000).toFixed(1)}L`, helper: `Across ${m.blocked} interventions`, change: "--", direction: "up", tone: "green" },
+    { label: "Loss prevented", value: `₹${(m.fraud_prevented / 100000).toFixed(1)}L`, helper: `Across ${m.blocked} interventions`, change: "--", direction: "up", tone: "cobalt" },
   ];
 
   const chartData = metricsData.chart_data || [];
@@ -98,7 +96,7 @@ export default function DashboardPage() {
     <>
       <section className="mb-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-col gap-1">
-          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Live risk command center</p>
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Risk command center</p>
           <h1 className="text-[34px] font-semibold leading-tight tracking-[-0.04em] text-text-primary">Risk overview</h1>
           <p className="mt-1 text-[14px] text-text-secondary">Payment risk, coordinated fraud and automated decisions across Acme Payments.</p>
         </div>
@@ -145,18 +143,12 @@ export default function DashboardPage() {
 
       <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => {
-          const TrendIcon = metric.direction === "up" ? ArrowUpRight : ArrowDownRight;
-          const trendColor = metric.direction === "down" ? "text-success" : metric.tone === "amber" ? "text-warning" : "text-success";
-          
           return (
             <article key={metric.label} className="group relative flex flex-col gap-4 overflow-hidden rounded-[16px] border border-border bg-surface p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_18px_38px_rgba(13,34,76,0.09)]">
               <span className={`absolute inset-x-0 top-0 h-0.5 ${metric.tone === "blue" ? "bg-primary" : metric.tone === "amber" ? "bg-warning" : metric.tone === "red" ? "bg-danger" : "bg-success"}`} />
               <span className="text-[10px] font-bold uppercase tracking-[0.11em] text-text-muted">{metric.label}</span>
               <div className="text-[30px] font-semibold leading-none tracking-[-0.04em] text-text-primary tabular-nums">{metric.value}</div>
               <div className="flex items-center gap-2 mt-auto pt-2 border-t border-border-subtle">
-                <div className={`flex items-center font-semibold text-caption ${trendColor} bg-white border border-border-subtle px-1.5 py-0.5 rounded`}>
-                  <TrendIcon className="h-3 w-3 mr-0.5" /> {metric.change}
-                </div>
                 <span className="text-caption text-text-secondary truncate">{metric.helper}</span>
               </div>
             </article>
@@ -170,7 +162,7 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-body font-semibold text-text-primary">Risk Activity</h2>
-                <span className="rounded-full bg-success-soft px-2 py-0.5 text-caption font-semibold text-success border border-success/20">LIVE</span>
+
               </div>
               <p className="mt-1 text-label-sm text-text-secondary">Transactions analysed across all payment methods</p>
             </div>
@@ -274,7 +266,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between gap-3 border-b border-border p-5">
             <div>
               <h2 className="text-body font-semibold text-text-primary">Recent transactions</h2>
-              <p className="mt-1 text-caption text-text-secondary">Updated live from backend</p>
+              <p className="mt-1 text-caption text-text-secondary">Persisted risk activity</p>
             </div>
             <Link href="/transactions" className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-caption font-semibold text-text-secondary hover:bg-surface-secondary hover:text-text-primary transition-colors">
               View all <ChevronRight className="h-3.5 w-3.5" />
@@ -305,12 +297,12 @@ export default function DashboardPage() {
                     <td className="px-4 py-4 text-label-sm font-semibold text-text-primary tabular-nums">₹{t.amount.toLocaleString()}</td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <span className={`text-caption font-semibold text-mono-sm font-mono ${t.ml_risk >= 0.8 ? "text-danger" : t.ml_risk >= 0.3 ? "text-warning" : "text-text-secondary"}`}>{(t.ml_risk || 0).toFixed(2)}</span>
+                        <span className={`text-caption font-semibold text-mono-sm font-mono ${(t.ml_risk ?? 0) >= 0.8 ? "text-danger" : (t.ml_risk ?? 0) >= 0.3 ? "text-warning" : "text-text-secondary"}`}>{(t.ml_risk ?? 0).toFixed(2)}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <span className={`text-caption font-semibold text-mono-sm font-mono ${t.graph_risk >= 0.8 ? "text-danger" : t.graph_risk >= 0.3 ? "text-warning" : "text-text-secondary"}`}>{(t.graph_risk || 0).toFixed(2)}</span>
+                        <span className={`text-caption font-semibold text-mono-sm font-mono ${(t.graph_risk ?? 0) >= 0.8 ? "text-danger" : (t.graph_risk ?? 0) >= 0.3 ? "text-warning" : "text-text-secondary"}`}>{(t.graph_risk ?? 0).toFixed(2)}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4"><DecisionBadge decision={t.decision || "PENDING"} /></td>

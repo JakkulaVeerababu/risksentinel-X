@@ -170,7 +170,7 @@ export default function DeveloperPage() {
               <div>
                 <label className="text-caption text-text-secondary font-semibold uppercase mb-2 block">Base URL</label>
                 <div className="flex items-center bg-surface-secondary border border-border rounded-xl px-4 py-3 shadow-sm">
-                  <code className="text-label-sm text-text-primary text-mono-sm text-mono-sm font-mono flex-1">
+                  <code className="text-label-sm text-text-primary text-mono-sm font-mono flex-1">
                     https://api.risksentinel.io/v1
                   </code>
                   <button 
@@ -185,7 +185,7 @@ export default function DeveloperPage() {
               <div>
                 <label className="text-caption text-text-secondary font-semibold uppercase mb-2 block">Test API Key</label>
                 <div className="flex items-center bg-surface-secondary border border-border rounded-xl px-4 py-3 shadow-sm">
-                  <code className="text-label-sm text-text-primary text-mono-sm text-mono-sm font-mono flex-1">
+                  <code className="text-label-sm text-text-primary text-mono-sm font-mono flex-1">
                     sk_test_rsx_99a...
                   </code>
                   <button 
@@ -199,7 +199,7 @@ export default function DeveloperPage() {
               
               <div className="pt-3 border-t border-border">
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(49,94,251,0.5)]"></div>
                   <span className="text-label-sm font-semibold text-text-primary">API Status: Operational</span>
                 </div>
               </div>
@@ -212,12 +212,12 @@ export default function DeveloperPage() {
               Webhook Events
             </h2>
             <p className="text-label-sm text-text-secondary mb-5 leading-relaxed">
-              Configure webhooks to receive real-time updates when asynchronous fraud analysis completes.
+              Configure webhooks to receive backend updates when asynchronous fraud analysis completes.
             </p>
             <div className="space-y-3">
               {WEBHOOKS.map(wh => (
                 <div key={wh.name} className="p-4 bg-surface-secondary rounded-xl border border-border hover:border-primary/30 transition-colors shadow-sm">
-                  <div className="text-mono-sm text-mono-sm font-mono text-label-sm font-semibold text-primary mb-1">{wh.name}</div>
+                  <div className="text-mono-sm font-mono text-label-sm font-semibold text-primary mb-1">{wh.name}</div>
                   <div className="text-caption text-text-secondary leading-relaxed">{wh.desc}</div>
                 </div>
               ))}
@@ -243,7 +243,7 @@ export default function DeveloperPage() {
                     <span className={`px-2 py-1 rounded text-caption font-semibold uppercase ${endpoint.method === 'POST' ? 'bg-success-soft text-success border border-success/20' : 'bg-info-soft text-info border border-info/20'}`}>
                       {endpoint.method}
                     </span>
-                    <code className="text-label-sm font-semibold text-text-primary text-mono-sm text-mono-sm font-mono">{endpoint.path}</code>
+                    <code className="text-label-sm font-semibold text-text-primary text-mono-sm font-mono">{endpoint.path}</code>
                   </div>
                   <h3 className="text-heading-md font-semibold text-text-primary mb-2">{endpoint.title}</h3>
                   <p className="text-label-sm text-text-secondary mb-6 leading-relaxed max-w-2xl">{endpoint.description}</p>
@@ -260,7 +260,7 @@ export default function DeveloperPage() {
                         </button>
                       </div>
                       <div className="bg-[#1e2336] rounded-b-lg rounded-t-none p-4 overflow-x-auto border border-[#3e455e] h-[200px] shadow-inner">
-                        <pre className="text-caption text-[#a8c7fa] text-mono-sm text-mono-sm font-mono whitespace-pre-wrap leading-relaxed">
+                        <pre className="text-caption text-[#a8c7fa] text-mono-sm font-mono whitespace-pre-wrap leading-relaxed">
                           {endpoint.req}
                         </pre>
                       </div>
@@ -277,7 +277,7 @@ export default function DeveloperPage() {
                         </button>
                       </div>
                       <div className="bg-[#1e2336] rounded-b-lg rounded-t-none p-4 overflow-x-auto border border-[#3e455e] h-[200px] shadow-inner">
-                        <pre className="text-caption text-[#b8f5ed] text-mono-sm text-mono-sm font-mono whitespace-pre-wrap leading-relaxed">
+                        <pre className="text-caption text-[#b8f5ed] text-mono-sm font-mono whitespace-pre-wrap leading-relaxed">
                           {endpoint.res}
                         </pre>
                       </div>

@@ -66,7 +66,7 @@ export default function CasesPage() {
         {metrics.map((m, i) => (
           <div key={i} className={`rounded-xl border ${m.highlight ? 'border-danger/30 bg-danger-soft/50' : 'border-border bg-surface'} p-5 shadow-sm hover:premium-shadow-hover transition-all`}>
             <div className={`text-caption font-semibold uppercase mb-3 ${m.highlight ? 'text-danger' : 'text-text-muted'}`}>{m.label}</div>
-            <div className={`text-display-lg text-display-md tabular-nums ${m.color || (m.highlight ? 'text-danger' : 'text-text-primary')}`}>{m.value}</div>
+            <div className={`text-[25px] font-semibold tracking-[-.04em] tabular-nums ${m.color || (m.highlight ? 'text-danger' : 'text-text-primary')}`}>{m.value}</div>
           </div>
         ))}
       </div>
@@ -154,10 +154,10 @@ export default function CasesPage() {
                       <input className="rounded border-border text-primary focus:ring-primary w-4 h-4 cursor-pointer" type="checkbox" disabled={c.isResolved} />
                     </td>
                     <td className="p-4">
-                      <span className={`text-label-sm text-mono-sm text-mono-sm font-mono font-semibold ${c.isResolved ? 'text-text-muted line-through' : 'text-primary'}`}>{c.id}</span>
+                      <span className={`text-label-sm text-mono-sm font-mono font-semibold ${c.isResolved ? 'text-text-muted line-through' : 'text-primary'}`}>{c.id}</span>
                     </td>
                     <td className="p-4">
-                      <span className="text-label-sm text-mono-sm text-mono-sm font-mono font-semibold text-text-primary">{c.entity}</span>
+                      <span className="text-label-sm text-mono-sm font-mono font-semibold text-text-primary">{c.entity}</span>
                     </td>
                     <td className="p-4 text-label-sm text-text-secondary">{c.type}</td>
                     <td className="p-4">
@@ -185,11 +185,11 @@ export default function CasesPage() {
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className={`flex items-center gap-1.5 text-label-sm text-mono-sm text-mono-sm font-mono font-semibold ${c.slaColor}`}>
+                      <div className={`flex items-center gap-1.5 text-label-sm text-mono-sm font-mono font-semibold ${c.slaColor}`}>
                         {c.sla.includes('min') && <Clock className="h-4 w-4" />} {c.sla}
                       </div>
                     </td>
-                    <td className="p-4 text-caption text-text-secondary text-mono-sm text-mono-sm font-mono">{c.created}</td>
+                    <td className="p-4 text-caption text-text-secondary text-mono-sm font-mono">{c.created}</td>
                     <td className="p-4 text-center">
                       <button className="h-8 w-8 rounded-lg flex items-center justify-center text-text-muted hover:bg-surface-secondary hover:text-text-primary transition-colors">
                         <MoreVertical className="h-4 w-4" />
@@ -209,11 +209,11 @@ export default function CasesPage() {
             <div className="p-6 border-b border-border bg-surface-secondary/50 flex justify-between items-start">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-heading-md text-mono-sm text-mono-sm font-mono font-semibold text-text-primary ">CASE-RSX184</h3>
+                  <h3 className="text-heading-md text-mono-sm font-mono font-semibold text-text-primary ">CASE-RSX184</h3>
                   <span className="inline-flex items-center px-2 py-0.5 rounded border border-danger/30 text-danger bg-danger-soft text-caption font-semibold ">P1 CRITICAL</span>
                 </div>
                 <p className="text-label-sm text-text-secondary flex items-center gap-2 flex-wrap">
-                  Fraud Cluster <span className="text-mono-sm text-mono-sm font-mono font-semibold text-text-primary">FRC-0184</span>
+                  Fraud Cluster <span className="text-mono-sm font-mono font-semibold text-text-primary">FRC-0184</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-border-strong"></span>
                   Assigned to <span className="font-semibold text-text-primary">R. Verma</span>
                 </p>
@@ -237,20 +237,20 @@ export default function CasesPage() {
                 <div className="grid grid-cols-3 gap-4 mb-5">
                   <div>
                     <div className="text-caption text-text-muted uppercase font-semibold mb-1">Total Exposure</div>
-                    <div className="text-heading-md font-semibold text-mono-sm text-mono-sm font-mono text-danger tabular-nums">₹4.82L</div>
+                    <div className="text-heading-md font-semibold text-mono-sm font-mono text-danger tabular-nums">₹4.82L</div>
                   </div>
                   <div>
                     <div className="text-caption text-text-muted uppercase font-semibold mb-1">Transactions</div>
-                    <div className="text-heading-md font-semibold text-mono-sm text-mono-sm font-mono text-text-primary tabular-nums">43</div>
+                    <div className="text-heading-md font-semibold text-mono-sm font-mono text-text-primary tabular-nums">43</div>
                   </div>
                   <div>
                     <div className="text-caption text-text-muted uppercase font-semibold mb-1">Entities Linked</div>
-                    <div className="text-heading-md font-semibold text-mono-sm text-mono-sm font-mono text-text-primary tabular-nums">18</div>
+                    <div className="text-heading-md font-semibold text-mono-sm font-mono text-text-primary tabular-nums">18</div>
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <span className="px-2.5 py-1 bg-surface-secondary border border-border rounded-md text-caption text-mono-sm text-mono-sm font-mono font-medium text-text-secondary">IP: 49.37.***.82</span>
-                  <span className="px-2.5 py-1 bg-surface-secondary border border-border rounded-md text-caption text-mono-sm text-mono-sm font-mono font-medium text-text-secondary">Device: dev_4F892</span>
+                  <span className="px-2.5 py-1 bg-surface-secondary border border-border rounded-md text-caption text-mono-sm font-mono font-medium text-text-secondary">IP: 49.37.***.82</span>
+                  <span className="px-2.5 py-1 bg-surface-secondary border border-border rounded-md text-caption text-mono-sm font-mono font-medium text-text-secondary">Device: dev_4F892</span>
                 </div>
               </div>
 
@@ -263,10 +263,10 @@ export default function CasesPage() {
                 </div>
                 <div className="bg-black/40 rounded-lg p-3 border border-[#3e455e] mb-4 flex justify-between items-center relative z-10">
                   <span className="text-danger font-semibold text-label-sm flex items-center gap-2"><Ban className="h-4 w-4" /> BLOCK ENTIRE CLUSTER</span>
-                  <span className="text-success text-caption text-mono-sm text-mono-sm font-mono font-semibold bg-success/10 px-2 py-0.5 rounded border border-success/20">94% Confidence</span>
+                  <span className="text-success text-caption text-mono-sm font-mono font-semibold bg-success/10 px-2 py-0.5 rounded border border-success/20">94% Confidence</span>
                 </div>
                 <p className="text-label-sm text-[#a1a6bb] leading-relaxed relative z-10">
-                  Pattern matches known synthetic identity ring (Ring-7A). IP <span className="text-mono-sm text-mono-sm font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">49.37.***.82</span> associated with 14 previously blocked accounts. Velocity of transactions across cluster entities exceeds normal thresholds by 400% in last 24h.
+                  Pattern matches known synthetic identity ring (Ring-7A). IP <span className="text-mono-sm font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">49.37.***.82</span> associated with 14 previously blocked accounts. Velocity of transactions across cluster entities exceeds normal thresholds by 400% in last 24h.
                 </p>
               </div>
 
@@ -284,18 +284,18 @@ export default function CasesPage() {
                     </thead>
                     <tbody className="divide-y divide-border">
                       <tr className="hover:bg-surface-secondary/50">
-                        <td className="p-3 text-mono-sm text-mono-sm font-mono font-semibold text-primary">pay_PM71JD29</td>
-                        <td className="p-3 text-mono-sm text-mono-sm font-mono font-semibold text-text-primary">₹12,500</td>
+                        <td className="p-3 text-mono-sm font-mono font-semibold text-primary">pay_PM71JD29</td>
+                        <td className="p-3 text-mono-sm font-mono font-semibold text-text-primary">₹12,500</td>
                         <td className="p-3 text-right"><span className="text-caption font-semibold text-danger bg-danger-soft border border-danger/20 px-1.5 py-0.5 rounded">BLOCKED</span></td>
                       </tr>
                       <tr className="hover:bg-surface-secondary/50">
-                        <td className="p-3 text-mono-sm text-mono-sm font-mono font-semibold text-primary">pay_QZ18HF63</td>
-                        <td className="p-3 text-mono-sm text-mono-sm font-mono font-semibold text-text-primary">₹45,000</td>
+                        <td className="p-3 text-mono-sm font-mono font-semibold text-primary">pay_QZ18HF63</td>
+                        <td className="p-3 text-mono-sm font-mono font-semibold text-text-primary">₹45,000</td>
                         <td className="p-3 text-right"><span className="text-caption font-semibold text-danger bg-danger-soft border border-danger/20 px-1.5 py-0.5 rounded">BLOCKED</span></td>
                       </tr>
                       <tr className="hover:bg-surface-secondary/50">
-                        <td className="p-3 text-mono-sm text-mono-sm font-mono font-semibold text-primary">pay_XT92PL11</td>
-                        <td className="p-3 text-mono-sm text-mono-sm font-mono font-semibold text-text-primary">₹8,200</td>
+                        <td className="p-3 text-mono-sm font-mono font-semibold text-primary">pay_XT92PL11</td>
+                        <td className="p-3 text-mono-sm font-mono font-semibold text-text-primary">₹8,200</td>
                         <td className="p-3 text-right"><span className="text-caption font-semibold text-warning bg-warning-soft border border-warning/20 px-1.5 py-0.5 rounded">REVIEW</span></td>
                       </tr>
                     </tbody>
@@ -312,19 +312,19 @@ export default function CasesPage() {
                 <div className="relative pl-5 border-l-2 border-border ml-3 space-y-6">
                   <div className="relative">
                     <div className="absolute -left-[27px] top-1 w-3 h-3 rounded-full bg-primary border-2 border-surface ring-2 ring-primary/20"></div>
-                    <div className="text-caption font-semibold text-text-muted text-mono-sm text-mono-sm font-mono mb-1">12:47 PM</div>
+                    <div className="text-caption font-semibold text-text-muted text-mono-sm font-mono mb-1">12:47 PM</div>
                     <div className="text-label-sm font-semibold text-text-primary">AI Investigation Completed</div>
                     <div className="text-caption text-text-secondary mt-1.5 leading-relaxed">Sentinel compiled cluster insights and recommended Block.</div>
                   </div>
                   <div className="relative">
                     <div className="absolute -left-[27px] top-1 w-3 h-3 rounded-full bg-text-muted border-2 border-surface ring-2 ring-text-muted/20"></div>
-                    <div className="text-caption font-semibold text-text-muted text-mono-sm text-mono-sm font-mono mb-1">12:44 PM</div>
+                    <div className="text-caption font-semibold text-text-muted text-mono-sm font-mono mb-1">12:44 PM</div>
                     <div className="text-label-sm font-semibold text-text-primary">Note Added</div>
                     <div className="text-caption text-text-primary bg-surface border border-border p-3 rounded-xl mt-2 shadow-sm font-medium italic">&quot;Reviewing device velocity history.&quot; - R. Verma</div>
                   </div>
                   <div className="relative">
                     <div className="absolute -left-[27px] top-1 w-3 h-3 rounded-full bg-text-muted border-2 border-surface ring-2 ring-text-muted/20"></div>
-                    <div className="text-caption font-semibold text-text-muted text-mono-sm text-mono-sm font-mono mb-1">12:42 PM</div>
+                    <div className="text-caption font-semibold text-text-muted text-mono-sm font-mono mb-1">12:42 PM</div>
                     <div className="text-label-sm font-semibold text-text-primary">Case Assigned</div>
                     <div className="text-caption text-text-secondary mt-1.5">Assigned to R. Verma (SLA: 1h)</div>
                   </div>

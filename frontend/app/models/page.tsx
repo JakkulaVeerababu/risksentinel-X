@@ -110,7 +110,7 @@ export default function ModelsPage() {
             </div>
           </div>
         </div>
-        <div className="relative z-10 flex items-center gap-2 px-4 py-2 bg-success-soft text-success border border-green-200 rounded-md font-semibold text-label-sm">
+        <div className="relative z-10 flex items-center gap-2 px-4 py-2 bg-success-soft text-success border border-blue-200 rounded-md font-semibold text-label-sm">
           <CheckCircle2 className="w-4 h-4" />
           ACTIVE & SERVING
         </div>
@@ -149,8 +149,8 @@ export default function ModelsPage() {
 
               <div>
                 <div className="flex justify-between text-label-sm mb-1">
-                  <span className="text-text-secondary font-medium">F1 Score</span>
-                  <span className="font-semibold tabular-nums">{formatPercent(metrics.f1)}</span>
+                  <span className="text-text-secondary font-medium">Synthetic Graph F1</span>
+                  <span className="font-semibold tabular-nums">{metrics.f1.toFixed(4)}</span>
                 </div>
                 <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
                   <div className="bg-primary h-full" style={{ width: `${metrics.f1 * 100}%` }}></div>
@@ -159,7 +159,7 @@ export default function ModelsPage() {
               
               <div className="pt-4 border-t border-border mt-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-label-sm font-medium text-text-secondary">PR-AUC</span>
+                  <span className="text-label-sm font-medium text-text-secondary">IEEE-CIS AP</span>
                   <span className="text-body-lg font-semibold text-text-primary tabular-nums">{metrics.pr_auc.toFixed(4)}</span>
                 </div>
               </div>
@@ -172,9 +172,9 @@ export default function ModelsPage() {
           <div className="bg-white border border-border rounded-xl p-6 shadow-subtle flex flex-col justify-between">
             <h3 className="text-caption font-semibold text-text-muted uppercase mb-4">Confusion Matrix (At Threshold {threshold.toFixed(2)})</h3>
             <div className="grid grid-cols-2 gap-2 flex-1">
-              <div className="bg-success-soft border border-green-200 rounded-lg p-3 flex flex-col justify-center">
+              <div className="bg-success-soft border border-blue-200 rounded-lg p-3 flex flex-col justify-center">
                 <span className="text-caption text-success font-medium mb-1">True Positive</span>
-                <span className="text-heading-md font-semibold text-green-800 tabular-nums">{metrics.tp_count.toLocaleString()}</span>
+                <span className="text-heading-md font-semibold text-blue-800 tabular-nums">{metrics.tp_count.toLocaleString()}</span>
               </div>
               <div className="bg-danger-soft border border-red-200 rounded-lg p-3 flex flex-col justify-center">
                 <span className="text-caption text-danger font-medium mb-1">False Positive</span>

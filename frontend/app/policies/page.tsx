@@ -100,26 +100,27 @@ export default function PoliciesPage() {
 
   return (
     <div className="flex flex-col gap-8 pb-12 h-full">
-      
+
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-heading-lg text-heading-lg text-text-primary ">
+          <h1 className="text-heading-lg text-text-primary ">
             Policy Engine
           </h1>
           <p className="text-label-sm text-text-secondary flex items-center gap-2">
             <span className="font-semibold text-primary flex items-center gap-1.5"><Activity className="w-4 h-4" /> AI recommends.</span> Policy decides.
           </p>
         </div>
-        <button 
+        {/* Policy Mutation Disabled for MVP */}
+        {/* <button
           onClick={() => setIsEditorOpen(true)}
           className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl font-semibold transition-all premium-shadow hover:premium-shadow-hover flex items-center gap-2 text-label-sm"
         >
           <Plus className="w-4 h-4" /> Create Policy
-        </button>
+        </button> */}
       </div>
 
       <div className="bg-surface border border-border rounded-xl overflow-hidden shadow-sm flex flex-col h-full min-h-[600px]">
-        
+
         <div className="p-5 border-b border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-surface-secondary/50">
           <div className="flex items-center gap-4">
             <button className="flex items-center gap-2 text-label-sm font-semibold text-text-secondary hover:text-text-primary px-4 py-2 rounded-lg border border-border bg-surface shadow-sm transition-colors">
@@ -129,9 +130,9 @@ export default function PoliciesPage() {
           </div>
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 h-4 w-4 text-text-muted pointer-events-none top-1/2 -translate-y-1/2" />
-            <input 
-              type="text" 
-              placeholder="Search policies..." 
+            <input
+              type="text"
+              placeholder="Search policies..."
               className="w-full bg-surface border border-border rounded-lg pl-10 pr-4 py-2 text-label-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 text-text-primary shadow-sm transition-all"
             />
           </div>
@@ -156,17 +157,17 @@ export default function PoliciesPage() {
               )}
               {policies.map(p => (
                 <tr key={p.policy_id} className="hover:bg-surface-secondary/50 transition-colors group">
-                  <td className="p-4 whitespace-nowrap text-label-sm text-mono-sm text-mono-sm font-mono font-semibold text-text-secondary">{p.priority}</td>
+                  <td className="p-4 whitespace-nowrap text-label-sm text-mono-sm font-mono font-semibold text-text-secondary">{p.priority}</td>
                   <td className="p-4">
                     <div className="text-label-sm font-semibold text-text-primary mb-1">{p.name}</div>
-                    <div className="text-caption text-text-muted text-mono-sm text-mono-sm font-mono">{p.policy_id}</div>
+                    <div className="text-caption text-text-muted text-mono-sm font-mono">{p.policy_id}</div>
                   </td>
                   <td className="p-4">
                     <div className="flex flex-wrap gap-2 items-center">
                       <span className="text-caption font-semibold text-primary bg-primary-soft px-2 py-0.5 rounded border border-primary/20 uppercase ">{p.conditions.operator}</span>
                       {p.conditions.rules.map((r, i) => (
                         <React.Fragment key={i}>
-                          <span className="bg-surface-secondary border border-border text-text-secondary text-caption px-2.5 py-1 rounded-md text-mono-sm text-mono-sm font-mono shadow-sm">
+                          <span className="bg-surface-secondary border border-border text-text-secondary text-caption px-2.5 py-1 rounded-md text-mono-sm font-mono shadow-sm">
                             {r.field} <span className="text-primary font-semibold mx-1">{r.operator}</span> {r.value}
                           </span>
                         </React.Fragment>
@@ -175,18 +176,18 @@ export default function PoliciesPage() {
                   </td>
                   <td className="p-4 whitespace-nowrap">
                     <DecisionBadge decision={p.action} />
-                    <div className="text-caption text-mono-sm text-mono-sm font-mono font-semibold text-text-secondary mt-2">{p.reason_code}</div>
+                    <div className="text-caption text-mono-sm font-mono font-semibold text-text-secondary mt-2">{p.reason_code}</div>
                   </td>
                   <td className="p-4 whitespace-nowrap">
-                    <button 
-                      onClick={() => handleToggle(p.policy_id)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shadow-inner ${p.enabled ? 'bg-success' : 'bg-border-strong'}`}
+                    <button
+                      disabled
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shadow-inner opacity-60 cursor-not-allowed ${p.enabled ? 'bg-success' : 'bg-border-strong'}`}
                     >
                       <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${p.enabled ? 'translate-x-6' : 'translate-x-1'}`} />
                     </button>
                   </td>
                   <td className="p-4 whitespace-nowrap text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleDelete(p.policy_id)} className="text-text-muted hover:text-danger p-2 rounded-lg hover:bg-danger-soft transition-colors border border-transparent hover:border-danger/20">
+                    <button disabled className="text-text-muted opacity-50 cursor-not-allowed p-2 rounded-lg border border-transparent">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
@@ -207,9 +208,9 @@ export default function PoliciesPage() {
               </h2>
               <button onClick={() => setIsEditorOpen(false)} className="text-text-muted hover:text-text-primary hover:bg-surface p-2 rounded-lg transition-colors"><X className="w-5 h-5"/></button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto space-y-8 bg-surface">
-              
+
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="block text-caption font-semibold text-text-secondary uppercase mb-2">Policy Name</label>
@@ -217,7 +218,7 @@ export default function PoliciesPage() {
                 </div>
                 <div>
                   <label className="block text-caption font-semibold text-text-secondary uppercase mb-2">Priority <span className="text-text-muted normal-case font-normal">(Higher runs first)</span></label>
-                  <input type="number" value={priority} onChange={e => setPriority(Number(e.target.value))} className="w-full bg-surface-secondary/50 border border-border rounded-lg px-4 py-2.5 text-label-sm text-text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 shadow-sm transition-all text-mono-sm text-mono-sm font-mono font-semibold" />
+                  <input type="number" value={priority} onChange={e => setPriority(Number(e.target.value))} className="w-full bg-surface-secondary/50 border border-border rounded-lg px-4 py-2.5 text-label-sm text-text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 shadow-sm transition-all text-mono-sm font-mono font-semibold" />
                 </div>
               </div>
 
@@ -234,14 +235,14 @@ export default function PoliciesPage() {
                     </select>
                   </div>
                 </div>
-                
+
                 <div className="p-5 bg-surface space-y-4">
                   {rules.map((rule, idx) => (
                     <div key={idx} className="flex gap-3 items-center bg-surface-secondary/30 p-2 rounded-lg border border-transparent hover:border-border transition-colors">
                       <input type="text" value={rule.field} onChange={(e) => {
                         const newR = [...rules]; newR[idx].field = e.target.value; setRules(newR);
-                      }} placeholder="Field (e.g. graph_score)" className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-label-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary/50 focus:outline-none shadow-sm text-mono-sm text-mono-sm font-mono"/>
-                      
+                      }} placeholder="Field (e.g. graph_score)" className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-label-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary/50 focus:outline-none shadow-sm text-mono-sm font-mono"/>
+
                       <select value={rule.operator} onChange={(e) => {
                         const newR = [...rules]; newR[idx].operator = e.target.value; setRules(newR);
                       }} className="w-24 bg-surface border border-border rounded-lg px-2 py-2 text-label-sm text-primary font-semibold focus:border-primary focus:ring-1 focus:ring-primary/50 focus:outline-none shadow-sm cursor-pointer text-center">
@@ -255,12 +256,12 @@ export default function PoliciesPage() {
 
                       <input type="text" value={rule.value} onChange={(e) => {
                         const newR = [...rules]; newR[idx].value = e.target.value; setRules(newR);
-                      }} placeholder="Value" className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-label-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary/50 focus:outline-none shadow-sm text-mono-sm text-mono-sm font-mono"/>
-                      
+                      }} placeholder="Value" className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-label-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary/50 focus:outline-none shadow-sm text-mono-sm font-mono"/>
+
                       <button onClick={() => setRules(rules.filter((_, i) => i !== idx))} className="text-text-muted hover:text-danger p-2 hover:bg-danger-soft rounded-lg transition-colors border border-transparent hover:border-danger/20"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   ))}
-                  
+
                   <button onClick={() => setRules([...rules, {field:'', operator:'>=', value:''}])} className="text-caption text-primary hover:text-primary-hover font-semibold flex items-center gap-1.5 mt-4 ml-2">
                     <Plus className="w-4 h-4" /> Add Rule
                   </button>
@@ -278,12 +279,12 @@ export default function PoliciesPage() {
                 </div>
                 <div>
                   <label className="block text-caption font-semibold uppercase mb-2 text-text-secondary">Reason Code</label>
-                  <input type="text" value={reasonCode} onChange={e => setReasonCode(e.target.value)} className="w-full bg-surface-secondary/50 border border-border rounded-lg px-4 py-2.5 text-label-sm text-text-primary text-mono-sm text-mono-sm font-mono font-semibold focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 shadow-sm transition-all" placeholder="e.g. COORDINATED_ATTACK"/>
+                  <input type="text" value={reasonCode} onChange={e => setReasonCode(e.target.value)} className="w-full bg-surface-secondary/50 border border-border rounded-lg px-4 py-2.5 text-label-sm text-text-primary text-mono-sm font-mono font-semibold focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 shadow-sm transition-all" placeholder="e.g. COORDINATED_ATTACK"/>
                 </div>
               </div>
 
             </div>
-            
+
             <div className="px-6 py-5 border-t border-border bg-surface-secondary/80 flex justify-end gap-3">
               <button onClick={() => setIsEditorOpen(false)} className="px-5 py-2.5 text-label-sm font-semibold text-text-secondary hover:text-text-primary bg-surface hover:bg-surface-secondary border border-border rounded-xl transition-colors shadow-sm">Cancel</button>
               <button onClick={handleCreatePolicy} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-xl font-semibold transition-all premium-shadow hover:premium-shadow-hover">Save Policy</button>

@@ -30,3 +30,49 @@ def get_policy_metadata():
             {"rule_id": "SAFE_FALLBACK_REVIEW", "description": "Unknown Input Combination -> REVIEW (Safe Fallback)"}
         ]
     )
+@router.get("/")
+def list_policies():
+    """
+    Returns READ-ONLY policies for the UI.
+    """
+    import datetime
+    return {
+        "policies": [
+            {
+                "policy_id": "P-V1-001",
+                "name": "Low Machine Risk -> ALLOW",
+                "priority": 100,
+                "conditions": {"operator": "AND", "rules": [{"field": "ml_risk", "operator": "<", "value": "0.4"}]},
+                "action": "ALLOW",
+                "reason_code": "LOW_MACHINE_RISK",
+                "enabled": True,
+                "version": POLICY_VERSION,
+                "updated_at": datetime.datetime.now().isoformat()
+            },
+            {
+                "policy_id": "P-V1-004",
+                "name": "ML High AND Graph High -> BLOCK",
+                "priority": 90,
+                "conditions": {"operator": "AND", "rules": [{"field": "ml_risk", "operator": ">=", "value": "0.8"}, {"field": "graph_risk", "operator": ">=", "value": "0.3"}]},
+                "action": "BLOCK",
+                "reason_code": "HIGH_ML_AND_GRAPH",
+                "enabled": True,
+                "version": POLICY_VERSION,
+                "updated_at": datetime.datetime.now().isoformat()
+            }
+        ]
+    }
+
+from fastapi import HTTPException
+
+@router.post("/")
+def create_policy():
+    raise HTTPException(status_code=405, detail="Policy mutations disabled in V3 certification mode.")
+
+@router.put("/{policy_id}/toggle")
+def toggle_policy(policy_id: str):
+    raise HTTPException(status_code=405, detail="Policy mutations disabled in V3 certification mode.")
+
+@router.delete("/{policy_id}")
+def delete_policy(policy_id: str):
+    raise HTTPException(status_code=405, detail="Policy mutations disabled in V3 certification mode.")

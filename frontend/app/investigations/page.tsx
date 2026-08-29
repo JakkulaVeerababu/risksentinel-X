@@ -54,7 +54,7 @@ export default function InvestigationsPage() {
     <div className="flex flex-col gap-8 pb-12 h-full">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-heading-lg text-heading-lg text-text-primary ">
+          <h1 className="text-heading-lg text-text-primary ">
             Investigations
           </h1>
           <p className="text-label-sm text-text-secondary font-medium">
@@ -109,14 +109,14 @@ export default function InvestigationsPage() {
               )}
               {investigations.map(inv => (
                 <tr key={inv.case_id} className="hover:bg-surface-secondary/50 transition-colors group">
-                  <td className="p-4 whitespace-nowrap text-label-sm text-mono-sm text-mono-sm font-mono font-semibold text-primary group-hover:underline cursor-pointer">{inv.case_id}</td>
+                  <td className="p-4 whitespace-nowrap text-label-sm text-mono-sm font-mono font-semibold text-primary group-hover:underline cursor-pointer">{inv.case_id}</td>
                   <td className="p-4">
                     <div className="text-label-sm font-semibold text-text-primary mb-1 truncate max-w-xs" title={inv.title}>{inv.title}</div>
                     <div className="text-caption text-text-secondary truncate max-w-xs">{inv.trigger}</div>
                   </td>
                   <td className="p-4 whitespace-nowrap">{getSeverityBadge(inv.severity)}</td>
-                  <td className="p-4 whitespace-nowrap text-label-sm text-mono-sm text-mono-sm font-mono text-text-primary font-semibold">{inv.transactions?.length || 0}</td>
-                  <td className="p-4 whitespace-nowrap text-label-sm text-mono-sm text-mono-sm font-mono font-semibold text-danger tabular-nums">₹{(inv.exposure || 0).toLocaleString()}</td>
+                  <td className="p-4 whitespace-nowrap text-label-sm text-mono-sm font-mono text-text-primary font-semibold">{inv.transactions?.length || 0}</td>
+                  <td className="p-4 whitespace-nowrap text-label-sm text-mono-sm font-mono font-semibold text-danger tabular-nums">₹{(inv.exposure || 0).toLocaleString()}</td>
                   <td className="p-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       {inv.assignee ? (
@@ -132,7 +132,7 @@ export default function InvestigationsPage() {
                     </div>
                   </td>
                   <td className="p-4 whitespace-nowrap">{getStatusBadge(inv.status)}</td>
-                  <td className="p-4 whitespace-nowrap text-caption text-mono-sm text-mono-sm font-mono text-text-secondary">{new Date(inv.created_at).toLocaleString()}</td>
+                  <td className="p-4 whitespace-nowrap text-caption text-mono-sm font-mono text-text-secondary">{new Date(inv.created_at).toLocaleString()}</td>
                   <td className="p-4 whitespace-nowrap text-right">
                     <Link href={`/investigations/${inv.case_id}`} className="inline-flex items-center gap-2 bg-primary text-white hover:bg-primary-hover px-4 py-2 rounded-lg text-caption font-semibold transition-all shadow-sm group-hover:premium-shadow-hover">
                       Investigate <ArrowRight className="w-3.5 h-3.5" />
