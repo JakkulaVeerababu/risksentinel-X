@@ -221,7 +221,7 @@ risksentinel-x/
 │   │   ├── ml/        # XGBoost scoring service
 │   │   ├── orchestration/  # Pipeline coordinator
 │   │   └── policy/    # Deterministic rule engine
-│   └── tests/         # 92 tests (91 pass, 1 skip)
+│   └── tests/         # 90 tests (88 pass, 2 skip)
 ├── frontend/          # Next.js dashboard
 ├── evaluation/        # Frozen evaluation artifacts
 │   └── results/       # ml_heldout_metrics.json, evaluation_summary.json
