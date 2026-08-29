@@ -112,7 +112,7 @@ def run_scenario(request: RunScenarioRequest, db: Session = Depends(get_db)):
         elif ml_risk > 0.6 or graph_risk > 0.6:
             final_decision = "REVIEW"
             
-        tx_model.policy_decision = final_decision
+        tx_model.decision = final_decision
         tx_model.status = "COMPLETED"
         db.commit()
         
