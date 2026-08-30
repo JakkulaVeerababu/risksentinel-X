@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Check, LoaderCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, LoaderCircle } from "lucide-react";
 import BrandLogo from "../../../components/brand/BrandLogo";
 
 const accessPoints = [
@@ -27,11 +27,9 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-[100dvh] w-full overflow-x-hidden bg-[#06132c] p-0 sm:p-4 lg:h-[100dvh] lg:min-h-0 lg:overflow-hidden xl:p-6">
-      <div className="grid min-h-[100dvh] w-full overflow-hidden bg-white sm:min-h-[calc(100dvh-32px)] sm:rounded-[28px] sm:border sm:border-white/15 sm:shadow-[0_36px_110px_rgba(0,0,0,.4)] lg:h-full lg:min-h-0 lg:grid-cols-[1.16fr_.84fr]">
+      <div className="grid min-h-[100dvh] w-full overflow-hidden bg-white sm:min-h-[calc(100dvh-32px)] sm:rounded-[18px] sm:border sm:border-white/15 sm:shadow-[0_28px_80px_rgba(0,0,0,.32)] lg:h-full lg:min-h-0 lg:grid-cols-[1.12fr_.88fr]">
         <section className="relative hidden min-h-0 overflow-hidden bg-[#071633] px-10 py-9 text-white lg:flex lg:flex-col xl:px-14 xl:py-11 2xl:px-16">
           <div className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.045)_1px,transparent_1px)] [background-size:76px_76px]" />
-          <div className="absolute -right-[12%] -top-[28%] h-[720px] w-[720px] rounded-full bg-[#245dff]/35 blur-[125px]" />
-          <div className="absolute -bottom-[45%] left-[12%] h-[620px] w-[620px] rounded-full bg-[#6a36ff]/28 blur-[120px]" />
           <div className="absolute inset-y-0 right-[3%] w-[56%] -skew-x-12 bg-gradient-to-b from-[#315fff]/22 via-[#21449d]/8 to-transparent" />
 
           <div className="relative z-10 inline-flex w-fit"><BrandLogo inverse /></div>
@@ -41,7 +39,7 @@ export default function LoginPage() {
             <h1 className="balance mt-5 text-[48px] font-semibold leading-[.98] tracking-[-.055em] xl:text-[58px] 2xl:text-[66px]">One clear view from signal to decision.</h1>
             <p className="mt-5 max-w-[650px] text-[15px] leading-7 text-[#aab9d4] xl:text-[17px]">Investigate coordinated fraud, understand every recommendation and act before payment risk turns into loss.</p>
 
-            <div className="mt-8 overflow-hidden rounded-[22px] border border-white/12 bg-[#0b1b3b]/86 shadow-[0_24px_70px_rgba(0,0,0,.28)] backdrop-blur-xl">
+            <div className="mt-8 overflow-hidden rounded-[12px] border border-white/12 bg-[#0b1b3b]/86 shadow-[0_18px_50px_rgba(0,0,0,.22)]">
               <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
                 <div><p className="text-[10px] font-extrabold uppercase tracking-[.15em] text-[#788baD]">Active intelligence</p><p className="mt-1 text-[14px] font-bold">Coordinated cluster FRC-0184</p></div>
                 <span className="rounded-full border border-[#ff7c83]/25 bg-[#4a2130] px-2.5 py-1 text-[10px] font-bold text-[#ff9ca2]">Critical · 96</span>
@@ -66,13 +64,13 @@ export default function LoginPage() {
 
           <div className="my-auto mx-auto w-full max-w-[500px] py-8">
             <p className="text-[11px] font-extrabold uppercase tracking-[.18em] text-[#255df5]">Credential-free access</p>
-            <h2 className="balance mt-4 text-[38px] font-semibold leading-[1.04] tracking-[-.05em] text-[#071936] sm:text-[46px] xl:text-[52px]">Enter the risk workspace.</h2>
+            <h2 className="balance mt-4 text-[36px] font-semibold leading-[1.04] tracking-[-.05em] text-[#071936] sm:text-[42px] xl:text-[46px]">Enter the risk workspace.</h2>
             <p className="mt-5 max-w-[460px] text-[14px] leading-6 text-[#69768b]">No email, password or setup is required. The complete platform is preloaded for your demo.</p>
 
             <div className="mt-7 divide-y divide-[#e8ecf2] rounded-2xl border border-[#e0e6ef] bg-white px-5 shadow-[0_16px_50px_rgba(31,51,92,.07)]">
-              {accessPoints.map(([title, detail]) => (
-                <div key={title} className="flex gap-3 py-4">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#255df5]" />
+              {accessPoints.map(([title, detail], index) => (
+                <div key={title} className="grid grid-cols-[26px_1fr] gap-3 py-4">
+                  <span className="font-mono text-[10px] font-bold text-[#8b97aa]">{String(index + 1).padStart(2, "0")}</span>
                   <div><p className="text-[13px] font-bold text-[#27344c]">{title}</p><p className="mt-1 text-[11px] leading-5 text-[#7b8698]">{detail}</p></div>
                 </div>
               ))}

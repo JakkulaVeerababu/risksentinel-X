@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 import "../styles/globals.css";
+import "../styles/premium.css";
 import type { Metadata } from "next";
 import RootFrame from "../components/layout/RootFrame";
 

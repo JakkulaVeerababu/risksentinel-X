@@ -12,5 +12,5 @@ export default function RootFrame({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return <div className="premium-shell"><DashboardLayout>{children}</DashboardLayout></div>;
 }

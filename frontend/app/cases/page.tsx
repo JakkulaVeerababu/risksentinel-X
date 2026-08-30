@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Download, Plus, Search, ChevronDown, Filter, MoreVertical,
-  Activity, AlertTriangle, Ban, Clock, ArrowUpRight, ShieldAlert, ExternalLink, X
+  AlertTriangle, Clock, ArrowUpRight, ShieldAlert, ExternalLink, X
 } from "lucide-react";
 import { fetchInvestigations, Investigation } from "@/lib/api";
 import { PageHeader, Skeleton, ErrorState } from "../../components/ui";
@@ -141,21 +141,19 @@ export default function CasesPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 bg-surface-secondary/30">
-              <div className="bg-[#1e2336] rounded-xl p-5 text-white premium-shadow border border-[#3e455e] relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
-                <div className="flex items-center gap-2 mb-4 border-b border-[#3e455e] pb-3 relative z-10">
-                  <Activity className="h-5 w-5 text-primary" />
-                  <h4 className="text-label-sm font-semibold uppercase ">Sentinel Recommendation</h4>
+              <div className="relative overflow-hidden border border-[#dfe5ee] border-l-2 border-l-[#245df5] bg-white p-5">
+                <div className="relative z-10 mb-4 border-b border-[#e5e9f0] pb-3">
+                  <h4 className="text-label-sm font-semibold uppercase text-[#17233f]">Sentinel recommendation</h4>
                 </div>
-                <div className="bg-black/40 rounded-lg p-3 border border-[#3e455e] mb-4 flex justify-between items-center relative z-10">
-                  <span className={`font-semibold text-label-sm flex items-center gap-2 ${selectedCase.recommendation === 'BLOCK' ? 'text-danger' : selectedCase.recommendation === 'REVIEW' ? 'text-warning' : 'text-success'}`}>
-                    {selectedCase.recommendation === 'BLOCK' && <Ban className="h-4 w-4" />} {selectedCase.recommendation || 'PENDING'}
+                <div className="relative z-10 mb-4 flex items-center justify-between border border-[#e5e9f0] bg-[#f7f9fc] p-3">
+                  <span className={`font-semibold text-label-sm ${selectedCase.recommendation === 'BLOCK' ? 'text-danger' : selectedCase.recommendation === 'REVIEW' ? 'text-warning' : 'text-success'}`}>
+                    {selectedCase.recommendation || 'PENDING'}
                   </span>
-                  <span className="text-text-muted text-caption text-mono-sm font-mono font-semibold px-2 py-0.5 rounded border border-[#3e455e]">
+                  <span className="border border-[#dfe5ee] px-2 py-0.5 font-mono text-caption font-semibold text-text-muted">
                     {selectedCase.confidence ? `${(selectedCase.confidence * 100).toFixed(1)}% Confidence` : 'Running...'}
                   </span>
                 </div>
-                <div className="text-label-sm text-[#a1a6bb] leading-relaxed relative z-10">
+                <div className="relative z-10 text-label-sm leading-relaxed text-[#667287]">
                   <span className="block font-semibold mb-2">Reason Codes:</span>
                   <ul className="list-disc pl-5">
                     {selectedCase.reason_codes?.map((rc: string) => <li key={rc}>{rc}</li>) || <li>None</li>}

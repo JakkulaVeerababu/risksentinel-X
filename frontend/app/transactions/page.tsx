@@ -4,22 +4,18 @@ import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowDownToLine,
-  Ban,
   CalendarDays,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Eye,
   Filter,
   MoreHorizontal,
   PlayCircle,
   RefreshCcw,
   Search,
-  ShieldCheck,
   SlidersHorizontal,
   X,
-  Check,
-  AlertTriangle
+  Check
 } from "lucide-react";
 import { fetchRecentTransactions, Transaction } from "@/lib/api";
 import { timeAgo } from "@/lib/utils";
@@ -44,12 +40,6 @@ function decisionStyle(decision: string) {
   if (decision === "BLOCK") return "border-[#ffd0d4] bg-[#fff0f1] text-[#d52d39]";
   if (decision === "REVIEW") return "border-[#d6e3ff] bg-[#eef4ff] text-[#255df5]";
   return "border-[#cdd9f8] bg-[#edf3ff] text-[#315efb]";
-}
-
-function DecisionIcon({ decision }: { decision: string }) {
-  if (decision === "BLOCK") return <Ban className="h-3.5 w-3.5" />;
-  if (decision === "REVIEW") return <Eye className="h-3.5 w-3.5" />;
-  return <ShieldCheck className="h-3.5 w-3.5" />;
 }
 
 export default function TransactionsPage() {
@@ -120,8 +110,7 @@ export default function TransactionsPage() {
       </section>
 
       {error && (
-        <div className="mt-6 p-4 bg-danger-soft text-danger border border-danger/20 rounded-xl flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5" />
+        <div className="mt-6 border border-danger/20 border-l-2 border-l-danger bg-danger-soft p-4 text-danger">
           <span className="font-semibold">{error}</span>
         </div>
       )}
@@ -168,7 +157,7 @@ export default function TransactionsPage() {
                       <span className={`text-[16px] font-bold tabular-nums ${tx.graph_risk >= 0.8 ? "text-[#d72d38]" : tx.graph_risk >= 0.3 ? "text-[#bd7209]" : "text-[#315efb]"}`}>{Math.round(tx.graph_risk * 100)}</span>
                     )}
                   </td>
-                  <td className="px-4 py-4"><span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[10px] font-extrabold uppercase ${decisionStyle(tx.decision || "PENDING")}`}><DecisionIcon decision={tx.decision || "PENDING"} />{tx.decision || "PENDING"}</span></td>
+                  <td className="px-4 py-4"><span className={`inline-flex items-center rounded-md border px-2.5 py-1.5 text-[10px] font-extrabold uppercase ${decisionStyle(tx.decision || "PENDING")}`}>{tx.decision || "PENDING"}</span></td>
                   <td className="px-4 py-4 text-right"><p className="font-mono text-[10px] font-semibold text-[#778399]">{tx.timestamp ? timeAgo(tx.timestamp) : ""}</p><Link href={`/transactions/${tx.transaction_id}`} aria-label={`Open ${tx.transaction_id}`} className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-md text-[#8e98a9] opacity-0 transition hover:bg-[#eaf0fa] group-hover:opacity-100"><MoreHorizontal className="h-4 w-4" /></Link></td>
                 </tr>
               )})}

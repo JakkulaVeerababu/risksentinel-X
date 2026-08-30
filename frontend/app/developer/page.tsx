@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { PageHeader, Card, Badge } from "../../components/ui";
-import { Copy, Check, Terminal, Webhook, FileJson } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 
 export default function DeveloperPage() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -137,10 +137,7 @@ export default function DeveloperPage() {
         <div className="lg:col-span-1 space-y-8">
           
           <Card className="p-6 premium-shadow">
-            <h2 className="text-caption font-semibold text-text-muted uppercase flex items-center gap-2 mb-5">
-              <Terminal className="w-4 h-4 text-primary" /> 
-              Environment
-            </h2>
+            <h2 className="rsx-rule-heading mb-5">Environment</h2>
             
             <div className="space-y-5">
               <div>
@@ -175,10 +172,7 @@ export default function DeveloperPage() {
           </Card>
 
           <Card className="p-6 premium-shadow">
-            <h2 className="text-caption font-semibold text-text-muted uppercase flex items-center gap-2 mb-4">
-              <Webhook className="w-4 h-4 text-primary" /> 
-              Webhook Events
-            </h2>
+            <h2 className="rsx-rule-heading mb-4">Webhook events</h2>
             <p className="text-label-sm text-text-secondary leading-relaxed">
               Webhook integrations are outside the current MVP.
             </p>
@@ -189,11 +183,8 @@ export default function DeveloperPage() {
         {/* Right Column: API Reference */}
         <div className="lg:col-span-2 space-y-8">
           <Card className="p-0 overflow-hidden premium-shadow border border-border">
-            <div className="px-6 py-5 border-b border-border bg-surface-secondary flex items-center gap-3">
-              <div className="p-2 bg-surface rounded-lg border border-border shadow-sm">
-                <FileJson className="w-5 h-5 text-text-primary" />
-              </div>
-              <h2 className="text-body-lg font-semibold text-text-primary ">API Reference</h2>
+            <div className="border-b border-border bg-surface-secondary px-6 py-5">
+              <h2 className="rsx-rule-heading">API reference</h2>
             </div>
             
             <div className="divide-y divide-border bg-surface">

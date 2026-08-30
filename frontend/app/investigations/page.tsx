@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { fetchInvestigations } from "../../lib/api";
-import { Search, SlidersHorizontal, ArrowRight, ShieldAlert, Clock, CheckCircle2 } from "lucide-react";
+import { Search, SlidersHorizontal, ArrowRight } from "lucide-react";
 import { ErrorState, EmptyState, Skeleton } from "../../components/ui";
 
 export default function InvestigationsPage() {
@@ -32,19 +32,19 @@ export default function InvestigationsPage() {
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
-      case "CRITICAL": return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-danger-soft text-danger border border-danger/20 flex items-center gap-1.5 w-fit"><ShieldAlert className="w-3 h-3" /> CRITICAL</span>;
-      case "HIGH": return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-warning-soft text-warning border border-warning/20 flex items-center gap-1.5 w-fit"><ShieldAlert className="w-3 h-3" /> HIGH</span>;
-      case "MEDIUM": return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-info-soft text-info border border-info/20 flex items-center gap-1.5 w-fit"><ShieldAlert className="w-3 h-3" /> MEDIUM</span>;
-      default: return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-surface-secondary text-text-secondary border border-border flex items-center gap-1.5 w-fit"><ShieldAlert className="w-3 h-3" /> LOW</span>;
+      case "CRITICAL": return <span className="w-fit rounded-md border border-danger/20 bg-danger-soft px-2.5 py-1 text-caption font-semibold uppercase text-danger">CRITICAL</span>;
+      case "HIGH": return <span className="w-fit rounded-md border border-warning/20 bg-warning-soft px-2.5 py-1 text-caption font-semibold uppercase text-warning">HIGH</span>;
+      case "MEDIUM": return <span className="w-fit rounded-md border border-info/20 bg-info-soft px-2.5 py-1 text-caption font-semibold uppercase text-info">MEDIUM</span>;
+      default: return <span className="w-fit rounded-md border border-border bg-surface-secondary px-2.5 py-1 text-caption font-semibold uppercase text-text-secondary">LOW</span>;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "OPEN": return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-surface-secondary text-text-primary border border-border">OPEN</span>;
-      case "INVESTIGATING": return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-primary-soft text-primary border border-primary/20 flex items-center gap-1.5 w-fit"><Clock className="w-3 h-3" /> INVESTIGATING</span>;
+      case "INVESTIGATING": return <span className="w-fit rounded-md border border-primary/20 bg-primary-soft px-2.5 py-1 text-caption font-semibold uppercase text-primary">INVESTIGATING</span>;
       case "ESCALATED": return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-warning-soft text-warning border border-warning/20">ESCALATED</span>;
-      case "RESOLVED": return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-success-soft text-success border border-success/20 flex items-center gap-1.5 w-fit"><CheckCircle2 className="w-3 h-3" /> RESOLVED</span>;
+      case "RESOLVED": return <span className="w-fit rounded-md border border-success/20 bg-success-soft px-2.5 py-1 text-caption font-semibold uppercase text-success">RESOLVED</span>;
       case "DISMISSED": return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-surface-secondary text-text-muted border border-border border-dashed">DISMISSED</span>;
       default: return null;
     }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, AlertTriangle, ShieldCheck, Ban, Eye, Network, Brain, Search, Clock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { fetchRiskCase, fetchAuditTimeline, PipelineResponse, AuditEvent } from "@/lib/api";
 import { timeAgo } from "@/lib/utils";
 
@@ -48,7 +48,7 @@ export default function TransactionDetailPage() {
   if (error || !data) {
     return (
       <div className="p-8 flex flex-col items-center justify-center min-h-[400px]">
-        <AlertTriangle className="h-10 w-10 text-danger mb-4" />
+        <p className="mb-3 text-[10px] font-bold uppercase tracking-[.14em] text-danger">Data unavailable</p>
         <h2 className="text-xl font-bold text-text-primary mb-2">Transaction Not Found</h2>
         <p className="text-text-secondary mb-6">{error}</p>
         <button onClick={() => router.push("/transactions")} className="px-4 py-2 bg-surface border border-border rounded-lg shadow-sm hover:bg-surface-secondary">
@@ -97,9 +97,8 @@ export default function TransactionDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* ML SECTION */}
         <div className="border border-border rounded-xl bg-surface shadow-sm overflow-hidden flex flex-col">
-          <div className="border-b border-border bg-surface-secondary px-5 py-4 flex items-center gap-2">
-            <Brain className="w-5 h-5 text-primary" />
-            <h2 className="font-semibold text-text-primary">1. ML Analysis</h2>
+          <div className="border-b border-border bg-surface-secondary px-5 py-4">
+            <h2 className="rsx-rule-heading">1. ML analysis</h2>
           </div>
           <div className="p-5 flex-1">
             <div className="flex justify-between items-end mb-2">
@@ -123,9 +122,8 @@ export default function TransactionDetailPage() {
 
         {/* GRAPH SECTION */}
         <div className="border border-border rounded-xl bg-surface shadow-sm overflow-hidden flex flex-col">
-          <div className="border-b border-border bg-surface-secondary px-5 py-4 flex items-center gap-2">
-            <Network className="w-5 h-5 text-primary" />
-            <h2 className="font-semibold text-text-primary">2. Graph Intelligence</h2>
+          <div className="border-b border-border bg-surface-secondary px-5 py-4">
+            <h2 className="rsx-rule-heading">2. Graph intelligence</h2>
           </div>
           <div className="p-5 flex-1">
             <div className="flex justify-between items-end mb-2">
@@ -161,10 +159,7 @@ export default function TransactionDetailPage() {
         {/* AGENT SECTION */}
         <div className="border border-border rounded-xl bg-surface shadow-sm overflow-hidden flex flex-col">
           <div className="border-b border-border bg-surface-secondary px-5 py-4 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Search className="w-5 h-5 text-primary" />
-              <h2 className="font-semibold text-text-primary">3. Agent Investigation</h2>
-            </div>
+            <h2 className="rsx-rule-heading">3. Agent investigation</h2>
             <span className={`text-xs font-bold uppercase px-2 py-1 rounded ${agent.status === 'COMPLETED' ? 'bg-success-soft text-success' : agent.status === 'DEGRADED' ? 'bg-warning-soft text-warning' : 'bg-surface-secondary text-text-muted'}`}>
               {agent.status}
             </span>
@@ -209,9 +204,8 @@ export default function TransactionDetailPage() {
 
         {/* POLICY SECTION */}
         <div className="border border-border rounded-xl bg-surface shadow-sm overflow-hidden flex flex-col border-l-4 border-l-primary">
-          <div className="border-b border-border bg-surface-secondary px-5 py-4 flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-primary" />
-            <h2 className="font-semibold text-text-primary">4. Policy Decision</h2>
+          <div className="border-b border-border bg-surface-secondary px-5 py-4">
+            <h2 className="rsx-rule-heading">4. Policy decision</h2>
           </div>
           <div className="p-5 flex-1">
             <div className="mb-5">
@@ -248,9 +242,8 @@ export default function TransactionDetailPage() {
 
       {/* AUDIT TIMELINE */}
       <div className="border border-border rounded-xl bg-surface shadow-sm overflow-hidden">
-        <div className="border-b border-border bg-surface-secondary px-5 py-4 flex items-center gap-2">
-          <Clock className="w-5 h-5 text-primary" />
-          <h2 className="font-semibold text-text-primary">Audit Timeline</h2>
+        <div className="border-b border-border bg-surface-secondary px-5 py-4">
+          <h2 className="rsx-rule-heading">Audit timeline</h2>
         </div>
         <div className="p-5">
           {timeline.length === 0 ? (

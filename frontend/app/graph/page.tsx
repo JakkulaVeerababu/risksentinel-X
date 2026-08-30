@@ -2,7 +2,7 @@
 
 import { FormEvent, useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronRight, Filter, Minus, Plus, RotateCcw, Search, Layers } from "lucide-react";
+import { ChevronRight, Search } from "lucide-react";
 import { PageHeader, ErrorState } from "../../components/ui";
 import { fetchGraphContext } from "../../lib/api";
 
@@ -22,7 +22,6 @@ export default function GraphExplorerPage() {
   const [selectedId, setSelectedId] = useState("");
   const [query, setQuery] = useState("");
   const [zoom, setZoom] = useState(1);
-  const [showFilters, setShowFilters] = useState(false);
   const [graphData, setGraphData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -53,7 +52,7 @@ export default function GraphExplorerPage() {
     <div className="rsx-page space-y-5">
       <PageHeader
         eyebrow="Relationship intelligence"
-        title="Network graph (Demo)"
+        title="Network graph"
         description="Trace the connections behind a payment decision without losing the operational context."
         actions={<Link href="/clusters" className="inline-flex h-9 items-center gap-2 rounded-md bg-[#111a2d] px-4 text-[11px] font-bold text-white transition-colors hover:bg-[#263047]">Open fraud clusters <ChevronRight className="h-3.5 w-3.5" /></Link>}
       />
@@ -71,8 +70,8 @@ export default function GraphExplorerPage() {
 
         {!graphData && !loading && (
           <div className="flex flex-col items-center justify-center min-h-[500px] text-center space-y-4">
-            <Layers className="w-12 h-12 text-text-muted opacity-50" />
-            <p className="text-body-md text-text-secondary max-w-md">No graph context is available for this transaction.</p>
+            <p className="rsx-section-label">Relationship explorer</p>
+            <p className="max-w-md text-[14px] text-text-secondary">No graph context is available for this transaction.</p>
             {error && <p className="text-danger text-sm">Failed to load graph or entity not found.</p>}
           </div>
         )}

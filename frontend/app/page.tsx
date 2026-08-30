@@ -45,7 +45,6 @@ export default function ProductLandingPage() {
       <main>
         <section className="relative overflow-hidden bg-[#071226] pt-[72px] text-white">
           <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)] [background-size:72px_72px]" />
-          <div className="pointer-events-none absolute right-[-15%] top-[-20%] h-[780px] w-[780px] rounded-full bg-[#2f6bff]/[.22] blur-[130px]" />
           <svg className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[58%] opacity-20 lg:block" viewBox="0 0 900 880" preserveAspectRatio="none" aria-hidden="true">
             <g fill="none" stroke="#7da1ff" strokeWidth="1"><path d="M40 180 L260 98 L480 210 L720 112 L870 245"/><path d="M0 540 L220 420 L470 522 L690 398 L900 470"/><path d="M260 98 L220 420"/><path d="M480 210 L470 522"/><path d="M720 112 L690 398"/></g>
           </svg>

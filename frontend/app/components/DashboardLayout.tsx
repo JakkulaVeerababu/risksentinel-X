@@ -21,7 +21,6 @@ type NavItem = {
   label: string;
   href: string;
   badge?: string;
-  accent?: boolean;
 };
 
 type NavSection = { label: string; items: NavItem[] };
@@ -41,7 +40,7 @@ const navigation: NavSection[] = [
     items: [
       { label: "Network graph", href: "/graph" },
       { label: "Fraud clusters", href: "/clusters", badge: "4" },
-      { label: "Investigation AI", href: "/ai", accent: true },
+      { label: "Investigation AI", href: "/ai" },
       { label: "Recommendations", href: "/recommendations" },
     ],
   },
@@ -81,26 +80,23 @@ function Sidebar({ mobile = false, onNavigate }: { mobile?: boolean; onNavigate?
   const pathname = usePathname();
 
   return (
-    <aside className={`${mobile ? "flex" : "hidden lg:flex"} h-full w-[232px] flex-col border-r border-[#e2e6ef] bg-white`}>
-      <div className="flex h-[62px] items-center border-b border-[#edf0f5] px-5">
+    <aside className={`${mobile ? "flex" : "hidden lg:flex"} h-full w-[244px] flex-col border-r border-[#e2e6ef] bg-white`}>
+      <div className="flex h-16 items-center border-b border-[#edf0f5] px-5">
         <BrandLogo href="/dashboard" />
       </div>
 
-      <div className="border-b border-[#eef1f5] px-3 py-3">
-        <button className="group flex w-full items-center justify-between rounded-xl border border-transparent px-2.5 py-2 text-left transition-all hover:border-[#e8ecf3] hover:bg-[#f8faff]">
-          <span className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#dfe5ee] bg-[#f8faf8] text-caption font-semibold text-[#315efb]">AP</span>
-            <span className="min-w-0">
-              <span className="block truncate text-label-sm font-semibold text-[#17233f]">Acme Payments</span>
-              <span className="mt-0.5 block truncate text-caption font-medium text-[#8791a4]">Production workspace</span>
-            </span>
+      <div className="border-b border-[#eef1f5] px-4 py-4">
+        <button className="group flex w-full items-center justify-between border-l-2 border-[#245df5] px-3 py-1 text-left transition-colors hover:bg-[#f8faff]">
+          <span className="min-w-0">
+            <span className="block truncate text-[13px] font-semibold text-[#17233f]">Acme Payments</span>
+            <span className="mt-0.5 block truncate text-[11px] font-medium text-[#8791a4]">Production workspace</span>
           </span>
           <ChevronDown className="h-4 w-4 text-[#9aa3b3] transition-transform group-hover:translate-y-0.5" />
         </button>
         <Link
           href="/investigations"
           onClick={onNavigate}
-          className="mt-2 flex h-9 w-full items-center justify-center gap-2 rounded-md bg-[#111a2d] px-3 text-caption font-semibold text-white transition-colors hover:bg-[#253047]"
+          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-[#245df5] px-3 text-[12px] font-semibold text-white shadow-[0_8px_20px_rgba(36,93,245,.18)] transition-colors hover:bg-[#1747c9]"
         >
           <Plus className="h-3.5 w-3.5" /> New investigation
         </Link>
@@ -122,7 +118,6 @@ function Sidebar({ mobile = false, onNavigate }: { mobile?: boolean; onNavigate?
                   >
                     {active && <span className="absolute -left-3 h-5 w-[2px] bg-[#315efb]" />}
                     <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                    {item.accent && <span className="rounded bg-gradient-to-r from-[#eaf0ff] to-[#f1eaff] px-1.5 py-0.5 text-caption font-semibold uppercase text-[#6941c6]">AI</span>}
                     {item.badge && <span className={`min-w-5 rounded-full px-1.5 py-0.5 text-center text-caption font-semibold ${active ? "bg-white text-[#255df5]" : "bg-[#eef1f5] text-[#7d8799]"}`}>{item.badge}</span>}
                   </Link>
                 );
@@ -135,10 +130,7 @@ function Sidebar({ mobile = false, onNavigate }: { mobile?: boolean; onNavigate?
       <div className="border-t border-[#eef1f5] p-3">
         <div className="border-t border-[#edf0f5] px-1 py-2">
           <div className="flex items-center gap-2 text-caption font-semibold text-[#344158]">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#315efb] opacity-30" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#315efb]" />
-            </span>
+            <span className="h-1.5 w-1.5 rounded-full bg-[#315efb]" />
             All risk engines operational
           </div>
           <p className="mt-1 pl-4 text-[10px] font-medium text-[#8d958f]">ML · Graph · Policy</p>
@@ -186,7 +178,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f7fb] text-[#17233f]">
+    <div className="rsx-workspace min-h-screen bg-[#f4f6fa] text-[#17233f]">
       <div className="fixed inset-y-0 left-0 z-40 hidden lg:block"><Sidebar /></div>
 
       {mobileNavOpen && (
@@ -199,8 +191,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      <div className="flex min-h-screen flex-col lg:pl-[232px]">
-        <header className="sticky top-0 z-50 flex h-[62px] items-center border-b border-[#e2e6ef] bg-white/95 px-4 backdrop-blur-xl sm:px-6">
+      <div className="flex min-h-screen flex-col lg:pl-[244px]">
+        <header className="sticky top-0 z-50 flex h-16 items-center border-b border-[#e2e6ef] bg-white/95 px-4 backdrop-blur-xl sm:px-7">
           <button className="mr-2 rounded-lg p-2 text-[#566177] hover:bg-[#f2f5f9] lg:hidden" aria-label="Open navigation" onClick={() => setMobileNavOpen(true)}><Menu className="h-5 w-5" /></button>
           <div className="mr-3 lg:hidden"><BrandLogo compact /></div>
 
@@ -249,15 +241,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             <button className="hidden rounded-lg p-2 text-[#647086] hover:bg-[#f2f5f9] sm:block" aria-label="Help"><CircleHelp className="h-[18px] w-[18px]" /></button>
-            <Link href="/settings" className="ml-0.5 flex items-center gap-2 border-l border-[#e7ebf1] py-1 pl-2.5 text-left sm:ml-1 sm:pl-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#dfe5ee] bg-[#f8faf8] text-[10px] font-bold text-[#1f335d]">FO</span>
-              <span className="hidden 2xl:block"><span className="block text-caption font-semibold text-[#2d3950]">Fraud Ops</span><span className="block text-caption font-semibold text-[#8b95a7]">Administrator</span></span>
+            <Link href="/settings" className="ml-0.5 hidden border-l border-[#e7ebf1] py-0.5 pl-3 text-left sm:block">
+              <span className="block text-[12px] font-semibold text-[#2d3950]">Fraud Ops</span>
+              <span className="block text-[10px] font-medium text-[#8b95a7]">Administrator</span>
             </Link>
           </div>
         </header>
 
         <PageTransition>
-          <main className="mx-auto w-full max-w-[1540px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-7">
+          <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-7 sm:py-7 xl:px-9 xl:py-8">
             {children}
           </main>
         </PageTransition>

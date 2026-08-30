@@ -10,8 +10,7 @@ import {
   ExternalLink,
   PlayCircle,
   X,
-  CheckCircle2,
-  AlertTriangle
+  CheckCircle2
 } from "lucide-react";
 import {
   Area,
@@ -73,7 +72,7 @@ export default function DashboardPage() {
   }
 
   if (error) {
-    return <div className="p-8 flex justify-center text-danger"><AlertTriangle className="mr-2" /> {error}</div>;
+    return <div className="border border-danger/20 border-l-2 border-l-danger bg-danger-soft p-5 text-center font-semibold text-danger">{error}</div>;
   }
 
   if (!metricsData) return null;

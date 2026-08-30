@@ -1,10 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Download, Calendar, ChevronDown, RefreshCcw, Search, Filter, SortDesc,
-  Activity, ShieldAlert, Gavel, Network, Settings, User, X, FileJson, Copy, ExternalLink, AlertTriangle
-} from "lucide-react";
+import { Calendar, ChevronDown, RefreshCcw, X } from "lucide-react";
 import { fetchAuditEvents, AuditEvent } from "@/lib/api";
 import { PageHeader, Skeleton, ErrorState } from "../../components/ui";
 
@@ -33,15 +30,6 @@ export default function AuditPage() {
   useEffect(() => {
     loadData();
   }, []);
-
-  const getActorIcon = (service: string) => {
-    const s = service.toLowerCase();
-    if (s.includes('policy')) return <Gavel className="h-4 w-4 text-text-secondary" />;
-    if (s.includes('agent') || s.includes('ai')) return <Activity className="h-4 w-4 text-primary" />;
-    if (s.includes('graph')) return <Network className="h-4 w-4 text-text-secondary" />;
-    if (s.includes('model') || s.includes('score')) return <ShieldAlert className="h-4 w-4 text-info" />;
-    return <Settings className="h-4 w-4 text-text-secondary" />;
-  };
 
   if (loading && events.length === 0) {
     return (
@@ -100,9 +88,7 @@ export default function AuditPage() {
           <div className="text-[25px] font-semibold tabular-nums">{decisionEvents}</div>
         </div>
         <div className="flex-1 flex flex-col p-5">
-          <div className="flex items-center gap-2 mb-2 text-caption font-semibold uppercase text-text-muted">
-            <Activity className="h-4 w-4 text-primary" /> AI Investigations
-          </div>
+          <div className="mb-2 text-caption font-semibold uppercase text-text-muted">AI investigations</div>
           <div className="text-[25px] font-semibold tabular-nums">{aiEvents}</div>
         </div>
       </div>
@@ -134,12 +120,7 @@ export default function AuditPage() {
                         <span className="text-label-sm text-mono-sm font-mono text-text-secondary">{evt.event_id.substring(0, 12)}...</span>
                       </td>
                       <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-lg flex items-center justify-center border bg-surface-secondary border-border text-text-muted">
-                            {getActorIcon(evt.service)}
-                          </div>
-                          <span className="text-label-sm font-semibold text-text-primary">{evt.service}</span>
-                        </div>
+                        <span className="text-label-sm font-semibold text-text-primary">{evt.service}</span>
                       </td>
                       <td className="p-4">
                         <span className="text-label-sm font-medium text-text-primary">{evt.event_type}</span>

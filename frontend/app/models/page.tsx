@@ -4,17 +4,6 @@ import React, { useState, useEffect } from "react";
 import { PageHeader, Skeleton, ErrorState } from "../../components/ui";
 import { modelsService, ModelPerformanceData } from "../../services/models";
 import { 
-  CheckCircle2, 
-  BrainCircuit, 
-  Database, 
-  Clock, 
-  ShieldCheck, 
-  AlertTriangle,
-  FileSearch,
-  Activity,
-  Layers
-} from "lucide-react";
-import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Legend, Area, AreaChart
 } from "recharts";
@@ -87,26 +76,20 @@ export default function ModelsPage() {
       {/* Model Info Header */}
       <div className="bg-white border border-border rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-subtle relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-        <div className="relative z-10 flex items-start gap-4">
-          <div className="p-3 bg-primary-soft rounded-lg">
-            <BrainCircuit className="w-6 h-6 text-primary" />
-          </div>
+        <div className="relative z-10 border-l-2 border-[#245df5] pl-4">
           <div>
             <h2 className="text-body-lg font-semibold text-text-primary flex items-center gap-2">
               {model_info.model_name}
               <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-caption text-mono-sm text-mono-sm font-mono">{model_info.model_version}</span>
             </h2>
-            <div className="flex items-center gap-4 mt-2 text-label-sm text-text-secondary">
-              <span className="flex items-center gap-1.5"><Database className="w-4 h-4" /> {model_info.test_samples.toLocaleString()} IEEE-CIS held-out evaluation</span>
-              <span className="flex items-center gap-1.5"><Layers className="w-4 h-4" /> {model_info.feature_count} Features</span>
-              {model_info.training_date && <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {new Date(model_info.training_date).toLocaleDateString()}</span>}
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-label-sm text-text-secondary">
+              <span>{model_info.test_samples.toLocaleString()} IEEE-CIS held-out samples</span>
+              <span>{model_info.feature_count} features</span>
+              {model_info.training_date && <span>Trained {new Date(model_info.training_date).toLocaleDateString()}</span>}
             </div>
           </div>
         </div>
-        <div className="relative z-10 flex items-center gap-2 px-4 py-2 bg-success-soft text-success border border-blue-200 rounded-md font-semibold text-label-sm">
-          <CheckCircle2 className="w-4 h-4" />
-          ACTIVE & SERVING
-        </div>
+        <div className="relative z-10 border-l-2 border-[#245df5] pl-3 text-[11px] font-semibold uppercase tracking-[.08em] text-[#245df5]">Active &amp; serving</div>
       </div>
 
       {/* Grid: Confusion Matrix & Core Metrics */}
@@ -115,9 +98,7 @@ export default function ModelsPage() {
         {/* ML Metrics */}
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white border border-border rounded-xl p-6 shadow-subtle h-full">
-            <h3 className="text-caption font-semibold text-text-muted uppercase mb-6 flex items-center gap-2">
-              <Activity className="w-4 h-4" /> Machine Learning Metrics
-            </h3>
+            <h3 className="rsx-rule-heading mb-6">Machine learning metrics</h3>
             
             <div className="space-y-6">
               <div>
@@ -189,17 +170,17 @@ export default function ModelsPage() {
             <p className="text-[11px] text-text-muted mb-4">Illustrative assumptions only; not Razorpay economics.</p>
             
             <div className="flex justify-between items-center py-2 border-b border-border">
-              <div className="flex items-center gap-2 text-label-sm text-text-secondary"><ShieldCheck className="w-4 h-4 text-success" /> False Positive Unit Cost</div>
+              <div className="text-label-sm text-text-secondary">False positive unit cost</div>
               <div className="font-semibold text-success tabular-nums">₹150</div>
             </div>
             
             <div className="flex justify-between items-center py-2 border-b border-border">
-              <div className="flex items-center gap-2 text-label-sm text-text-secondary"><AlertTriangle className="w-4 h-4 text-danger" /> False Negative Unit Cost</div>
+              <div className="text-label-sm text-text-secondary">False negative unit cost</div>
               <div className="font-semibold text-danger tabular-nums">₹2,000</div>
             </div>
 
             <div className="flex justify-between items-center py-2 border-b border-border">
-              <div className="flex items-center gap-2 text-label-sm text-text-secondary"><FileSearch className="w-4 h-4 text-warning" /> Total False Positive Cost</div>
+              <div className="text-label-sm text-text-secondary">Total false positive cost</div>
               <div className="font-semibold text-warning tabular-nums">{formatCurrency(metrics.fp_count * 150)}</div>
             </div>
 
@@ -216,9 +197,7 @@ export default function ModelsPage() {
         
         {/* Synthetic Seeded Graph Benchmark */}
         <div className="bg-white border border-border rounded-xl p-6 shadow-subtle lg:col-span-2 mt-2">
-          <h3 className="text-caption font-semibold text-text-muted uppercase mb-6 flex items-center gap-2">
-            <Activity className="w-4 h-4" /> Synthetic seeded graph benchmark
-          </h3>
+          <h3 className="rsx-rule-heading mb-6">Synthetic seeded graph benchmark</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div>
               <div className="flex justify-between text-label-sm mb-1">
@@ -252,9 +231,9 @@ export default function ModelsPage() {
 
         {/* Empty State for Charts */}
         <div className="bg-white border border-border rounded-xl p-6 shadow-subtle lg:col-span-2">
-          <div className="flex flex-col items-center justify-center h-48 text-center space-y-4">
-            <Layers className="w-12 h-12 text-text-muted opacity-50" />
-            <p className="text-body-md text-text-secondary max-w-md">Detailed curve data is not included in the deployed demo artifact.</p>
+          <div className="flex h-48 flex-col items-center justify-center space-y-3 text-center">
+            <p className="rsx-section-label">Curve data unavailable</p>
+            <p className="max-w-md text-[13px] text-text-secondary">Detailed curve data is not included in the deployed demo artifact.</p>
           </div>
         </div>
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { fetchPolicies, createPolicy, togglePolicy, deletePolicy } from "../../lib/api";
-import { Plus, Shield, Search, Trash2, SlidersHorizontal, Activity, X } from "lucide-react";
+import { Plus, Search, Trash2, SlidersHorizontal, X } from "lucide-react";
 import { DecisionBadge } from "../../components/ui/DecisionBadge";
 
 type Rule = { field: string; operator: string; value: string | number };
@@ -107,7 +107,7 @@ export default function PoliciesPage() {
             Policy Engine
           </h1>
           <p className="text-label-sm text-text-secondary flex items-center gap-2">
-            <span className="font-semibold text-primary flex items-center gap-1.5"><Activity className="w-4 h-4" /> AI recommends.</span> Policy decides.
+            <span className="font-semibold text-primary">AI recommends.</span> Policy decides.
           </p>
         </div>
         {/* Policy Mutation Disabled for MVP */}
@@ -203,9 +203,7 @@ export default function PoliciesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-surface border border-border rounded-2xl w-full max-w-2xl overflow-hidden shadow-drawer flex flex-col max-h-full animate-in zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-border flex justify-between items-center bg-surface-secondary/80">
-              <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-3">
-                <Shield className="w-6 h-6 text-primary" /> Create New Policy
-              </h2>
+              <h2 className="rsx-rule-heading text-heading-md">Create new policy</h2>
               <button onClick={() => setIsEditorOpen(false)} className="text-text-muted hover:text-text-primary hover:bg-surface p-2 rounded-lg transition-colors"><X className="w-5 h-5"/></button>
             </div>
 
@@ -224,9 +222,7 @@ export default function PoliciesPage() {
 
               <div className="border border-border rounded-xl overflow-hidden shadow-sm">
                 <div className="flex justify-between items-center px-5 py-4 bg-surface-secondary border-b border-border">
-                  <h3 className="text-label-sm font-semibold text-text-primary flex items-center gap-2 ">
-                    <Activity className="w-4 h-4 text-primary" /> Rules Engine
-                  </h3>
+                  <h3 className="rsx-rule-heading">Rules engine</h3>
                   <div className="flex items-center gap-3">
                     <span className="text-caption font-semibold text-text-secondary uppercase ">Match Logic</span>
                     <select value={rootOp} onChange={(e: any) => setRootOp(e.target.value)} className="bg-surface border border-border text-primary text-caption font-semibold rounded-lg px-3 py-1.5 outline-none focus:border-primary shadow-sm cursor-pointer hover:bg-surface-secondary transition-colors">

@@ -20,20 +20,20 @@
     --landing-ease: cubic-bezier(.22, 1, .36, 1);
     --landing-container: 1320px;
 
-    --background: #F5F7FB;
+    --background: #F4F6FA;
     --surface: #FFFFFF;
-    --surface-secondary: #F8FAFC;
+    --surface-secondary: #F7F9FC;
     
-    --text-primary: #111A2D;
-    --text-secondary: #5E6878;
-    --text-muted: #89929F;
+    --text-primary: #0B1739;
+    --text-secondary: #56627A;
+    --text-muted: #8792A8;
     
-    --border: #E2E8F0;
-    --border-subtle: #F1F5F9;
-    --border-strong: #CBD5E1;
+    --border: #DDE3EC;
+    --border-subtle: #EBEFF5;
+    --border-strong: #C9D2DF;
     
-    --primary: #255DF5;
-    --primary-hover: #174BD4;
+    --primary: #245DF5;
+    --primary-hover: #1747C9;
     --primary-soft: #EDF3FF;
     --primary-glow: rgba(37, 99, 235, 0.25);
     
@@ -251,14 +251,14 @@
   }
 
   .rsx-page {
-    animation: rsx-page-in .32s cubic-bezier(.22, 1, .36, 1) both;
+    animation: rsx-page-in .24s cubic-bezier(.22, 1, .36, 1) both;
   }
 
   .rsx-card {
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     background: #fff;
-    box-shadow: 0 1px 2px rgba(16, 24, 40, .025);
+    box-shadow: 0 1px 2px rgba(11, 23, 57, .025), 0 8px 24px rgba(11, 23, 57, .025);
   }
 
   .rsx-card-interactive {
@@ -267,8 +267,8 @@
 
   .rsx-card-interactive:hover {
     transform: translateY(-1px);
-    border-color: #c9d1cc;
-    box-shadow: 0 7px 22px rgba(25, 42, 52, .055);
+    border-color: #cbd5e3;
+    box-shadow: 0 12px 30px rgba(11, 23, 57, .065);
   }
 
   .rsx-eyebrow {
@@ -280,8 +280,8 @@
   }
 
   .rsx-grid {
-    background-image: linear-gradient(rgba(76, 101, 155, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(76, 101, 155, .055) 1px, transparent 1px);
-    background-size: 28px 28px;
+    background-image: linear-gradient(rgba(76, 101, 155, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(76, 101, 155, .045) 1px, transparent 1px);
+    background-size: 36px 36px;
   }
 
   .rsx-blueprint {
@@ -298,9 +298,95 @@
   }
 
   .rsx-diagonal-wash {
-    background:
-      linear-gradient(118deg, transparent 0 48%, rgba(44, 94, 244, .09) 48% 55%, transparent 55% 63%, rgba(116, 70, 216, .09) 63% 70%, transparent 70%),
-      #f8faff;
+    background: linear-gradient(110deg, #fbfcff 0%, #f5f8ff 72%, #edf3ff 100%);
+  }
+
+  .rsx-workspace {
+    color: var(--text-primary);
+  }
+
+  .rsx-workspace :where(h1, h2, h3) {
+    text-wrap: balance;
+  }
+
+  .rsx-workspace :is([class~="text-[8px]"], [class~="text-[9px]"], [class~="text-[10px]"]) {
+    font-size: 11px !important;
+    line-height: 16px !important;
+  }
+
+  .rsx-workspace [class~="text-[11px]"] {
+    font-size: 12px !important;
+    line-height: 17px !important;
+  }
+
+  .rsx-workspace :is([class~="rounded-[24px]"], [class~="rounded-[28px]"], [class~="rounded-[32px]"]) {
+    border-radius: 14px !important;
+  }
+
+  .rsx-workspace :is([class~="rounded-2xl"], [class~="rounded-xl"]) {
+    border-radius: 12px;
+  }
+
+  .rsx-workspace :where(section, article, aside, div)[class*="shadow-["] {
+    box-shadow: 0 10px 32px rgba(11, 23, 57, .055) !important;
+  }
+
+  .rsx-section-label {
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .rsx-stat-card {
+    min-height: 122px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(11, 23, 57, .02);
+  }
+
+  .rsx-stat-label {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+
+  .rsx-stat-value {
+    margin-top: 12px;
+    color: var(--text-primary);
+    font-size: clamp(24px, 2vw, 30px);
+    font-weight: 650;
+    letter-spacing: -.04em;
+    line-height: 1;
+  }
+
+  .rsx-stat-helper {
+    margin-top: 9px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  .rsx-data-panel {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 10px 32px rgba(11, 23, 57, .04);
+  }
+
+  .rsx-rule-heading {
+    border-left: 2px solid var(--primary);
+    padding-left: 10px;
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .01em;
   }
 
   .balance { text-wrap: balance; }
