@@ -96,18 +96,18 @@ export default function DashboardPage() {
     <>
       <section className="mb-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-col gap-1">
-          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Risk command center</p>
+          <div className="mb-2 text-[11px] font-extrabold uppercase tracking-[.16em] text-primary">Illustrative demo scenario</div>
           <h1 className="text-[34px] font-semibold leading-tight tracking-[-0.04em] text-text-primary">Risk overview</h1>
-          <p className="mt-1 text-[14px] text-text-secondary">Payment risk, coordinated fraud and automated decisions across Acme Payments.</p>
+          <p className="mt-1 text-[14px] text-text-secondary">Payment risk, coordinated fraud and automated decisions across Acme Payments (seeded demo data).</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <button className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-label-sm font-medium text-text-primary shadow-sm hover:bg-surface-secondary transition-all">
             <CalendarDays className="h-4 w-4 text-text-muted" />
             24H <ChevronDown className="h-4 w-4 text-text-muted" />
           </button>
-          <button onClick={() => announce("Risk report export is ready")} className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-label-sm font-medium text-text-primary shadow-sm hover:bg-surface-secondary transition-all">
+          <button className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-label-sm font-medium text-text-primary shadow-sm hover:bg-surface-secondary transition-all opacity-75 cursor-not-allowed" disabled>
             <Download className="h-4 w-4 text-text-muted" />
-            Export
+            Preview Export
           </button>
           <div className="hidden sm:block mx-1 h-6 w-px bg-border"></div>
           <Link href="/simulator" className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-label-sm font-semibold text-white shadow-sm hover:bg-primary-hover hover:premium-shadow-hover transition-all duration-200">

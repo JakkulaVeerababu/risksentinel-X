@@ -137,6 +137,11 @@ export async function fetchRiskCase(transactionId: string): Promise<PipelineResp
   return await response.json();
 }
 
+export async function fetchGraphContext(entityId: string): Promise<any> {
+  const response = await apiFetch(`/graph/context/${entityId}`);
+  return await response.json();
+}
+
 export async function startSimulation(scenario_type: string, transaction_count = 5): Promise<any> {
   const mapping: Record<string, string> = {
     "normal_customer": "Normal Customer",

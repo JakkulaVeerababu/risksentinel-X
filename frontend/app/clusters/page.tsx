@@ -31,8 +31,8 @@ export default function FraudClustersPage() {
     <div className="rsx-page space-y-5">
       <PageHeader
         eyebrow="Graph intelligence"
-        title="Fraud clusters"
-        description="Detect coordinated actors across shared devices, payment instruments, identities, IP ranges, and merchants."
+        title="Fraud clusters (Synthetic Benchmark Demo)"
+        description="Detect coordinated actors across shared devices, payment instruments, identities, IP ranges, and merchants. (Illustrative benchmark data)"
         actions={<Link href="/graph" className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#dfe5ee] bg-white px-3 text-[11px] font-bold text-[#4d596f] shadow-sm hover:bg-[#fafbfc]"><Network className="h-4 w-4" /> Open graph explorer</Link>}
       />
 
@@ -44,9 +44,6 @@ export default function FraudClustersPage() {
           ["Contained today", "7", "₹6.24L protected", "text-[#315efb]", "bg-[#edf3ff]"],
         ].map(([label, value, helper, tone, surface], index) => (
           <div key={label} className={`rsx-card border-t-2 p-4 sm:p-5 ${index === 0 ? "border-t-[#315efb]" : index === 1 ? "border-t-[#7558c9]" : index === 2 ? "border-t-[#d5473e]" : "border-t-[#315efb]"}`}>
-            <p className="text-[10px] font-bold uppercase tracking-[.1em] text-[#8993a4]">{label}</p>
-            <p className="mt-1.5 text-[23px] font-bold tracking-[-.04em] text-[#17233f]">{value}</p>
-            <p className="mt-1 text-[10px] font-semibold text-[#7d8798]">{helper}</p>
           </div>
         ))}
       </section>
@@ -85,7 +82,7 @@ export default function FraudClustersPage() {
               </div>
               <h2 className="mt-1.5 text-[16px] font-bold text-[#16213a]">{selected.title}</h2>
             </div>
-            <button onClick={() => setContained((items) => items.includes(selected.id) ? items : [...items, selected.id])} className={`inline-flex h-9 items-center justify-center gap-2 rounded-lg border px-3 text-[10px] font-bold shadow-sm transition-all ${contained.includes(selected.id) ? "border-[#315efb] bg-[#edf3ff] text-[#255df5]" : "border-[#315efb] bg-[#315efb] text-white hover:bg-[#244fe0]"}`}>{contained.includes(selected.id) ? <><CheckCircle2 className="h-4 w-4" /> Cluster contained</> : <><Ban className="h-4 w-4" /> Contain cluster</>}</button>
+            <button onClick={() => setContained((items) => items.includes(selected.id) ? items : [...items, selected.id])} className={`inline-flex h-9 items-center justify-center gap-2 rounded-lg border px-3 text-[10px] font-bold shadow-sm transition-all opacity-75 cursor-not-allowed ${contained.includes(selected.id) ? "border-[#315efb] bg-[#edf3ff] text-[#255df5]" : "border-[#315efb] bg-[#315efb] text-white"}`} disabled>{contained.includes(selected.id) ? <><CheckCircle2 className="h-4 w-4" /> Cluster contained</> : <><Ban className="h-4 w-4" /> Contain cluster (Demo)</>}</button>
           </div>
 
           <div className="grid lg:grid-cols-[minmax(0,1fr)_272px]">
@@ -99,7 +96,7 @@ export default function FraudClustersPage() {
               <div className="flex items-center gap-2 text-[#255df5]"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#edf3ff]"><ShieldAlert className="h-4 w-4" /></span><p className="text-[10px] font-black uppercase tracking-[.14em]">AI assessment</p></div>
               <p className="mt-4 text-[12px] leading-5 text-[#4f5c72]">The same device fingerprint authenticated 11 accounts before attempting high-value payments within a 17-minute window.</p>
               <div className="mt-5 rounded-xl border border-[#e0e6f0] bg-white p-4 shadow-sm">
-                <div className="flex items-end justify-between"><span className="text-[10px] font-bold uppercase tracking-[.08em] text-[#8993a5]">Risk confidence</span><span className="text-[24px] font-black tracking-[-.04em] text-[#d14338]">{selected.score}%</span></div>
+                <div className="flex items-end justify-between"><span className="text-[10px] font-bold uppercase tracking-[.08em] text-[#8993a5]">Demo risk confidence</span><span className="text-[24px] font-black tracking-[-.04em] text-[#d14338]">{selected.score}%</span></div>
                 <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#edf0f5]"><div className="h-full rounded-full bg-[linear-gradient(90deg,#ff8a80,#d14338)]" style={{ width: `${selected.score}%` }} /></div>
               </div>
               <div className="mt-4 space-y-3">{[["Potential exposure", selected.exposure], ["Linked payments", String(selected.transactions)], ["First observed", "28 Aug · 21:42"]].map(([label,value]) => <div key={label} className="flex items-center justify-between border-b border-[#e7ebf2] pb-3"><span className="text-[10px] font-semibold text-[#7c8799]">{label}</span><span className="text-[10px] font-bold text-[#263249]">{value}</span></div>)}</div>

@@ -53,7 +53,7 @@ class AuditService:
             event_id=payload.get("event_id", f"migrated-{e.id}"),
             timestamp=e.timestamp,
             actor=payload.get("actor", "SYSTEM"),
-            service=e.component,
+            service=e.component or "SYSTEM",
             event_type=e.event_type,
             resource_id=e.transaction_id,
             input_summary=payload.get("input_summary", payload), # Fallback to full payload for legacy events

@@ -6,9 +6,9 @@ import { Check, ChevronRight, X } from "lucide-react";
 import { PageHeader } from "../../components/ui";
 
 const recommendations = [
-  { id: "REC-204", title: "Tighten device velocity for new accounts", detail: "Block more than 4 payment attempts from one device across newly created accounts within 15 minutes.", type: "Policy", impact: "₹2.1L / month", confidence: 94, urgency: "High", evidence: "18 incidents · 72 payments" },
-  { id: "REC-203", title: "Escalate cluster-linked refunds", detail: "Send refunds associated with a known identity cluster to manual review before settlement.", type: "Workflow", impact: "₹86K / month", confidence: 89, urgency: "High", evidence: "7 clusters · 23 refunds" },
-  { id: "REC-198", title: "Adjust high-value review threshold", detail: "Raise the review threshold for trusted returning customers to reduce unnecessary friction.", type: "Model", impact: "+1.4% conversion", confidence: 81, urgency: "Medium", evidence: "1,840 good payments" },
+  { id: "REC-204", title: "Tighten device velocity for new accounts", detail: "Block more than 4 payment attempts from one device across newly created accounts within 15 minutes.", type: "Policy", impact: "₹2.1L / month*", confidence: 94, urgency: "High", evidence: "18 incidents · 72 payments" },
+  { id: "REC-203", title: "Escalate cluster-linked refunds", detail: "Send refunds associated with a known identity cluster to manual review before settlement.", type: "Workflow", impact: "₹86K / month*", confidence: 89, urgency: "High", evidence: "7 clusters · 23 refunds" },
+  { id: "REC-198", title: "Adjust high-value review threshold", detail: "Raise the review threshold for trusted returning customers to reduce unnecessary friction.", type: "Model", impact: "+1.4% conversion*", confidence: 81, urgency: "Medium", evidence: "1,840 good payments" },
 ];
 
 export default function RecommendationsPage() {
@@ -17,7 +17,7 @@ export default function RecommendationsPage() {
 
   return (
     <div className="rsx-page space-y-5">
-      <PageHeader eyebrow="Agentic intelligence" title="Recommendations" description="Prioritized controls generated from recent transaction signals, investigator decisions, and model drift." actions={<Link href="/ai" className="inline-flex h-9 items-center bg-[#111a2d] px-3.5 text-[11px] font-bold text-white hover:bg-[#263047]">Ask Investigation AI →</Link>} />
+      <PageHeader eyebrow="Illustrative demo recommendations" title="Recommendations" description="These recommendations demonstrate the investigation workflow using seeded demo scenarios. Estimated impacts are illustrative and are not production financial estimates." actions={<Link href="/ai" className="inline-flex h-9 items-center bg-[#111a2d] px-3.5 text-[11px] font-bold text-white hover:bg-[#263047]">View Investigation AI →</Link>} />
 
       <section className="rsx-blueprint rsx-editorial-grid relative overflow-hidden rounded-[10px] border border-[#d7ded9] px-5 py-6 text-[#111a2d] sm:px-7">
         <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
@@ -42,8 +42,8 @@ export default function RecommendationsPage() {
                   </div>
                 </div>
                 <aside className="flex flex-col justify-between border-t border-[#edf0f5] bg-[#fafbfd] p-5 lg:border-l lg:border-t-0">
-                  <div><p className="text-[10px] font-extrabold uppercase tracking-[.12em] text-[#8b95a7]">Estimated impact</p><p className="mt-1.5 text-[20px] font-bold tracking-[-.03em] text-[#17233f]">{item.impact}</p><div className="mt-3 flex items-center justify-between text-[10px] font-semibold text-[#7a8598]"><span>AI confidence</span><span>{item.confidence}%</span></div><div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#e7ebf1]"><div className="h-full rounded-full bg-gradient-to-r from-[#255df5] to-[#7446d8]" style={{ width: `${item.confidence}%` }} /></div></div>
-                  {!status && <div className="mt-5 flex gap-2"><button onClick={() => setResolved((state) => ({ ...state, [item.id]: "dismissed" }))} aria-label={`Dismiss ${item.title}`} className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#dfe5ee] bg-white text-[#7c8799] hover:bg-[#f5f7fa]"><X className="h-4 w-4" /></button><button onClick={() => setResolved((state) => ({ ...state, [item.id]: "applied" }))} className="flex h-9 flex-1 items-center justify-center gap-2 rounded-lg bg-[#255df5] px-3 text-[10px] font-bold text-white hover:bg-[#174bd4]"><Check className="h-4 w-4" /> Apply safely</button></div>}
+                  <div><p className="text-[10px] font-extrabold uppercase tracking-[.12em] text-[#8b95a7]">Illustrative impact</p><p className="mt-1.5 text-[20px] font-bold tracking-[-.03em] text-[#17233f]">{item.impact}</p><div className="mt-3 flex items-center justify-between text-[10px] font-semibold text-[#7a8598]"><span>Demo confidence</span><span>{item.confidence}%</span></div><div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#e7ebf1]"><div className="h-full rounded-full bg-gradient-to-r from-[#255df5] to-[#7446d8]" style={{ width: `${item.confidence}%` }} /></div><p className="mt-2 text-[9px] text-[#8b95a7]">*Demo assumption only.</p></div>
+                  {!status && <div className="mt-5 flex gap-2"><button onClick={() => setResolved((state) => ({ ...state, [item.id]: "dismissed" }))} aria-label={`Dismiss ${item.title}`} className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#dfe5ee] bg-white text-[#7c8799] hover:bg-[#f5f7fa]"><X className="h-4 w-4" /></button><button onClick={() => setResolved((state) => ({ ...state, [item.id]: "applied" }))} className="flex h-9 flex-1 items-center justify-center gap-2 rounded-lg bg-[#255df5] px-3 text-[10px] font-bold text-white hover:bg-[#174bd4]"><Check className="h-4 w-4" /> Preview action</button></div>}
                 </aside>
               </div>
             </article>
@@ -51,7 +51,7 @@ export default function RecommendationsPage() {
         })}
       </section>
 
-      <Link href="/audit" className="flex items-center justify-between rounded-xl border border-[#e2e7ef] bg-white px-4 py-3 text-[10px] font-bold text-[#526078] hover:border-[#cfd9ea]"><span>Every applied recommendation is versioned and recorded in your audit trail.</span><span className="flex items-center gap-1 text-[#255df5]">View audit trail <ChevronRight className="h-3.5 w-3.5" /></span></Link>
+      <Link href="/audit" className="flex items-center justify-between rounded-xl border border-[#e2e7ef] bg-white px-4 py-3 text-[10px] font-bold text-[#526078] hover:border-[#cfd9ea]"><span>Policy changes remain outside the current demo workflow.</span><span className="flex items-center gap-1 text-[#255df5]">View audit trail <ChevronRight className="h-3.5 w-3.5" /></span></Link>
     </div>
   );
 }

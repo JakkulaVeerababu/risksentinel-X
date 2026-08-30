@@ -81,7 +81,7 @@ export default function LoginPage() {
             <button onClick={enterWorkspace} disabled={loading} className="group mt-6 flex h-[54px] w-full items-center justify-center gap-2 rounded-xl bg-[#255df5] px-5 text-[14px] font-bold text-white shadow-[0_16px_34px_rgba(37,93,245,.28)] transition hover:-translate-y-0.5 hover:bg-[#174bd4] disabled:translate-y-0 disabled:cursor-wait disabled:opacity-75">
               {loading ? <><LoaderCircle className="h-4 w-4 animate-spin" />Preparing workspace</> : <>Enter demo workspace <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
             </button>
-            <div className="mt-5 flex items-center justify-between gap-4 text-[10px] font-semibold text-[#8a95a7]"><span>17 operational workspaces</span><span className="text-[#315efb]">All engines online</span></div>
+            <div className="mt-5 flex items-center justify-between gap-4 text-[10px] font-semibold text-[#8a95a7]"><span>Credential-free demo</span><span className="text-[#315efb]">Bounded execution</span></div>
           </div>
 
           <p className="text-center text-[10px] font-medium text-[#9aa4b4]">Local hackathon demo · Built for secure evaluation</p>

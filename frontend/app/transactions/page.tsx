@@ -108,12 +108,12 @@ export default function TransactionsPage() {
     <div className="pb-10">
       <section className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <div className="mb-3 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#255df5]">Payment intelligence</div>
+          <div className="mb-3 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#255df5]">Illustrative demo scenario</div>
           <div className="flex flex-wrap items-center gap-3"><h1 className="text-[34px] font-semibold leading-tight tracking-[-.04em] text-[#0c1d3a] sm:text-[40px]">Transactions</h1></div>
-          <p className="mt-2 max-w-[720px] text-[14px] leading-6 text-[#67748b]">Monitor every payment decision, isolate elevated risk and open the full evidence trail without losing context.</p>
+          <p className="mt-2 max-w-[720px] text-[14px] leading-6 text-[#67748b]">Monitor every payment decision, isolate elevated risk and open the full evidence trail without losing context (seeded demo data).</p>
         </div>
         <div className="flex flex-wrap gap-2.5">
-          <button onClick={() => showNotice("Transaction export is ready")} className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#dce3ed] bg-white px-4 text-[12px] font-bold text-[#4b5870] shadow-sm transition hover:border-[#c8d3e2] hover:bg-[#f9fbff]"><ArrowDownToLine className="h-4 w-4" />Export</button>
+          <button className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#dce3ed] bg-white px-4 text-[12px] font-bold text-[#4b5870] shadow-sm transition hover:border-[#c8d3e2] opacity-75 cursor-not-allowed" disabled><ArrowDownToLine className="h-4 w-4" />Preview Export</button>
           <button onClick={loadData} className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#dce3ed] bg-white px-4 text-[12px] font-bold text-[#4b5870] shadow-sm transition hover:border-[#c8d3e2] hover:bg-[#f9fbff]"><RefreshCcw className="h-4 w-4" />Refresh</button>
           <Link href="/simulator" className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#255df5] px-4 text-[12px] font-bold text-white shadow-[0_9px_22px_rgba(37,93,245,.24)] transition hover:-translate-y-0.5 hover:bg-[#174bd4]"><PlayCircle className="h-4 w-4" />Simulate transaction</Link>
         </div>
@@ -140,7 +140,7 @@ export default function TransactionsPage() {
               <button className="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-[#dfe5ee] bg-white px-3 text-[11px] font-bold text-[#566278]"><CalendarDays className="h-3.5 w-3.5 text-[#7d899b]" />All time<ChevronDown className="h-3.5 w-3.5" /></button>
               <button onClick={() => setRiskFilter((value) => value === "Elevated" ? "All" : "Elevated")} className={`inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border px-3 text-[11px] font-bold ${riskFilter === "Elevated" ? "border-[#cddcff] bg-[#edf3ff] text-[#255df5]" : "border-[#dfe5ee] bg-white text-[#566278]"}`}><SlidersHorizontal className="h-3.5 w-3.5" />{riskFilter === "Elevated" ? "High + Critical risk" : "All risk levels"}</button>
             </div>
-            <button onClick={() => showNotice("Advanced filters are ready")} className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-dashed border-[#cbd5e4] px-3 text-[11px] font-bold text-[#255df5] hover:bg-[#f4f7ff]"><Filter className="h-3.5 w-3.5" />More filters</button>
+            <button className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-dashed border-[#cbd5e4] px-3 text-[11px] font-bold text-[#255df5] hover:bg-[#f4f7ff] opacity-75 cursor-not-allowed" disabled><Filter className="h-3.5 w-3.5" />More filters</button>
           </div>
         </div>
 

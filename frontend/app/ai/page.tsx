@@ -5,11 +5,11 @@ import { PageHeader } from "../../components/ui";
 export default function AIHubPage() {
   return (
     <div className="rsx-page space-y-5">
-      <PageHeader eyebrow="Investigation intelligence" title="Investigation AI" description="Move from signal to an evidence-backed decision without leaving the case context." />
+      <PageHeader eyebrow="Investigation intelligence" title="Investigation AI (Demo)" description="Move from signal to an evidence-backed decision without leaving the case context (seeded demo data)." />
 
       <section className="overflow-hidden rounded-[10px] border border-[#dfe5ee] bg-white">
         <div className="rsx-diagonal-wash flex flex-col gap-4 border-b border-[#dfe5ee] px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-7">
-          <div><p className="text-[10px] font-extrabold uppercase tracking-[.16em] text-[#315efb]">Active intelligence brief</p><h2 className="mt-2 text-[24px] font-semibold tracking-[-.04em] text-[#111a2d]">Ask the evidence, not another dashboard.</h2></div>
+          <div><p className="text-[10px] font-extrabold uppercase tracking-[.16em] text-[#315efb]">Illustrative demo scenario</p><h2 className="mt-2 text-[24px] font-semibold tracking-[-.04em] text-[#111a2d]">Ask the evidence, not another dashboard.</h2></div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-[10px] font-semibold text-[#657187]"><span><i className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[#315efb]"/>Graph connected</span><span>Policy aware</span><span>Active evidence</span></div>
         </div>
 

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import health, score, graph, investigate, decision, policy, stream, dashboard, simulation, audit, evaluation, transactions
+from app.api.v1.endpoints import health, score, graph, investigate, decision, policy, stream, dashboard, simulation, audit, evaluation, transactions, investigations
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["health"])
@@ -15,3 +15,4 @@ api_router.include_router(simulation.router, tags=["simulation"], prefix="/simul
 api_router.include_router(audit.router, tags=["audit"], prefix="/audit")
 api_router.include_router(evaluation.router, tags=["evaluation"], prefix="/evaluation")
 api_router.include_router(transactions.router, tags=["transactions"], prefix="/transactions")
+api_router.include_router(investigations.router, tags=["investigations"], prefix="/investigations")

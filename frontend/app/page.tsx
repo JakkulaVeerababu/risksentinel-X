@@ -1,202 +1,214 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  BadgeCheck,
-  Bot,
-  Check,
-  ChevronRight,
-  CircleDot,
-  Gauge,
-  Network,
-  Play,
-  ShieldCheck,
-  Sparkles,
-  Waypoints,
-} from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import BrandLogo from "../components/brand/BrandLogo";
+import LandingNav from "../components/landing/LandingNav";
+import LiveRiskPreview from "../components/landing/LiveRiskPreview";
+import ProductSystem from "../components/landing/ProductSystem";
 
-const capabilities = [
-  {
-    icon: Network,
-    eyebrow: "Graph intelligence",
-    title: "See the fraud ring, not just the payment.",
-    copy: "Connect transactions, devices, identities, IPs and merchants in one explainable investigation surface.",
-    metric: "14 relationships",
-    detail: "resolved per investigation",
-    tone: "from-[#07142f] via-[#0a1c45] to-[#112866]",
-  },
-  {
-    icon: Bot,
-    eyebrow: "Investigation copilot",
-    title: "Turn evidence into an answer your team can act on.",
-    copy: "AI-guided summaries surface the strongest signals, recommended actions and supporting evidence without hiding the reasoning.",
-    metric: "94% confidence",
-    detail: "policy-aligned response",
-    tone: "from-[#17104a] via-[#29176c] to-[#4b24a9]",
-  },
-  {
-    icon: Gauge,
-    eyebrow: "Evidence-based decisioning",
-    title: "Make high-stakes decisions with full evidence.",
-    copy: "Combine risk models, graph signals and policy controls to allow, review or block every transaction consistently.",
-    metric: "163 ms",
-    detail: "median skip-path latency",
-    tone: "from-[#07142f] via-[#163675] to-[#315efb]",
-  },
+const graphNodes = [
+  { kind: "Payment", value: "pay_PM71JD29", x: "48%", y: "48%", tone: "border-[#efaaa6] bg-[#fff2f1] text-[#b9342d]" },
+  { kind: "Device", value: "DVC-9821", x: "22%", y: "25%", tone: "border-[#a8bff4] bg-white text-[#255df5]" },
+  { kind: "Customer", value: "Aarav S.", x: "14%", y: "72%", tone: "border-[#ccd5e3] bg-white text-[#43516a]" },
+  { kind: "IP address", value: "49.37.***.82", x: "49%", y: "14%", tone: "border-[#b8c6e2] bg-white text-[#43516a]" },
+  { kind: "Merchant", value: "Nova Electronics", x: "80%", y: "27%", tone: "border-[#ccd5e3] bg-white text-[#43516a]" },
+  { kind: "Instrument", value: "Card ••8219", x: "76%", y: "73%", tone: "border-[#e7c994] bg-[#fffaf1] text-[#9a5a00]" },
 ];
 
-const trustPoints = ["Credential-free demo", "17 operational workspaces", "Explainable decisioning"];
+const observedSignals = [
+  ["Device relationship", "Linked to 11 accounts", "Graph evidence"],
+  ["Transaction velocity", "4.8× account baseline", "Model feature"],
+  ["Merchant behavior", "Pattern deviation detected", "Risk model"],
+  ["Payment instrument", "Shared across 6 identities", "Graph evidence"],
+];
+
+const decisionTrail = [
+  ["14:32:18.101", "Payment received", "₹48,900 · Nova Electronics"],
+  ["14:32:18.116", "Model risk score", "94 / 100"],
+  ["14:32:18.132", "Graph intelligence", "4 linked entities · cluster FRC-0184"],
+  ["14:32:18.251", "Agent investigation", "Coordinated payment behavior detected"],
+  ["14:32:18.267", "Policy evaluation", "Rule RS-204 triggered"],
+  ["14:32:18.270", "Final decision", "BLOCK"],
+];
+
+const productProof = [
+  ["Real-time scoring", "Models evaluate incoming payment features before enforcement."],
+  ["Graph-linked evidence", "Relationships connect identities, devices, merchants and instruments."],
+  ["Deterministic enforcement", "Policy—not generative AI—owns every final decision."],
+  ["Auditable decisions", "Evidence, recommendations and policy outcomes remain traceable."],
+];
 
 export default function ProductLandingPage() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#f7f9ff] text-[#071632]">
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#071229]/90 backdrop-blur-2xl">
-        <div className="mx-auto flex h-[76px] max-w-[1440px] items-center px-5 sm:px-8 lg:px-12">
-          <BrandLogo inverse />
-          <nav className="ml-10 hidden items-center gap-8 lg:flex" aria-label="Product navigation">
-            <a href="#platform" className="text-[13px] font-semibold text-white/70 transition hover:text-white">Platform</a>
-            <a href="#intelligence" className="text-[13px] font-semibold text-white/70 transition hover:text-white">Intelligence</a>
-            <a href="#outcomes" className="text-[13px] font-semibold text-white/70 transition hover:text-white">Outcomes</a>
-          </nav>
-          <div className="ml-auto flex items-center gap-3">
-            <Link href="/login" className="hidden h-10 items-center rounded-xl border border-white/20 px-4 text-[13px] font-semibold text-white transition hover:border-white/40 hover:bg-white/10 sm:flex">
-              Log in
-            </Link>
-            <Link href="/login" className="group flex h-10 items-center gap-2 whitespace-nowrap rounded-xl bg-white px-4 text-[13px] font-bold text-[#174bd4] shadow-[0_8px_24px_rgba(35,91,255,.24)] transition hover:-translate-y-0.5 hover:bg-[#eef3ff]">
-              Open demo <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen overflow-x-hidden bg-white text-[#071426]">
+      <LandingNav />
 
       <main>
-        <section className="relative min-h-[840px] overflow-hidden bg-[#071229] pt-[76px] text-white">
-          <div className="absolute inset-0 opacity-90 [background-image:linear-gradient(rgba(255,255,255,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.055)_1px,transparent_1px)] [background-size:80px_80px]" />
-          <div className="absolute -right-[16%] top-[-12%] h-[850px] w-[850px] rounded-full bg-[#245dff]/35 blur-[120px]" />
-          <div className="absolute -bottom-[45%] left-[24%] h-[700px] w-[700px] rounded-full bg-[#6b35ff]/30 blur-[130px]" />
-          <div className="absolute inset-y-0 right-[8%] hidden w-[52%] skew-x-[-18deg] bg-gradient-to-b from-[#2e6bff]/25 via-[#1742bb]/10 to-transparent lg:block" />
+        <section className="relative overflow-hidden bg-[#071226] pt-[72px] text-white">
+          <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)] [background-size:72px_72px]" />
+          <div className="pointer-events-none absolute right-[-15%] top-[-20%] h-[780px] w-[780px] rounded-full bg-[#2f6bff]/[.22] blur-[130px]" />
+          <svg className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[58%] opacity-20 lg:block" viewBox="0 0 900 880" preserveAspectRatio="none" aria-hidden="true">
+            <g fill="none" stroke="#7da1ff" strokeWidth="1"><path d="M40 180 L260 98 L480 210 L720 112 L870 245"/><path d="M0 540 L220 420 L470 522 L690 398 L900 470"/><path d="M260 98 L220 420"/><path d="M480 210 L470 522"/><path d="M720 112 L690 398"/></g>
+          </svg>
 
-          <div className="relative mx-auto grid max-w-[1440px] gap-14 px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:grid-cols-[.92fr_1.08fr] lg:px-12 lg:pb-28 lg:pt-28">
-            <div className="flex flex-col justify-center">
-              <div className="mb-7 inline-flex w-fit items-center gap-2 rounded-full border border-[#5b81ff]/30 bg-[#2145a2]/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.18em] text-[#bcd0ff] backdrop-blur">
-                <Sparkles className="h-3.5 w-3.5" /> AI-native payment risk
-              </div>
-              <h1 className="balance max-w-[760px] text-[48px] font-semibold leading-[.98] tracking-[-.055em] sm:text-[64px] lg:text-[76px]">
+          <div className="landing-container relative grid gap-16 pb-20 pt-20 sm:pb-24 sm:pt-24 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:gap-10 lg:pb-28 lg:pt-28">
+            <div className="max-w-[650px]">
+              <div className="flex items-center gap-3 text-[11px] font-semibold tracking-[.04em] text-[#9eb8f5]"><span className="h-px w-8 bg-[#5b8cff]" />AI-native payment risk intelligence</div>
+              <h1 className="mt-8 text-[50px] font-semibold leading-[.96] tracking-[-.062em] sm:text-[66px] lg:text-[78px]">
                 Every payment.
-                <span className="block bg-gradient-to-r from-[#72a1ff] via-[#d2ddff] to-[#8d79ff] bg-clip-text text-transparent">Understood before you decide.</span>
+                <span className="mt-2 block text-[#84a8ff]">Understood before</span>
+                <span className="block">you decide.</span>
               </h1>
-              <p className="mt-7 max-w-[620px] text-[17px] leading-7 text-[#aebbd4] sm:text-[19px] sm:leading-8">
-                RiskSentinel X unifies graph intelligence, agentic investigation and policy-grade decisions in one command surface for modern fraud teams.
-              </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <Link href="/login" className="group inline-flex h-[52px] items-center justify-center gap-2 rounded-xl bg-[#2e63ff] px-6 text-[14px] font-bold text-white shadow-[0_16px_40px_rgba(46,99,255,.35)] transition hover:-translate-y-0.5 hover:bg-[#4775ff]">
-                  Enter demo workspace <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
-                <a href="#platform" className="inline-flex h-[52px] items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[.06] px-6 text-[14px] font-semibold text-white transition hover:border-white/30 hover:bg-white/[.1]">
-                  <Play className="h-4 w-4 fill-current" /> Explore the platform
-                </a>
+              <p className="mt-7 max-w-[580px] text-[18px] leading-8 text-[#c2cde0]">Detect risk. Connect evidence. Investigate instantly. Let deterministic policy make the final call.</p>
+              <p className="mt-3 max-w-[560px] text-[14px] leading-6 text-[#8493ad]">One operating surface for payment monitoring, graph investigation and explainable enforcement.</p>
+
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Link href="/login" className="landing-primary-cta group h-12 px-5 text-[13px]">Enter demo workspace <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" /></Link>
+                <a href="#platform" className="group inline-flex h-12 items-center justify-center gap-2 px-4 text-[13px] font-semibold text-white/[.76] transition-colors hover:text-white"><Play className="h-3.5 w-3.5 fill-current" />Watch how it works</a>
               </div>
-              <div className="mt-9 flex flex-wrap gap-x-5 gap-y-3">
-                {trustPoints.map((item) => (
-                  <span key={item} className="flex items-center gap-2 text-[12px] font-semibold text-[#94a4c1]"><Check className="h-3.5 w-3.5 text-[#7fa4ff]" />{item}</span>
-                ))}
+
+              <div className="mt-10 flex flex-wrap border-y border-white/10 py-4 text-[10px] font-medium text-[#8e9db6]">
+                {["No account required", "Seeded demo data", "Policy-controlled decisions"].map((item, index) => <span key={item} className={`py-1 ${index > 0 ? "ml-4 border-l border-white/10 pl-4" : ""}`}>{item}</span>)}
               </div>
             </div>
 
-            <div className="relative flex min-h-[530px] items-center justify-center lg:min-h-[620px]">
-              <div className="absolute inset-x-[8%] inset-y-[9%] rotate-[-7deg] rounded-[36px] border border-[#5578ff]/30 bg-[#1643cc]/15 backdrop-blur-sm" />
-              <div className="relative w-full max-w-[700px] overflow-hidden rounded-[26px] border border-white/15 bg-[#0b1833]/95 shadow-[0_36px_100px_rgba(0,0,0,.48)]">
-                <div className="flex h-14 items-center border-b border-white/10 px-5">
-                  <div className="flex gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#ff6b6b]" /><span className="h-2.5 w-2.5 rounded-full bg-[#ffc145]" /><span className="h-2.5 w-2.5 rounded-full bg-[#315efb]" /></div>
-                  <span className="ml-5 text-[11px] font-bold uppercase tracking-[.16em] text-[#7f91b2]">Risk command center</span>
-                  <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#19366f] px-2.5 py-1 text-[10px] font-bold text-[#7fa4ff]"><span className="h-1.5 w-1.5 rounded-full bg-[#6f95ff]" />Operational</span>
-                </div>
-                <div className="grid gap-px bg-white/10 sm:grid-cols-[1fr_220px]">
-                  <div className="bg-[#0a152d] p-5 sm:p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div><p className="text-[11px] font-bold uppercase tracking-[.12em] text-[#7789aa]">Coordinated exposure</p><p className="mt-2 text-[34px] font-semibold tracking-[-.04em]">₹4.82L</p></div>
-                      <span className="rounded-lg border border-[#ff6b6b]/25 bg-[#4c1f2b] px-2.5 py-1 text-[10px] font-bold text-[#ff8d93]">Critical</span>
-                    </div>
-                    <div className="relative mt-7 h-[278px] overflow-hidden rounded-2xl border border-white/10 bg-[#071126] [background-image:linear-gradient(rgba(91,129,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(91,129,255,.06)_1px,transparent_1px)] [background-size:32px_32px]">
-                      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 520 280" aria-hidden="true">
-                        <g stroke="#31599f" strokeWidth="1.4" opacity=".8"><line x1="255" y1="145" x2="105" y2="70" /><line x1="255" y1="145" x2="115" y2="225" /><line x1="255" y1="145" x2="405" y2="65" /><line x1="255" y1="145" x2="410" y2="218" /><line x1="105" y1="70" x2="405" y2="65" strokeDasharray="5 7" /></g>
-                        <g><circle cx="255" cy="145" r="34" fill="#e74440" stroke="#ffc7c4" strokeWidth="4" /><circle cx="105" cy="70" r="22" fill="#356df0" stroke="#a9c0ff" strokeWidth="3" /><circle cx="115" cy="225" r="22" fill="#315efb" stroke="#bfd0ff" strokeWidth="3" /><circle cx="405" cy="65" r="22" fill="#7b4ee8" stroke="#cbb7ff" strokeWidth="3" /><circle cx="410" cy="218" r="22" fill="#d68516" stroke="#ffd18a" strokeWidth="3" /></g>
-                      </svg>
-                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 translate-y-8 text-center"><p className="text-[11px] font-bold text-white">TX C9000</p><p className="text-[10px] text-[#9aa9c4]">Blocked · score 94</p></div>
-                      <div className="absolute left-[10%] top-[7%] text-[10px] font-semibold text-[#bac7dc]">Device 8812</div>
-                      <div className="absolute bottom-[7%] right-[7%] text-[10px] font-semibold text-[#bac7dc]">Card •8219</div>
-                    </div>
-                  </div>
-                  <div className="bg-[#101d38] p-5">
-                    <p className="text-[10px] font-bold uppercase tracking-[.14em] text-[#7183a6]">Decision brief</p>
-                    <div className="mt-4 rounded-xl border border-[#ff6f6f]/20 bg-[#381d29] p-3"><div className="flex items-center gap-2 text-[11px] font-bold text-[#ff8e92]"><ShieldCheck className="h-4 w-4" />Block cluster</div><p className="mt-2 text-[10px] leading-4 text-[#bba3ab]">Shared device and payment instrument across 11 accounts.</p></div>
-                    <div className="mt-5 space-y-4">
-                      {[['Entity risk','94'],['Linked identities','11'],['Policy confidence','97%']].map(([label,value]) => <div key={label} className="border-b border-white/10 pb-3"><p className="text-[10px] font-bold uppercase tracking-[.1em] text-[#6f81a2]">{label}</p><p className="mt-1 text-[15px] font-semibold text-white">{value}</p></div>)}
-                    </div>
-                    <div className="mt-5 flex items-center gap-2 text-[10px] font-semibold text-[#72a1ff]"><CircleDot className="h-3.5 w-3.5" />Evidence synchronized</div>
-                  </div>
-                </div>
-              </div>
-              <div className="absolute bottom-[2%] left-0 hidden w-[220px] rounded-2xl border border-white/15 bg-white/10 p-4 shadow-2xl backdrop-blur-xl sm:block">
-                <p className="text-[10px] font-bold uppercase tracking-[.12em] text-[#a7b5ce]">Loss prevented today</p><p className="mt-2 text-[26px] font-semibold tracking-[-.035em]">₹18.4L</p><p className="mt-1 text-[10px] font-semibold text-[#7fa4ff]">↑ 16.8% vs yesterday</p>
+            <div className="relative lg:-mr-24">
+              <div className="absolute inset-x-[12%] bottom-[6%] top-[8%] bg-[#2f6bff]/[.16] blur-[85px]" />
+              <div className="relative">
+                <LiveRiskPreview />
+                <p className="mt-3 text-right text-[9px] font-medium text-[#6f809d]">Interactive seeded scenario · Buildathon demo</p>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="platform" className="border-b border-[#dce4f2] bg-white py-20 sm:py-28">
-          <div className="mx-auto max-w-[1280px] px-5 sm:px-8">
-            <div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
-              <div><p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#255df5]">One connected platform</p><h2 className="balance mt-4 text-[39px] font-semibold leading-[1.05] tracking-[-.045em] sm:text-[54px]">Built for the moment risk becomes real.</h2></div>
-              <p className="max-w-[640px] text-[17px] leading-7 text-[#61708a] lg:ml-auto">Replace fragmented tools with one operating system for monitoring, investigating, deciding and proving every high-risk action.</p>
+        <section id="platform" className="border-b border-[#e3e8f0] bg-white py-20 sm:py-28">
+          <div className="landing-container">
+            <div className="grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
+              <h2 className="landing-section-title max-w-[700px]">Built for the moment risk becomes real.</h2>
+              <div className="lg:justify-self-end"><p className="landing-section-copy max-w-[580px]">A payment moves through four accountable systems. Each step contributes evidence. Only policy returns the final outcome.</p><p className="mt-4 text-[11px] font-semibold text-[#255df5]">Select a stage to inspect the decision path.</p></div>
             </div>
-            <div className="mt-14 grid overflow-hidden rounded-[28px] border border-[#dbe3f1] bg-[#f5f8ff] md:grid-cols-3">
-              {capabilities.map((item, index) => (
-                <article key={item.title} className={`group relative min-h-[430px] overflow-hidden bg-gradient-to-br ${item.tone} p-7 text-white md:p-8 ${index > 0 ? "border-t border-white/10 md:border-l md:border-t-0" : ""}`}>
-                  <div className="absolute -right-16 -top-12 h-52 w-52 rounded-full bg-white/10 blur-3xl transition-transform duration-500 group-hover:scale-125" />
-                  <div className="relative flex h-full flex-col">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/15 bg-white/10"><item.icon className="h-5 w-5" /></span>
-                    <p className="mt-8 text-[10px] font-extrabold uppercase tracking-[.18em] text-white/55">{item.eyebrow}</p>
-                    <h3 className="balance mt-3 text-[28px] font-medium leading-[1.08] tracking-[-.035em]">{item.title}</h3>
-                    <p className="mt-4 text-[14px] leading-6 text-white/62">{item.copy}</p>
-                    <div className="mt-auto border-t border-white/15 pt-6"><p className="text-[27px] font-semibold tracking-[-.035em]">{item.metric}</p><p className="mt-1 text-[11px] font-semibold text-white/50">{item.detail}</p></div>
-                  </div>
-                </article>
-              ))}
+            <div className="mt-14 sm:mt-16"><ProductSystem /></div>
+          </div>
+        </section>
+
+        <section id="intelligence" className="border-b border-[#e3e8f0] bg-[#f7f9fc] py-20 sm:py-28">
+          <div className="landing-container">
+            <div className="grid gap-7 lg:grid-cols-[1fr_.8fr] lg:items-end">
+              <div><p className="text-[12px] font-semibold text-[#255df5]">Graph intelligence</p><h2 className="landing-section-title mt-4 max-w-[760px]">Investigate the relationship, not only the payment.</h2></div>
+              <p className="landing-section-copy max-w-[560px] lg:justify-self-end">Risk hides in the connections between identities, infrastructure and commerce. The relationship explorer makes those connections reviewable.</p>
+            </div>
+
+            <div className="mt-14 grid border border-[#dce3ed] bg-white lg:grid-cols-[1.28fr_.72fr]">
+              <div className="relative min-h-[540px] overflow-hidden border-b border-[#dce3ed] bg-[#fbfcfe] lg:border-b-0 lg:border-r">
+                <div className="flex h-16 items-center justify-between border-b border-[#e4e9f0] px-5 sm:px-6"><div><p className="text-[12px] font-semibold text-[#17233b]">Relationship explorer</p><p className="mt-1 text-[9px] text-[#8490a2]">12 entities · 14 relationships · Live graph</p></div><span className="hidden text-[9px] font-semibold text-[#255df5] sm:block">Cluster FRC-0184 selected</span></div>
+
+                <div className="relative hidden h-[474px] landing-risk-grid sm:block">
+                  <svg viewBox="0 0 720 474" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true">
+                    <g fill="none" stroke="#afbfdf" strokeWidth="1.2"><path d="M345 225 L158 118"/><path d="M345 225 L108 340"/><path d="M345 225 L352 64"/><path d="M345 225 L575 126"/><path d="M345 225 L548 346"/><path d="M158 118 L352 64" strokeDasharray="4 6"/><path d="M575 126 L548 346" strokeDasharray="4 6"/></g>
+                    <path d="M158 118 L345 225 L548 346" fill="none" stroke="#2f6bff" strokeWidth="2" />
+                    <rect x="70" y="40" width="580" height="352" fill="none" stroke="#d9a4a0" strokeDasharray="5 6" opacity=".65" />
+                  </svg>
+                  <div className="absolute left-[7%] top-[7%] text-[8px] font-semibold uppercase tracking-[.1em] text-[#a95a55]">Suspicious relationship boundary</div>
+                  {graphNodes.map((node) => <div key={node.kind} className={`group absolute -translate-x-1/2 -translate-y-1/2 border px-3 py-2.5 shadow-[0_4px_14px_rgba(30,52,88,.06)] transition-transform duration-200 hover:-translate-y-[54%] ${node.tone}`} style={{ left: node.x, top: node.y }}><p className="text-[8px] font-semibold uppercase tracking-[.08em] opacity-60">{node.kind}</p><p className="mt-1 whitespace-nowrap font-mono text-[9px] font-semibold">{node.value}</p></div>)}
+                  <div className="absolute bottom-5 left-5 flex gap-5 border border-[#dfe5ee] bg-white px-3 py-2 text-[9px] text-[#647188] shadow-sm"><span><i className="mr-1.5 inline-block h-1.5 w-1.5 bg-[#2f6bff]" />Direct link</span><span><i className="mr-1.5 inline-block h-1.5 w-1.5 bg-[#a9b5c8]" />Inferred link</span></div>
+                </div>
+
+                <div className="divide-y divide-[#e6eaf1] sm:hidden">
+                  {graphNodes.map((node, index) => <div key={node.kind} className="flex items-center gap-3 px-5 py-4"><span className={`h-2 w-2 ${index === 0 ? "bg-[#d14338]" : "bg-[#315efb]"}`} /><div><p className="text-[9px] font-semibold uppercase tracking-[.08em] text-[#8a95a7]">{index === 0 ? "Selected payment" : `Connected ${node.kind.toLowerCase()}`}</p><p className="mt-1 font-mono text-[10px] font-semibold text-[#263249]">{node.value}</p></div></div>)}
+                </div>
+              </div>
+
+              <aside className="p-6 sm:p-8">
+                <div className="flex items-start justify-between border-b border-[#e2e7ef] pb-6"><div><p className="font-mono text-[10px] font-semibold text-[#255df5]">pay_PM71JD29</p><p className="mt-2 text-[20px] font-semibold tracking-[-.025em] text-[#17233b]">₹48,900</p></div><span className="border border-[#f0c9c6] bg-[#fff1f0] px-2 py-1 text-[8px] font-bold text-[#c93830]">CRITICAL</span></div>
+                <div className="py-6"><div className="flex items-end justify-between"><span className="text-[11px] font-medium text-[#6f7b90]">Risk score</span><span className="text-[30px] font-semibold tracking-[-.04em] text-[#d14338]">94</span></div><div className="mt-3 h-1 bg-[#edf0f5]"><div className="h-full w-[94%] bg-[#d14338]" /></div></div>
+                <dl className="divide-y divide-[#e6eaf1] border-y border-[#e6eaf1]">
+                  {[["Linked identities", "11"], ["Shared devices", "4"], ["Merchant connections", "3"], ["Cluster confidence", "High"]].map(([label, value]) => <div key={label} className="flex items-center justify-between py-3.5"><dt className="text-[11px] text-[#6f7b90]">{label}</dt><dd className="font-mono text-[11px] font-semibold text-[#263249]">{value}</dd></div>)}
+                </dl>
+                <Link href="/investigations/CASE-RSX184" className="group mt-7 inline-flex items-center gap-2 text-[12px] font-semibold text-[#255df5]">Open investigation <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" /></Link>
+              </aside>
             </div>
           </div>
         </section>
 
-        <section id="intelligence" className="relative overflow-hidden bg-[#f4f7ff] py-20 sm:py-28">
-          <div className="absolute inset-y-0 left-[45%] w-[70%] -skew-x-12 bg-gradient-to-r from-[#dce8ff]/20 via-[#a8c5ff]/28 to-[#ede6ff]/45" />
-          <div className="relative mx-auto grid max-w-[1280px] gap-12 px-5 sm:px-8 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
+        <section className="border-b border-[#e3e8f0] bg-white py-20 sm:py-28">
+          <div className="landing-container grid gap-12 lg:grid-cols-[.72fr_1.28fr] lg:gap-20">
             <div>
-              <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#255df5]">Explainability by design</p>
-              <h2 className="balance mt-4 text-[39px] font-semibold leading-[1.05] tracking-[-.045em] sm:text-[54px]">A decision trail your team can trust.</h2>
-              <p className="mt-6 max-w-[520px] text-[16px] leading-7 text-[#60708a]">Every recommendation is paired with evidence, policy context and a clear owner—so the handoff from machine speed to human judgment feels natural.</p>
-              <Link href="/login" className="group mt-8 inline-flex items-center gap-2 text-[14px] font-bold text-[#245df5]">Explore the workspace <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></Link>
+              <p className="text-[12px] font-semibold text-[#255df5]">Investigation intelligence</p>
+              <h2 className="landing-section-title mt-4">AI recommends.<br />Policy decides.</h2>
+              <p className="landing-section-copy mt-6 max-w-[470px]">The investigation agent compresses evidence into a reviewable recommendation. It never bypasses the enforcement boundary.</p>
+              <div className="mt-8 border-l-2 border-[#315efb] pl-4"><p className="text-[11px] font-semibold text-[#17233b]">Clear ownership by design</p><p className="mt-2 text-[12px] leading-5 text-[#6c788c]">Models detect risk. The agent explains. Deterministic policy allows, reviews or blocks.</p></div>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-[24px] border border-[#dce4f1] bg-white p-6 shadow-[0_18px_60px_rgba(38,65,120,.08)] sm:translate-y-8"><Waypoints className="h-6 w-6 text-[#255df5]" /><p className="mt-7 text-[11px] font-bold uppercase tracking-[.13em] text-[#8b97aa]">Signal convergence</p><p className="mt-2 text-[38px] font-semibold tracking-[-.05em] text-[#10203e]">11 linked</p><p className="mt-2 text-[13px] leading-5 text-[#6c7890]">accounts identified across shared device, IP and payment instrument.</p></div>
-              <div className="rounded-[24px] border border-[#202f52] bg-[#0a1730] p-6 text-white shadow-[0_22px_70px_rgba(10,23,48,.18)]"><BadgeCheck className="h-6 w-6 text-[#7fa4ff]" /><p className="mt-7 text-[11px] font-bold uppercase tracking-[.13em] text-[#7f91b2]">Recommended action</p><p className="mt-2 text-[29px] font-semibold tracking-[-.04em]">Block entire cluster</p><div className="mt-6 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full w-[94%] rounded-full bg-gradient-to-r from-[#2f6bff] to-[#8a6df0]" /></div><p className="mt-3 text-[12px] font-semibold text-[#9fb0cc]">94% confidence · Policy aligned</p></div>
+
+            <div className="border-y border-[#dfe5ee]">
+              <div className="flex items-center justify-between border-b border-[#dfe5ee] py-4"><div><p className="text-[12px] font-semibold text-[#17233b]">Investigation output</p><p className="mt-1 font-mono text-[9px] text-[#818da0]">CASE-RSX184 · Evidence bundle 04</p></div><span className="text-[9px] font-semibold text-[#255df5]">Policy aware</span></div>
+              <div>
+                {observedSignals.map(([label, value, source], index) => <div key={label} className={`grid gap-2 py-4 sm:grid-cols-[1fr_1.25fr_.7fr] sm:items-center ${index < observedSignals.length - 1 ? "border-b border-[#edf0f5]" : ""}`}><span className="text-[10px] font-medium text-[#778398]">{label}</span><span className="text-[12px] font-semibold text-[#263249]">{value}</span><span className="text-left font-mono text-[9px] text-[#8b95a6] sm:text-right">{source}</span></div>)}
+              </div>
+              <div className="grid border-t border-[#dfe5ee] bg-[#f7f9fc] sm:grid-cols-[1fr_auto] sm:items-center">
+                <div className="p-5"><p className="text-[9px] font-semibold uppercase tracking-[.08em] text-[#7d889a]">Agent recommendation</p><p className="mt-2 text-[16px] font-semibold text-[#17233b]">Escalate to BLOCK review</p><p className="mt-1 text-[10px] text-[#69758a]">Confidence: High · Evidence sources: 4</p></div>
+                <div className="border-t border-[#dfe5ee] p-5 sm:border-l sm:border-t-0"><p className="text-[9px] font-semibold uppercase tracking-[.08em] text-[#7d889a]">Enforcement owner</p><p className="mt-2 font-mono text-[12px] font-bold text-[#255df5]">POLICY ENGINE</p></div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="outcomes" className="bg-white py-20 sm:py-28">
-          <div className="mx-auto max-w-[1280px] px-5 sm:px-8">
-            <div className="rounded-[32px] bg-[#071229] px-6 py-14 text-center text-white shadow-[0_30px_90px_rgba(7,18,41,.22)] sm:px-12 sm:py-20">
-              <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#80a4ff]">Built for the hackathon. Ready for the room.</p>
-              <h2 className="balance mx-auto mt-5 max-w-[850px] text-[39px] font-semibold leading-[1.04] tracking-[-.05em] sm:text-[58px]">Enter the complete RiskSentinel X experience.</h2>
-              <p className="mx-auto mt-5 max-w-[620px] text-[16px] leading-7 text-[#9facc4]">No credentials. No setup. Start from the operations dashboard and explore every workflow.</p>
-              <Link href="/login" className="group mx-auto mt-8 inline-flex h-[52px] items-center justify-center gap-2 rounded-xl bg-[#2d63ff] px-7 text-[14px] font-bold shadow-[0_16px_40px_rgba(45,99,255,.34)] transition hover:-translate-y-0.5 hover:bg-[#4777ff]">Continue to demo <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></Link>
+        <section className="bg-[#071226] py-20 text-white sm:py-24">
+          <div className="landing-container">
+            <div className="grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:items-end"><div><p className="text-[12px] font-semibold text-[#84a8ff]">Governed decisioning</p><h2 className="mt-4 max-w-[690px] text-[38px] font-semibold leading-[1.03] tracking-[-.05em] sm:text-[56px]">One evidence bundle. One accountable outcome.</h2></div><p className="max-w-[560px] text-[15px] leading-7 text-[#98a7bf] lg:justify-self-end">Every contributor remains visible from initial score to final enforcement.</p></div>
+            <div className="mt-14 grid border-y border-white/[.14] md:grid-cols-5">
+              {[
+                ["Risk model", "92 / 100", "Calibrated score"],
+                ["Graph", "High-risk cluster", "11 linked identities"],
+                ["Agent", "Recommend block", "Evidence-backed"],
+                ["Policy", "RS-204", "Rule triggered"],
+                ["Final decision", "BLOCK", "Enforced"],
+              ].map(([label, value, detail], index) => <div key={label} className={`relative px-4 py-6 sm:px-5 md:min-h-[170px] md:py-7 ${index > 0 ? "border-t border-white/10 md:border-l md:border-t-0" : ""}`}><span className="font-mono text-[9px] text-[#6f809b]">0{index + 1}</span><p className="mt-6 text-[10px] font-medium text-[#8797b0]">{label}</p><p className={`mt-2 text-[16px] font-semibold ${index === 4 ? "text-[#ff8d87]" : "text-white"}`}>{value}</p><p className="mt-2 text-[9px] text-[#6f809b]">{detail}</p>{index < 4 && <ArrowRight className="absolute right-[-7px] top-1/2 z-10 hidden h-3.5 w-3.5 -translate-y-1/2 text-[#5b8cff] md:block" />}</div>)}
             </div>
+          </div>
+        </section>
+
+        <section className="border-b border-[#e3e8f0] bg-[#f7f9fc] py-20 sm:py-28">
+          <div className="landing-container grid gap-12 lg:grid-cols-[.62fr_1.38fr] lg:gap-20">
+            <div>
+              <p className="text-[12px] font-semibold text-[#255df5]">Decision trail</p>
+              <h2 className="landing-section-title mt-4">A decision your team can replay.</h2>
+              <p className="landing-section-copy mt-6 max-w-[430px]">Every system contribution is timestamped, attributable and available for review.</p>
+              <div className="mt-10 border-t border-[#dce3ed] pt-6"><p className="font-mono text-[44px] font-semibold tracking-[-.06em] text-[#17233b]">169<span className="ml-1 text-[18px] text-[#78869d]">ms</span></p><p className="mt-2 text-[11px] text-[#6f7b90]">Payment received → policy enforced</p></div>
+            </div>
+
+            <div className="relative border-y border-[#dce3ed] bg-white">
+              <div className="absolute bottom-7 left-[119px] top-7 hidden w-px bg-[#dfe5ee] sm:block" />
+              {decisionTrail.map(([time, event, detail], index) => <div key={time} className={`relative grid gap-2 px-5 py-4 sm:grid-cols-[94px_16px_1fr] sm:items-center sm:gap-4 ${index < decisionTrail.length - 1 ? "border-b border-[#edf0f5]" : "bg-[#fff6f5]"}`}><time className="font-mono text-[9px] text-[#7e899b]">{time}</time><span className={`relative z-10 hidden h-2 w-2 border-2 ring-4 ring-white sm:block ${index === decisionTrail.length - 1 ? "border-[#d14338] bg-[#d14338]" : "border-[#7c9eec] bg-white"}`} /><div className="flex flex-col justify-between gap-1 sm:flex-row sm:items-center"><p className={`text-[11px] font-semibold ${index === decisionTrail.length - 1 ? "text-[#b9342d]" : "text-[#263249]"}`}>{event}</p><p className={`font-mono text-[9px] ${index === decisionTrail.length - 1 ? "font-bold text-[#b9342d]" : "text-[#7b8799]"}`}>{detail}</p></div></div>)}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white">
+          <div className="landing-container grid border-x border-[#e2e7ef] sm:grid-cols-2 lg:grid-cols-4">
+            {productProof.map(([title, copy], index) => <div key={title} className={`min-h-[190px] px-6 py-8 ${index > 0 ? "border-t border-[#e2e7ef] sm:[&:nth-child(odd)]:border-l lg:border-l" : ""} ${index === 2 ? "sm:border-t" : ""}`}><span className="font-mono text-[9px] text-[#9aa4b4]">0{index + 1}</span><h3 className="mt-7 text-[15px] font-semibold text-[#17233b]">{title}</h3><p className="mt-3 text-[12px] leading-5 text-[#68758a]">{copy}</p></div>)}
+          </div>
+        </section>
+
+        <section id="outcomes" className="border-y border-[#e2e7ef] bg-[#f7f9fc] py-20 sm:py-28">
+          <div className="landing-container text-center">
+            <h2 className="landing-section-title mx-auto max-w-[840px]">See a payment become a decision.</h2>
+            <p className="landing-section-copy mx-auto mt-5 max-w-[610px]">Follow the complete path from incoming payment to enforced outcome in the live workspace.</p>
+
+            <div className="mx-auto mt-12 grid max-w-[1040px] border-y border-[#dce3ed] bg-white sm:grid-cols-3 lg:grid-cols-6">
+              {["Payment", "Model", "Graph", "Investigation", "Policy", "Block"].map((step, index) => <div key={step} className={`relative px-3 py-5 text-[10px] font-semibold ${index === 5 ? "text-[#c93830]" : "text-[#39465d]"} ${index > 0 ? "border-t border-[#e5e9f0] sm:border-l sm:[&:nth-child(-n+3)]:border-t-0 lg:border-l lg:border-t-0" : ""}`}><span className="mr-2 font-mono text-[8px] text-[#9aa4b4]">0{index + 1}</span>{step}{index < 5 && <ArrowRight className="absolute right-[-7px] top-1/2 z-10 hidden h-3.5 w-3.5 -translate-y-1/2 text-[#6f8fd9] lg:block" />}</div>)}
+            </div>
+
+            <Link href="/login" className="landing-primary-cta group mx-auto mt-10 h-12 px-6 text-[13px]">Launch live demo <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></Link>
+            <p className="mt-3 text-[10px] text-[#7d899b]">No account required.</p>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-[#dce4f1] bg-white">
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-5 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8"><BrandLogo /><p className="text-[12px] font-medium text-[#7d899e]">AI-native payment risk intelligence · 2026</p></div>
+      <footer className="bg-white">
+        <div className="landing-container grid gap-8 py-10 sm:grid-cols-[1fr_auto] sm:items-end">
+          <div><BrandLogo /><p className="mt-3 text-[12px] text-[#6f7b90]">AI-native payment risk intelligence.</p></div>
+          <div className="sm:text-right"><nav className="flex flex-wrap gap-x-6 gap-y-3 text-[11px] font-medium text-[#536078]" aria-label="Footer navigation"><a href="#platform" className="hover:text-[#071426]">Platform</a><a href="#intelligence" className="hover:text-[#071426]">Intelligence</a><a href="#outcomes" className="hover:text-[#071426]">Outcomes</a><Link href="/login" className="hover:text-[#071426]">Demo</Link></nav><p className="mt-4 text-[9px] text-[#919bac]">Built for the Razorpay AI Buildathon 2026</p></div>
+        </div>
       </footer>
     </div>
   );
