@@ -8,7 +8,7 @@ const payments = [
   {
     id: "pay_PM71JD29",
     merchant: "Nova Electronics",
-    amount: "₹48,900",
+    amount: "₹48,900.00",
     score: 94,
     risk: "Critical",
     decision: "BLOCK",
@@ -22,7 +22,7 @@ const payments = [
   {
     id: "pay_NX82KL81",
     merchant: "UrbanCart",
-    amount: "₹12,840",
+    amount: "₹12,840.00",
     score: 87,
     risk: "High",
     decision: "REVIEW",
@@ -36,7 +36,7 @@ const payments = [
   {
     id: "pay_KL92PQ44",
     merchant: "Zomato",
-    amount: "₹840",
+    amount: "₹840.00",
     score: 12,
     risk: "Low",
     decision: "ALLOW",
@@ -50,7 +50,7 @@ const payments = [
   {
     id: "pay_LP84MN20",
     merchant: "CloudStore",
-    amount: "₹24,800",
+    amount: "₹24,800.00",
     score: 79,
     risk: "High",
     decision: "REVIEW",
@@ -84,16 +84,16 @@ export default function LiveRiskPreview() {
       <div className="flex h-[58px] items-center border-b border-[#e5eaf2] px-4 sm:px-5">
         <div>
           <p className="text-[12px] font-semibold text-[#17213a]">Payment risk operations</p>
-          <p className="mt-0.5 text-[9px] font-medium text-[#8994a6]">Acme Payments · Production</p>
+          <p className="mt-3 text-right text-[9px] font-medium text-[#6f809d]">ILLUSTRATIVE DEMO · Interactive seeded scenario</p>
         </div>
         <div className="ml-auto flex items-center gap-2 text-[9px] font-semibold text-[#536078]"><span className="landing-live-dot" />Live monitoring</div>
       </div>
 
       <div className="grid grid-cols-3 border-b border-[#e5eaf2] bg-[#fbfcfe]">
         {[
-          ["Payment volume", "₹1.24Cr", "Today"],
+          ["Payment volume", "₹1,24,00,000.00", "Today"],
           ["Transactions", processed.toLocaleString("en-IN"), "Processed"],
-          ["Loss prevented", "₹18.4L", "269 interventions"],
+          ["Loss prevented", "₹18,40,000.00", "269 interventions"],
         ].map(([label, value, helper], index) => (
           <div key={label} className={`px-3 py-3.5 sm:px-5 sm:py-4 ${index < 2 ? "border-r border-[#e5eaf2]" : ""}`}>
             <p className="text-[8px] font-semibold uppercase tracking-[.08em] text-[#8994a6] sm:text-[9px]">{label}</p>

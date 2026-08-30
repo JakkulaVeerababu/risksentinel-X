@@ -31,7 +31,7 @@ const navigation: NavSection[] = [
     items: [
       { label: "Overview", href: "/dashboard" },
       { label: "Transactions", href: "/transactions" },
-      { label: "Risk queue", href: "/alerts", badge: "41" },
+      { label: "Risk queue", href: "/alerts" },
       { label: "Cases", href: "/cases" },
     ],
   },
@@ -39,7 +39,7 @@ const navigation: NavSection[] = [
     label: "Intelligence",
     items: [
       { label: "Network graph", href: "/graph" },
-      { label: "Fraud clusters", href: "/clusters", badge: "4" },
+      { label: "Fraud clusters", href: "/clusters" },
       { label: "Investigation AI", href: "/ai" },
       { label: "Recommendations", href: "/recommendations" },
     ],

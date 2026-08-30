@@ -10,7 +10,7 @@ POST /api/v1/evaluation/simulate
 ```
 
 ## Behavior
-The simulation generates 5-6 interconnected synthetic transactions (sharing devices/IPs). It updates the relationships in NetworkX and pushes events through the REAL ML scoring service, REAL agent, and REAL policy engine, streaming outputs to the dashboard.
+The simulation generates 5-6 interconnected synthetic transactions (sharing devices/IPs). It updates the relationships in NetworkX and pushes events through the REAL ML scoring service, REAL agent, and REAL policy engine, providing recent activity to the dashboard.
 
 ## Defense-Only Statement
 > The simulation creates synthetic suspicious patterns solely for defensive detection and investigation testing.

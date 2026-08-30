@@ -9,7 +9,7 @@ from app.policy.schemas import PolicyCreate, PolicyResponse
 
 router = APIRouter()
 
-@router.get("/", response_model=List[PolicyResponse])
+@router.get("", response_model=List[PolicyResponse])
 def get_policies(db: Session = Depends(get_db)):
     """
     List all policies sorted by priority (highest first).
@@ -17,7 +17,7 @@ def get_policies(db: Session = Depends(get_db)):
     policies = db.query(PolicyModel).order_by(PolicyModel.priority.desc()).all()
     return policies
 
-@router.post("/", response_model=PolicyResponse)
+@router.post("", response_model=PolicyResponse)
 def create_policy(policy: PolicyCreate, db: Session = Depends(get_db)):
     """
     Create a new deterministic policy rule.

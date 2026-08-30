@@ -4,7 +4,7 @@
 Build a comprehensive, auditable MVP that bridges ML fraud detection with LLM-assisted investigation, ensuring safety through deterministic policy boundaries.
 
 ## What We Built
-An end-to-end event-driven architecture featuring FastAPI, XGBoost, NetworkX, an LLM orchestration layer, PostgreSQL, and a Next.js Live Dashboard with SSE realtime streaming.
+An end-to-end event-driven architecture featuring FastAPI, XGBoost, NetworkX, an LLM orchestration layer, PostgreSQL, and a Next.js Live Dashboard with SSE current session visualization.
 
 ## What Went Well
 - **Component Separation:** Strictly decoupling ML, Graph, Agent, and Policy made testing and debugging significantly easier.

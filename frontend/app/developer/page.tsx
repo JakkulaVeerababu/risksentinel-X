@@ -53,7 +53,7 @@ export default function DeveloperPage() {
       method: "POST",
       path: "/api/v1/transactions/process",
       title: "Canonical Transaction Processing",
-      description: "Synchronously execute a transaction through the complete Sentinel pipeline (ML, Graph, AI, Policy).",
+      description: "Synchronously execute a transaction through the complete Sentinel pipeline (ML, Graph, Agent, Policy).",
       req: `curl -X POST "http://localhost:8000/api/v1/transactions/process" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -106,7 +106,7 @@ export default function DeveloperPage() {
       method: "GET",
       path: "/api/v1/audit/{transaction_id}",
       title: "Fetch Audit Trail",
-      description: "Retrieve the immutable step-by-step execution timeline for a processed transaction.",
+      description: "Retrieve the recorded step-by-step execution timeline for a processed transaction.",
       req: `curl -X GET "http://localhost:8000/api/v1/audit/tx_req_8923a"`,
       res: `{
   "transaction_id": "tx_req_8923a",
@@ -152,6 +152,11 @@ export default function DeveloperPage() {
                   >
                     {copiedKey === "base_url" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
                   </button>
+                </div>
+                <div className="mt-3">
+                  <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-primary hover:text-primary-dark transition-colors">
+                    View OpenAPI Docs
+                  </a>
                 </div>
               </div>
 

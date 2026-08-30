@@ -88,7 +88,7 @@ export default function AuditPage() {
           <div className="text-[25px] font-semibold tabular-nums">{decisionEvents}</div>
         </div>
         <div className="flex-1 flex flex-col p-5">
-          <div className="mb-2 text-caption font-semibold uppercase text-text-muted">AI investigations</div>
+          <div className="mb-2 text-caption font-semibold uppercase text-text-muted">Agent investigations</div>
           <div className="text-[25px] font-semibold tabular-nums">{aiEvents}</div>
         </div>
       </div>

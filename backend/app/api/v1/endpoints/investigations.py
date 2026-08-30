@@ -15,7 +15,7 @@ class InvestigationUpdateStatus(BaseModel):
 class InvestigationUpdateAssignee(BaseModel):
     assignee: str
 
-@router.get("/")
+@router.get("")
 def list_investigations(db: Session = Depends(get_db)):
     """List all investigations ordered by newest first."""
     investigations = db.query(InvestigationModel).order_by(InvestigationModel.created_at.desc()).all()

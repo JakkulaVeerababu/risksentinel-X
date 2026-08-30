@@ -10,12 +10,21 @@
   --border-strong: #c9d2df;
   --primary: #245df5;
   --primary-hover: #1747c9;
+  --primary-soft: #edf3ff;
+  --success: #2f6bff;
+  --success-soft: #edf3ff;
 }
 
 .premium-shell {
   min-height: 100vh;
-  background: var(--background);
+  background:
+    linear-gradient(180deg, rgba(238, 243, 255, .68) 0, rgba(244, 246, 250, 0) 240px),
+    var(--background);
   color: var(--text-primary);
+}
+
+.premium-shell * {
+  scrollbar-color: #cbd4e2 transparent;
 }
 
 .premium-shell :where(h1, h2, h3) {
@@ -30,6 +39,18 @@
   border-color: var(--border);
   border-radius: 12px;
   box-shadow: 0 1px 2px rgba(11, 23, 57, .025), 0 8px 24px rgba(11, 23, 57, .025);
+}
+
+.premium-shell :where(.rsx-card, .rsx-data-panel, .rsx-stat-card) {
+  background: rgba(255, 255, 255, .98);
+}
+
+.premium-shell :where(button, a, input, select, textarea) {
+  border-radius: 8px;
+}
+
+.premium-shell :where(button, a)[class*="shadow-"] {
+  box-shadow: none !important;
 }
 
 .premium-shell .rsx-card-interactive:hover {
@@ -49,6 +70,21 @@
   font-size: clamp(29px, 2.6vw, 34px) !important;
   line-height: 1.1 !important;
   letter-spacing: -.038em !important;
+}
+
+.premium-shell .rsx-eyebrow {
+  position: relative;
+  padding-left: 26px;
+}
+
+.premium-shell .rsx-eyebrow::before {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 18px;
+  height: 1px;
+  content: "";
+  background: var(--primary);
 }
 
 .premium-shell :is([class~="text-[8px]"], [class~="text-[9px]"], [class~="text-[10px]"]) {
@@ -73,6 +109,30 @@
 
 .premium-shell :is([class~="rounded-[24px]"], [class~="rounded-[28px]"], [class~="rounded-[32px]"], [class~="rounded-2xl"], [class~="rounded-xl"]) {
   border-radius: 12px;
+}
+
+.premium-shell :is(table, .rsx-data-panel) {
+  font-variant-numeric: tabular-nums;
+}
+
+.premium-shell thead {
+  background: #f8faff;
+}
+
+.premium-shell th {
+  color: #7f8ba0;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.premium-shell tbody tr {
+  border-color: #e9edf4 !important;
+}
+
+.premium-shell tbody tr:hover {
+  background: #f8faff !important;
 }
 
 .premium-shell :where(section, article, aside, div)[class*="shadow-["] {
@@ -172,9 +232,7 @@
   box-shadow: 0 8px 20px rgba(36, 93, 245, .18);
 }
 
-.premium-shell nav a[href="/ai"] > span:last-child:not(:first-child) {
-  display: none;
-}
+
 
 .premium-shell header a[href="/settings"] > span:first-child {
   display: none;
@@ -190,11 +248,43 @@
 
 .premium-shell main {
   max-width: 1500px !important;
-  padding: 28px 32px 40px !important;
+  padding: 30px 32px 48px !important;
 }
 
-.premium-shell .flex.flex-col.items-center.justify-center > span:has(> svg:only-child) {
+.premium-shell :is(span, div):has(> svg.lucide:only-child)[class*="items-center"][class*="justify-center"]:not(button):not(a) {
   display: none;
+}
+
+/* Decorative icon chips read as template artifacts in data-heavy enterprise UI. */
+.premium-shell :is(.rsx-card, .rsx-data-panel, .rsx-stat-card) > :is(span, div):has(> svg.lucide:only-child)[class*="rounded"] {
+  display: none;
+}
+
+.premium-shell [class*="bg-success"] {
+  --tw-bg-opacity: 1;
+}
+
+.premium-shell [class*="text-success"] {
+  color: #245df5 !important;
+}
+
+.premium-shell [class*="border-success"] {
+  border-color: #cbd9fb !important;
+}
+
+.premium-shell [class*="bg-success-soft"] {
+  background-color: #edf3ff !important;
+}
+
+.premium-shell [data-decorative-icon="true"] {
+  display: none !important;
+}
+
+/* Route-level cleanup for residual legacy dark cards. */
+.premium-shell[data-route="/recommendations"] a[class*="bg-[#111a2d]"],
+.premium-shell[data-route="/simulator"] a[class*="bg-[#111a2d]"] {
+  border: 1px solid #245df5;
+  background: #245df5 !important;
 }
 
 @media (min-width: 1024px) {

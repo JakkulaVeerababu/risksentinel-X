@@ -7,7 +7,7 @@ from app.audit.schemas import AuditTimelineResponse, AuditEvent
 
 router = APIRouter()
 
-@router.get("/", response_model=List[AuditEvent])
+@router.get("", response_model=List[AuditEvent])
 async def search_audit_events(
     transaction_id: Optional[str] = Query(None, description="Filter by TX ID"),
     decision: Optional[str] = Query(None, description="Filter by ALLOW, REVIEW, BLOCK"),

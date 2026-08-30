@@ -55,16 +55,16 @@ export default function Sidebar() {
       ]
     },
     {
-      title: "AI",
+      title: "INTELLIGENCE TOOLS",
       items: [
-        { label: "Investigation AI", href: "/ai", icon: Bot },
+        { label: "Investigation", href: "/investigation", icon: Bot },
         { label: "Recommendations", href: "/recommendations", icon: Lightbulb },
       ]
     },
     {
       title: "OPERATIONS",
       items: [
-        { label: "Cases", href: "/investigations", icon: FileCheck },
+        { label: "Cases", href: "/cases", icon: FileCheck },
         { label: "Alerts", href: "/alerts", icon: BellRing },
         { label: "Audit", href: "/audit", icon: History },
       ]

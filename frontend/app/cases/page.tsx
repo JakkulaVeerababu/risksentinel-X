@@ -1,25 +1,44 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Download, Plus, Search, ChevronDown, Filter, MoreVertical,
-  AlertTriangle, Clock, ArrowUpRight, ShieldAlert, ExternalLink, X
+  AlertTriangle, Clock, ArrowUpRight, ShieldAlert, ExternalLink, X, ArrowRight
 } from "lucide-react";
-import { fetchInvestigations, Investigation } from "@/lib/api";
+import { fetchInvestigations, fetchRecentTransactions, Investigation, Transaction } from "@/lib/api";
 import { PageHeader, Skeleton, ErrorState } from "../../components/ui";
 
+type CombinedCase = Investigation & Partial<Transaction>;
+
 export default function CasesPage() {
-  const [activeTab, setActiveTab] = useState("all");
-  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
-  const [cases, setCases] = useState<Investigation[]>([]);
+  const router = useRouter();
+  const [cases, setCases] = useState<CombinedCase[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   async function loadData() {
     setLoading(true);
     try {
-      const data = await fetchInvestigations();
-      setCases(data.investigations || []);
+      const [invData, txData] = await Promise.all([
+        fetchInvestigations(),
+        fetchRecentTransactions()
+      ]);
+      
+      const investigations = invData.investigations || [];
+      const transactions = txData || [];
+      
+      // Join on transaction_id
+      const combined = investigations.map(inv => {
+        const tx = transactions.find(t => t.transaction_id === inv.transaction_id);
+        return {
+          ...inv,
+          ...tx
+        };
+      });
+      
+      setCases(combined);
       setError(false);
     } catch (err) {
       console.error("Failed to fetch cases:", err);
@@ -31,6 +50,8 @@ export default function CasesPage() {
 
   useEffect(() => {
     loadData();
+    const interval = setInterval(loadData, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   if (loading && cases.length === 0) {
@@ -51,125 +72,131 @@ export default function CasesPage() {
     );
   }
 
-  const selectedCase = cases.find(c => c.transaction_id === selectedCaseId);
-  const openCasesCount = cases.filter(c => c.agent_state !== 'CLOSED').length;
+  const openCasesCount = cases.filter(c => c.agent_state !== 'CLOSED' && c.agent_state !== 'COMPLETED').length;
   const metrics = [
     { label: "Open", value: openCasesCount, highlight: false },
     { label: "Investigating", value: cases.filter(c => c.agent_state === 'PROCESSING').length, highlight: false },
-    { label: "Resolved", value: cases.filter(c => c.agent_state === 'CLOSED').length, highlight: false, color: "text-success" },
+    { label: "Resolved", value: cases.filter(c => c.agent_state === 'CLOSED' || c.agent_state === 'COMPLETED').length, highlight: false, color: "text-success" },
   ];
 
+  const getRiskLevelBadge = (mlScore: number | undefined, graphScore: number | undefined) => {
+    const ml = mlScore ?? 0;
+    const graph = graphScore ?? 0;
+    const maxScore = Math.max(ml, graph);
+    
+    if (maxScore >= 0.9) return <span className="w-fit rounded-md border border-danger/20 bg-danger-soft px-2.5 py-1 text-caption font-semibold uppercase text-danger">CRITICAL</span>;
+    if (maxScore >= 0.7) return <span className="w-fit rounded-md border border-warning/20 bg-warning-soft px-2.5 py-1 text-caption font-semibold uppercase text-warning">HIGH</span>;
+    if (maxScore >= 0.3) return <span className="w-fit rounded-md border border-info/20 bg-info-soft px-2.5 py-1 text-caption font-semibold uppercase text-info">MEDIUM</span>;
+    return <span className="w-fit rounded-md border border-border bg-surface-secondary px-2.5 py-1 text-caption font-semibold uppercase text-text-secondary">LOW</span>;
+  };
+
+  const getStatusBadge = (status: string | undefined) => {
+    const s = status || 'OPEN';
+    switch (s.toUpperCase()) {
+      case "PENDING":
+      case "OPEN": 
+        return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-surface-secondary text-text-primary border border-border">OPEN</span>;
+      case "PROCESSING":
+      case "INVESTIGATING": 
+        return <span className="w-fit rounded-md border border-primary/20 bg-primary-soft px-2.5 py-1 text-caption font-semibold uppercase text-primary">INVESTIGATING</span>;
+      case "REVIEW_REQUIRED":
+      case "ESCALATED": 
+        return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-warning-soft text-warning border border-warning/20">REVIEW_REQUIRED</span>;
+      case "CLOSED":
+      case "COMPLETED": 
+      case "RESOLVED": 
+        return <span className="w-fit rounded-md border border-success/20 bg-success-soft px-2.5 py-1 text-caption font-semibold uppercase text-success">RESOLVED</span>;
+      case "FAILED":
+      case "DISMISSED": 
+        return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-surface-secondary text-text-muted border border-border border-dashed">FAILED</span>;
+      default: 
+        return <span className="px-2.5 py-1 text-caption font-semibold rounded-md uppercase bg-surface-secondary text-text-primary border border-border">{s}</span>;
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-8 pb-12 h-full">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-3">
-            <h1 className="text-[36px] font-semibold leading-tight tracking-[-.04em] text-text-primary">Cases</h1>
-            <span className="px-2 py-0.5 bg-success-soft text-success rounded text-caption font-semibold border border-success/20">BACKEND DATA</span>
-          </div>
-          <p className="text-label-sm text-text-secondary">Manage fraud investigations, assignments and resolution workflows.</p>
-        </div>
-      </div>
+    <div className="flex h-full flex-col gap-6 pb-12">
+      <PageHeader eyebrow="Investigation operations" title="Cases" description="Manage fraud investigations, assignments and resolution workflows." actions={<span className="border-l-2 border-primary pl-3 text-[10px] font-semibold text-primary">Live API data</span>} />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         {metrics.map((m, i) => (
-          <div key={i} className={`rounded-xl border ${m.highlight ? 'border-danger/30 bg-danger-soft/50' : 'border-border bg-surface'} p-5 shadow-sm hover:premium-shadow-hover transition-all`}>
-            <div className={`text-caption font-semibold uppercase mb-3 ${m.highlight ? 'text-danger' : 'text-text-muted'}`}>{m.label}</div>
-            <div className={`text-[25px] font-semibold tracking-[-.04em] tabular-nums ${m.color || (m.highlight ? 'text-danger' : 'text-text-primary')}`}>{m.value}</div>
+          <div key={i} className="rsx-stat-card">
+            <div className="rsx-stat-label">{m.label}</div>
+            <div className={`rsx-stat-value tabular-nums ${m.color || ''}`}>{m.value}</div>
           </div>
         ))}
       </div>
 
-      <div className="flex h-full min-h-[700px] flex-col gap-6 2xl:flex-row">
-        <div className="flex-1 flex flex-col rounded-xl border border-border bg-surface shadow-sm overflow-hidden">
-          <div className="flex-1 overflow-x-auto">
-            <table className="w-full min-w-[900px] border-collapse whitespace-nowrap text-left">
-              <thead className="bg-surface-secondary text-caption font-semibold uppercase text-text-muted border-b border-border">
-                <tr>
-                  <th className="p-4">Transaction ID</th>
-                  <th className="p-4">Recommendation</th>
-                  <th className="p-4">Confidence</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4">Created</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border bg-surface">
-                {cases.length === 0 ? (
-                  <tr><td colSpan={5} className="p-8 text-center text-text-secondary">No cases found.</td></tr>
-                ) : (
-                  cases.map((c) => (
-                    <tr key={c.transaction_id} onClick={() => setSelectedCaseId(c.transaction_id)} className={`transition-colors cursor-pointer ${selectedCaseId === c.transaction_id ? 'bg-primary-soft/50' : 'hover:bg-surface-secondary/50'}`}>
-                      <td className="p-4">
-                        <span className="text-label-sm text-mono-sm font-mono font-semibold text-primary">{c.transaction_id}</span>
-                      </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-caption font-semibold ${c.recommendation === 'BLOCK' ? 'text-danger bg-danger-soft border border-danger/20' : c.recommendation === 'REVIEW' ? 'text-warning bg-warning-soft border border-warning/20' : 'text-success bg-success-soft border border-success/20'}`}>
-                          {c.recommendation || 'PENDING'}
-                        </span>
-                      </td>
-                      <td className="p-4 text-label-sm text-text-secondary">
-                        {c.confidence ? `${(c.confidence * 100).toFixed(1)}%` : '--'}
-                      </td>
-                      <td className="p-4">
-                        <span className="text-label-sm font-medium text-text-primary">{c.agent_state}</span>
-                      </td>
-                      <td className="p-4 text-caption text-text-secondary text-mono-sm font-mono">
-                        {c.created_at ? new Date(c.created_at).toLocaleString() : '--'}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+      <div className="bg-surface border border-border rounded-xl overflow-hidden shadow-sm flex flex-col h-full min-h-[600px] min-w-0">
+        <div className="flex-1 overflow-x-auto min-w-0">
+          <table className="w-full text-left border-collapse whitespace-nowrap min-w-full md:min-w-[1200px] table-fixed">
+            <colgroup>
+              <col className="w-48" />
+              <col className="w-auto hidden md:table-column" />
+              <col className="w-32" />
+              <col className="w-36" />
+              <col className="w-24 hidden md:table-column" />
+              <col className="w-28 hidden md:table-column" />
+              <col className="w-36" />
+              <col className="w-40 hidden md:table-column" />
+              <col className="w-32 hidden lg:table-column" />
+            </colgroup>
+            <thead className="bg-surface-secondary text-caption font-semibold uppercase text-text-muted border-b border-border">
+              <tr>
+                <th className="p-4">Case ID</th>
+                <th className="p-4 hidden md:table-cell">Transaction</th>
+                <th className="p-4">Risk level</th>
+                <th className="p-4">Status</th>
+                <th className="p-4 hidden md:table-cell">ML score</th>
+                <th className="p-4 hidden md:table-cell">Graph score</th>
+                <th className="p-4">Final decision</th>
+                <th className="p-4 hidden md:table-cell">Updated</th>
+                <th className="p-4 text-right hidden lg:table-cell">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border bg-surface">
+              {cases.length === 0 ? (
+                <tr><td colSpan={9} className="p-8 text-center text-text-secondary">No cases found.</td></tr>
+              ) : (
+                cases.map((c) => (
+                  <tr key={c.transaction_id} onClick={() => router.push(`/cases/${c.transaction_id}`)} className="transition-colors cursor-pointer hover:bg-surface-secondary/50 group">
+                    <td className="p-4">
+                      <span className="text-label-sm text-mono-sm font-mono font-semibold text-primary group-hover:underline">{c.transaction_id}</span>
+                    </td>
+                    <td className="p-4 text-label-sm text-text-primary font-medium hidden md:table-cell truncate max-w-[200px]">
+                      {c.amount ? `₹${c.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--'} {c.customer_id ? `(${c.customer_id})` : ''}
+                    </td>
+                    <td className="p-4">
+                      {getRiskLevelBadge(c.ml_risk, c.graph_risk)}
+                    </td>
+                    <td className="p-4">
+                      {getStatusBadge(c.agent_state)}
+                    </td>
+                    <td className="p-4 text-label-sm text-text-secondary tabular-nums hidden md:table-cell">
+                      {c.ml_risk ? c.ml_risk.toFixed(2) : '--'}
+                    </td>
+                    <td className="p-4 text-label-sm text-text-secondary tabular-nums hidden md:table-cell">
+                      {c.graph_risk ? c.graph_risk.toFixed(2) : '--'}
+                    </td>
+                    <td className="p-4">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-caption font-semibold ${c.decision === 'BLOCK' ? 'text-danger bg-danger-soft border border-danger/20' : c.decision === 'REVIEW' ? 'text-warning bg-warning-soft border border-warning/20' : c.decision === 'ALLOW' ? 'text-success bg-success-soft border border-success/20' : 'text-text-muted bg-surface-secondary border border-border'}`}>
+                        {c.decision || 'PENDING'}
+                      </span>
+                    </td>
+                    <td className="p-4 text-caption text-text-secondary text-mono-sm font-mono hidden md:table-cell">
+                      {c.updated_at ? new Date(c.updated_at).toLocaleString() : c.created_at ? new Date(c.created_at).toLocaleString() : '--'}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-right hidden lg:table-cell">
+                      <Link href={`/cases/${c.transaction_id}`} className="inline-flex items-center gap-2 bg-primary text-white hover:bg-primary-hover px-4 py-2 rounded-lg text-caption font-semibold transition-all shadow-sm group-hover:premium-shadow-hover" onClick={(e) => e.stopPropagation()}>
+                        Open Case <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-
-        {selectedCase && (
-          <div className="flex w-full shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm 2xl:w-[470px]">
-            <div className="p-6 border-b border-border bg-surface-secondary/50 flex justify-between items-start">
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <h3 className="text-heading-md text-mono-sm font-mono font-semibold text-text-primary ">{selectedCase.transaction_id.substring(0, 16)}...</h3>
-                </div>
-                <p className="text-label-sm text-text-secondary flex items-center gap-2 flex-wrap">
-                  Status: <span className="font-semibold text-text-primary">{selectedCase.agent_state}</span>
-                </p>
-              </div>
-              <button onClick={() => setSelectedCaseId(null)} className="h-8 w-8 rounded-lg border border-transparent bg-surface flex items-center justify-center text-text-muted hover:border-border hover:text-text-primary shadow-sm transition-colors">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 bg-surface-secondary/30">
-              <div className="relative overflow-hidden border border-[#dfe5ee] border-l-2 border-l-[#245df5] bg-white p-5">
-                <div className="relative z-10 mb-4 border-b border-[#e5e9f0] pb-3">
-                  <h4 className="text-label-sm font-semibold uppercase text-[#17233f]">Sentinel recommendation</h4>
-                </div>
-                <div className="relative z-10 mb-4 flex items-center justify-between border border-[#e5e9f0] bg-[#f7f9fc] p-3">
-                  <span className={`font-semibold text-label-sm ${selectedCase.recommendation === 'BLOCK' ? 'text-danger' : selectedCase.recommendation === 'REVIEW' ? 'text-warning' : 'text-success'}`}>
-                    {selectedCase.recommendation || 'PENDING'}
-                  </span>
-                  <span className="border border-[#dfe5ee] px-2 py-0.5 font-mono text-caption font-semibold text-text-muted">
-                    {selectedCase.confidence ? `${(selectedCase.confidence * 100).toFixed(1)}% Confidence` : 'Running...'}
-                  </span>
-                </div>
-                <div className="relative z-10 text-label-sm leading-relaxed text-[#667287]">
-                  <span className="block font-semibold mb-2">Reason Codes:</span>
-                  <ul className="list-disc pl-5">
-                    {selectedCase.reason_codes?.map((rc: string) => <li key={rc}>{rc}</li>) || <li>None</li>}
-                  </ul>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-caption font-semibold uppercase text-text-muted mb-3">Evidence Data</h4>
-                <pre className="bg-surface border border-border rounded-xl p-4 text-mono-sm font-mono text-text-secondary overflow-x-auto max-h-[300px]">
-                  {JSON.stringify(selectedCase.evidence || {}, null, 2)}
-                </pre>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

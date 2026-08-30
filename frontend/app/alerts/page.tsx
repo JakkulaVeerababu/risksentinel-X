@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Download, Plus, AlertTriangle, Search, ChevronDown, X, Network, Activity, ArrowUpRight
 } from "lucide-react";
@@ -30,7 +31,7 @@ export default function AlertsPage() {
           entity: t.customer_id,
           source: 'Risk Engine',
           evidence: `ML Risk: ${t.ml_risk}, Graph Risk: ${t.graph_risk}`,
-          exposure: `₹${t.amount.toLocaleString()}`,
+          exposure: `₹${t.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
           status: 'Unacknowledged',
           statusColor: 'text-warning',
           time: new Date(t.timestamp).toLocaleString(),
@@ -77,27 +78,14 @@ export default function AlertsPage() {
   ];
 
   return (
-    <div className="flex h-full flex-col gap-7 pb-12">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-3">
-            <h1 className="text-[36px] font-semibold leading-tight tracking-[-.04em] text-text-primary">Risk alerts</h1>
-            <span className="px-2 py-0.5 bg-success-soft text-success rounded text-caption font-semibold border border-success/20">BACKEND DATA</span>
-          </div>
-          <p className="text-label-sm text-text-secondary">Monitor and triage processed fraud and policy alerts.</p>
-        </div>
-      </div>
+    <div className="flex h-full flex-col gap-6 pb-12">
+      <PageHeader eyebrow="Risk queue" title="Risk alerts" description="Monitor and triage processed fraud and policy alerts." actions={<span className="border-l-2 border-primary pl-3 text-[10px] font-semibold text-primary">Live API data</span>} />
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {metrics.map((m, i) => (
-          <div key={i} className={`rounded-[10px] border-t-2 ${m.highlight ? 'border-danger/30 border-t-danger bg-danger-soft/30' : 'border-border border-t-[#80928a] bg-surface'} p-5 shadow-sm`}>
-            <div className="flex items-center gap-2 mb-3">
-              {m.icon}
-              <span className={`text-caption font-semibold uppercase ${m.highlight ? 'text-danger' : 'text-text-muted'}`}>{m.label}</span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className={`text-[25px] font-semibold tracking-[-.04em] ${m.highlight ? 'text-danger' : 'text-text-primary'}`}>{m.value}</span>
-            </div>
+          <div key={i} className="rsx-stat-card">
+            <div className="rsx-stat-label">{m.label}</div>
+            <div className={`rsx-stat-value ${m.highlight ? 'text-danger' : ''}`}>{m.value}</div>
           </div>
         ))}
       </div>
@@ -133,7 +121,7 @@ export default function AlertsPage() {
                         </div>
                       </td>
                       <td className="p-4">
-                        <a className="text-label-sm text-mono-sm font-mono font-semibold text-primary hover:underline" href="#">{alert.entity}</a>
+                        <Link className="text-label-sm text-mono-sm font-mono font-semibold text-primary hover:underline" href={`/transactions/${alert.tx_id}`}>{alert.entity}</Link>
                       </td>
                       <td className="p-4 text-label-sm text-mono-sm font-mono font-semibold text-text-primary tabular-nums">{alert.exposure}</td>
                       <td className="p-4">

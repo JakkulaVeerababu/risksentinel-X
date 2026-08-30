@@ -12,7 +12,7 @@ class AuditService:
     
     @classmethod
     def record_event(cls, db: Session, event: AuditEvent):
-        """Append an event to the immutable audit log."""
+        """Append an event to the persisted audit trail."""
         try:
             # Ensure no chain-of-thought is passed in the payload
             if "chain_of_thought" in event.input_summary or "internal_reasoning" in event.input_summary:

@@ -75,6 +75,19 @@ def check_node_details(entity_id: str):
     """Alias for /graph-check for path-based access."""
     return check_graph(entity_id)
 
+@router.get("/clusters")
+def get_clusters():
+    service = GraphRiskService.get_instance()
+    if not service.is_loaded:
+        raise HTTPException(status_code=503, detail="Graph data is not available")
+        
+    try:
+        clusters = service.get_top_clusters(limit=12)
+        return {"clusters": clusters}
+    except Exception as e:
+        logging.error(f"Failed to get clusters: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error.")
+
 @router.get("/cluster/{cluster_id}")
 def get_cluster_details(cluster_id: str):
     # This is a stub for real cluster-level aggregation, 

@@ -107,7 +107,7 @@ export default function PoliciesPage() {
             Policy Engine
           </h1>
           <p className="text-label-sm text-text-secondary flex items-center gap-2">
-            <span className="font-semibold text-primary">AI recommends.</span> Policy decides.
+            <span className="font-semibold text-primary">Intelligence recommends.</span> Policy decides.
           </p>
         </div>
         {/* Policy Mutation Disabled for MVP */}

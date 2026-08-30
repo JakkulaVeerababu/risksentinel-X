@@ -21,4 +21,4 @@ Crucially, the LLM does not independently block transactions. We use determinist
 A hard-coded Python Policy Engine evaluates the ML risk, Graph signals, and verified Agent evidence to make the final deterministic choice between ALLOW, REVIEW, and BLOCK. For instance, an automatic BLOCK requires ML Risk > 0.85 *and* corroborating evidence; high agent confidence alone cannot bypass this rule.
 
 **Audit:**
-The entire execution trace—tool calls, evidence, reason codes, ML scores, and final policy enforcement—is immutably logged into a PostgreSQL audit store. This allows full reconstruction through a Next.js Live Dashboard using Server-Sent Events (SSE) for real-time visualization."
+The entire execution trace—tool calls, evidence, reason codes, ML scores, and final policy enforcement—is securely recorded into a PostgreSQL audit store. This allows full reconstruction through a Next.js Live Dashboard using Server-Sent Events (SSE) for current session visualization."

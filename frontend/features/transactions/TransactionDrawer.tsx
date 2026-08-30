@@ -130,13 +130,13 @@ export function TransactionDrawer({ transaction, isOpen, onClose }: TransactionD
           </div>
         </section>
 
-        {/* AI Investigation */}
+        {/* Agent Investigation */}
         <section className="bg-ai-surface border border-ai-border rounded-xl p-5 shadow-card relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary opacity-10 rounded-full blur-2xl pointer-events-none"></div>
           
           <div className="relative z-10">
             <h3 className="text-body-sm font-semibold text-ai-text-primary mb-4 flex items-center gap-2">
-              <span className="text-primary font-semibold">✧</span> AI Investigation
+              <span className="text-primary font-semibold">✧</span> Agent Investigation
             </h3>
             
             <div className="bg-ai-background border border-ai-border rounded-lg p-3 mb-4">

@@ -5,7 +5,7 @@
 A fraud model can identify suspicious activity, but human analysts require context to make blocking decisions. RiskSentinel X bridges this gap by orchestrating an evidence-driven pipeline. It processes transactions through an XGBoost anomaly detector and a NetworkX graph intelligence layer. A bounded AI agent then synthesizes structured evidence using strict tool limits. Crucially, the system decouples probabilistic LLM reasoning from enforcement: the LLM recommends, but a deterministic Policy Engine decides. Evaluated on a quarantined 15% split of the IEEE-CIS benchmark, the ML layer achieved a 0.4810 Average Precision. The primary limitation is the prototype-scale in-memory graph infrastructure, which requires distributed graph technology (e.g., Neo4j) for production volumes.
 
 ## Problem Statement
-Fraud models produce risk scores (e.g., "0.89 probability of fraud"), leaving risk analysts to manually hunt for the underlying context. RiskSentinel bridges the prediction to an actionable investigation, structuring evidence, enforcing policy, and writing to an immutable audit log.
+Fraud models produce risk scores (e.g., "0.89 probability of fraud"), leaving risk analysts to manually hunt for the underlying context. RiskSentinel bridges the prediction to an actionable investigation, structuring evidence, enforcing policy, and writing to a persisted audit trail.
 
 ## System Thesis
 **Models detect. Graphs connect. Agents investigate. Policies decide.**

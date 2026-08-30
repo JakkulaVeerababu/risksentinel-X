@@ -48,7 +48,7 @@ A: Rapid prototyping for a hackathon. NetworkX provides rich graph algorithms (L
 A: Transaction features identify unusual behavior in isolation. Graphs expose *relationships*: shared devices, shared IPs, connected accounts, coordinated velocity. These are fundamentally different signal types. A transaction that looks normal individually may be part of a collusion ring.
 
 **Q: How would this scale beyond NetworkX?**
-A: Production would use distributed graph infrastructure (Neo4j, Amazon Neptune, JanusGraph) with streaming ingestion (Kafka) and pre-computed graph features. NetworkX is a prototype-scale demonstration of the architectural pattern.
+A: Production would use distributed graph infrastructure (Neo4j, Amazon Neptune, JanusGraph) with batch ingestion (Kafka) and pre-computed graph features. NetworkX is a prototype-scale demonstration of the architectural pattern.
 
 ---
 

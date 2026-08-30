@@ -22,7 +22,7 @@ async def event_generator():
 @router.get("/events")
 async def sse_endpoint():
     """
-    Server-Sent Events endpoint for real-time frontend updates.
+    Server-Sent Events endpoint for backend-connected updates.
     """
     logging.info("Client connected to SSE stream.")
     return EventSourceResponse(event_generator())

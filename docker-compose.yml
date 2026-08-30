@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   postgres:
@@ -37,11 +36,14 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        - BACKEND_INTERNAL_URL=http://backend:8000
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
-      - NEXT_PUBLIC_REALTIME_URL=http://localhost:8000/api/v1/stream/events
+      - NEXT_PUBLIC_API_BASE_URL=/api/backend
+      - NEXT_PUBLIC_REALTIME_URL=/api/backend/stream/events
+      - BACKEND_INTERNAL_URL=http://backend:8000
     depends_on:
       - backend
 

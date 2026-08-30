@@ -17,7 +17,7 @@
 | Graph Engine | Loaded | NetworkX synthetic relationships initialized |
 | Agent Provider | Healthy | Mock provider initialized cleanly |
 | Policy Engine | Ready | Deterministic thresholds match Phase 4 exactly |
-| Audit Service | Ready | Immutable chronological store initialized |
+| Audit Service | Ready | persisted chronological store initialized |
 | Realtime SSE | Connected | Dashboard stream functional |
 
 ## Testing Results

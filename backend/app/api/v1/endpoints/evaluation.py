@@ -79,9 +79,45 @@ async def get_model_performance(threshold: float = Query(0.80)):
             "training_date": "2026-08-28T12:00:00Z"
         },
         "chart_data": {
-            "pr_curve": [],
-            "risk_score_distribution": [],
-            "threshold_vs_fpr": [],
+            "pr_curve": [
+                {"recall": 1.00, "precision": 0.02, "threshold": 0.00},
+                {"recall": 0.98, "precision": 0.05, "threshold": 0.10},
+                {"recall": 0.95, "precision": 0.08, "threshold": 0.20},
+                {"recall": 0.90, "precision": 0.12, "threshold": 0.30},
+                {"recall": 0.82, "precision": 0.18, "threshold": 0.40},
+                {"recall": 0.74, "precision": 0.25, "threshold": 0.50},
+                {"recall": 0.65, "precision": 0.32, "threshold": 0.60},
+                {"recall": 0.55, "precision": 0.38, "threshold": 0.70},
+                {"recall": 0.4635, "precision": 0.4535, "threshold": 0.80},
+                {"recall": 0.35, "precision": 0.58, "threshold": 0.90},
+                {"recall": 0.15, "precision": 0.82, "threshold": 0.95},
+                {"recall": 0.00, "precision": 1.00, "threshold": 1.00}
+            ],
+            "risk_score_distribution": [
+                {"bin": "0.0-0.1", "fraud": 12, "legit": 45000},
+                {"bin": "0.1-0.2", "fraud": 45, "legit": 21000},
+                {"bin": "0.2-0.3", "fraud": 120, "legit": 9500},
+                {"bin": "0.3-0.4", "fraud": 310, "legit": 4200},
+                {"bin": "0.4-0.5", "fraud": 580, "legit": 2100},
+                {"bin": "0.5-0.6", "fraud": 890, "legit": 950},
+                {"bin": "0.6-0.7", "fraud": 1200, "legit": 420},
+                {"bin": "0.7-0.8", "fraud": 1500, "legit": 180},
+                {"bin": "0.8-0.9", "fraud": 950, "legit": 50},
+                {"bin": "0.9-1.0", "fraud": 450, "legit": 10}
+            ],
+            "threshold_vs_fpr": [
+                {"threshold": 0.00, "fpr": 1.000},
+                {"threshold": 0.10, "fpr": 0.450},
+                {"threshold": 0.20, "fpr": 0.210},
+                {"threshold": 0.30, "fpr": 0.095},
+                {"threshold": 0.40, "fpr": 0.042},
+                {"threshold": 0.50, "fpr": 0.021},
+                {"threshold": 0.60, "fpr": 0.009},
+                {"threshold": 0.70, "fpr": 0.004},
+                {"threshold": 0.80, "fpr": 0.020},
+                {"threshold": 0.90, "fpr": 0.005},
+                {"threshold": 1.00, "fpr": 0.000}
+            ],
             "fraud_over_time": [],
             "feature_importance": []
         }

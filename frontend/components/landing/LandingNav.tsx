@@ -14,6 +14,7 @@ const links = [
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showBanner, setShowBanner] = useState(true);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 28);
@@ -22,33 +23,49 @@ export default function LandingNav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const dark = !scrolled && !open;
-
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300 ${scrolled || open ? "border-[#dfe5ef] bg-white/95 shadow-[0_1px_0_rgba(7,20,38,.03)] backdrop-blur-md" : "border-white/10 bg-[#071226]"}`}>
-      <div className="landing-container flex h-[72px] items-center">
-        <BrandLogo inverse={dark} />
+    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/40 backdrop-blur-lg shadow-[0_8px_30px_rgba(23,42,79,.07)]" : "bg-transparent"}`}>
+      {showBanner && (
+        <div className="relative border-b border-white/20 bg-transparent">
+          <div className="flex h-9 items-center justify-center gap-3 px-10 lg:px-14 w-full text-center text-[10px] font-semibold text-[#10203a] sm:text-[11px]">
+            <span>See every payment risk decision, end to end.</span>
+            <a href="#platform" className="hidden text-[#255df5] underline-offset-4 hover:underline sm:inline">Explore the platform</a>
+          </div>
+          <button 
+            onClick={() => setShowBanner(false)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#10203a] opacity-60 hover:opacity-100"
+            aria-label="Dismiss banner"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
 
-        <nav className="ml-12 hidden items-center gap-9 lg:flex" aria-label="Product navigation">
+      <div className="border-b border-white/20 bg-transparent">
+        <div className="flex h-[70px] items-center px-5 lg:px-10 w-full">
+        <BrandLogo />
+
+        <nav className="ml-12 hidden items-center gap-8 lg:flex" aria-label="Product navigation">
           {links.map((link) => (
-            <a key={link.href} href={link.href} className={`landing-nav-link ${dark ? "text-white/[.68] hover:text-white" : "text-[#526079] hover:text-[#071426]"}`}>
+            <a key={link.href} href={link.href} className="text-[14px] font-medium text-[#526079] transition-colors hover:text-[#0B1F3A]">
               {link.label}
             </a>
           ))}
         </nav>
 
-        <div className="ml-auto hidden items-center gap-5 sm:flex">
-          <Link href="/login" className={`text-[13px] font-semibold transition-colors ${dark ? "text-white/[.72] hover:text-white" : "text-[#536078] hover:text-[#071426]"}`}>
+        <div className="ml-auto hidden items-center gap-6 sm:flex">
+          <Link href="/login" className="text-[14px] font-medium text-[#536078] transition-colors hover:text-[#0B1F3A]">
             Log in
           </Link>
-          <Link href="/login" className="landing-primary-cta group h-10 px-4 text-[13px]">
-            Open demo <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+          <Link href="/login" className="group flex h-[40px] items-center justify-center rounded-md bg-[#1364F1] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#0E54CD]">
+            Open demo <ArrowRight className="ml-1.5 h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
           </Link>
         </div>
 
-        <button type="button" aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open} onClick={() => setOpen((value) => !value)} className={`ml-auto flex h-10 w-10 items-center justify-center rounded-md sm:hidden ${dark ? "text-white hover:bg-white/10" : "text-[#17233d] hover:bg-[#f1f5fb]"}`}>
+        <button type="button" aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open} onClick={() => setOpen((value) => !value)} className="ml-auto flex h-10 w-10 items-center justify-center rounded-md text-[#17233d] hover:bg-[#f1f5fb] sm:hidden">
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
+        </div>
       </div>
 
       {open && (

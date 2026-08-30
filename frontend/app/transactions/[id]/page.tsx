@@ -83,7 +83,7 @@ export default function TransactionDetailPage() {
           <div>
             <h1 className="text-2xl font-bold text-text-primary font-mono">{transaction.id}</h1>
             <p className="text-text-secondary mt-1">
-              Customer: <span className="font-semibold text-text-primary">{transaction.customer_id}</span> • Amount: <span className="font-semibold text-text-primary tabular-nums">₹{transaction.amount?.toLocaleString()}</span>
+              Customer: <span className="font-semibold text-text-primary">{transaction.customer_id}</span> • Amount: <span className="font-semibold text-text-primary tabular-nums">₹{transaction.amount?.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </p>
           </div>
           <div className="flex items-center gap-3">

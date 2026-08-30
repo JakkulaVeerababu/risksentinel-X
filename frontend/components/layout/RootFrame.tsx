@@ -12,5 +12,9 @@ export default function RootFrame({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  return <div className="premium-shell"><DashboardLayout>{children}</DashboardLayout></div>;
+  return (
+    <div className="premium-shell" data-route={pathname}>
+      <DashboardLayout>{children}</DashboardLayout>
+    </div>
+  );
 }

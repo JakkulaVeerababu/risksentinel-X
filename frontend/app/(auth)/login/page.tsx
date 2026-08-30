@@ -6,83 +6,111 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, LoaderCircle } from "lucide-react";
 import BrandLogo from "../../../components/brand/BrandLogo";
 
-const accessPoints = [
-  ["Policy decisions", "Monitor allow, review and block outcomes"],
-  ["Graph evidence", "Trace devices, identities and payment links"],
-  ["AI investigations", "Turn complex signals into clear next actions"],
+const proof = [
+  ["186 ms", "average decisions"],
+  ["Graph-linked", "connected evidence"],
+  ["Policy-owned", "final outcomes"],
 ];
+
+function GoogleMark() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" aria-hidden="true">
+      <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.91h5.38a4.6 4.6 0 0 1-1.99 3.02v2.54h3.23c1.89-1.74 2.98-4.31 2.98-7.4Z" />
+      <path fill="#34A853" d="M12 22c2.7 0 4.96-.89 6.62-2.41l-3.23-2.54c-.9.6-2.04.95-3.39.95-2.6 0-4.81-1.76-5.6-4.13H3.07v2.62A10 10 0 0 0 12 22Z" />
+      <path fill="#FBBC05" d="M6.4 13.87A6 6 0 0 1 6.09 12c0-.65.11-1.28.31-1.87V7.51H3.07A10 10 0 0 0 2 12c0 1.61.38 3.14 1.07 4.49l3.33-2.62Z" />
+      <path fill="#EA4335" d="M12 6c1.47 0 2.79.51 3.83 1.5l2.87-2.87A9.64 9.64 0 0 0 12 2a10 10 0 0 0-8.93 5.51l3.33 2.62C7.19 7.76 9.4 6 12 6Z" />
+    </svg>
+  );
+}
+
+function GitHubMark() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] fill-[#111827]" aria-hidden="true">
+      <path d="M12 .7a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2.02c-3.22.7-3.9-1.37-3.9-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.72 1.27 3.38.97.1-.75.4-1.27.74-1.56-2.57-.3-5.27-1.29-5.27-5.69 0-1.26.45-2.28 1.2-3.09-.12-.29-.52-1.47.11-3.05 0 0 .98-.31 3.17 1.18a10.96 10.96 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.76.11 3.05.75.81 1.2 1.83 1.2 3.09 0 4.41-2.71 5.39-5.29 5.68.42.36.78 1.07.78 2.16v3.04c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .7Z" />
+    </svg>
+  );
+}
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const enterWorkspace = () => {
     if (loading) return;
     setLoading(true);
-    window.setTimeout(() => {
-      router.push("/dashboard", { scroll: true });
-      window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 120);
-    }, 520);
+    window.setTimeout(() => router.push("/dashboard", { scroll: true }), 420);
   };
 
   return (
-    <main className="min-h-[100dvh] w-full overflow-x-hidden bg-[#06132c] p-0 sm:p-4 lg:h-[100dvh] lg:min-h-0 lg:overflow-hidden xl:p-6">
-      <div className="grid min-h-[100dvh] w-full overflow-hidden bg-white sm:min-h-[calc(100dvh-32px)] sm:rounded-[18px] sm:border sm:border-white/15 sm:shadow-[0_28px_80px_rgba(0,0,0,.32)] lg:h-full lg:min-h-0 lg:grid-cols-[1.12fr_.88fr]">
-        <section className="relative hidden min-h-0 overflow-hidden bg-[#071633] px-10 py-9 text-white lg:flex lg:flex-col xl:px-14 xl:py-11 2xl:px-16">
-          <div className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.045)_1px,transparent_1px)] [background-size:76px_76px]" />
-          <div className="absolute inset-y-0 right-[3%] w-[56%] -skew-x-12 bg-gradient-to-b from-[#315fff]/22 via-[#21449d]/8 to-transparent" />
+    <main className="min-h-[100dvh] w-full overflow-x-hidden bg-white text-[#071426]">
+      <div className="grid min-h-[100dvh] lg:grid-cols-[minmax(0,1.9fr)_minmax(420px,1fr)]">
+        <section className="relative hidden overflow-hidden border-r border-[#d8e1ef] bg-[#eef6ff] px-12 py-9 lg:flex lg:flex-col xl:px-16 2xl:px-20">
+          <div className="login-visual-wash pointer-events-none absolute inset-0" />
+          <div className="login-diagonal-bands pointer-events-none absolute inset-0 opacity-90" aria-hidden="true"><span /><span /><span /><span /><span /></div>
+          <div className="pointer-events-none absolute -bottom-44 -right-20 h-[520px] w-[180px] rotate-[17deg] bg-[#68eef5]/20" />
 
-          <div className="relative z-10 inline-flex w-fit"><BrandLogo inverse /></div>
+          <div className="relative z-10"><BrandLogo /></div>
 
-          <div className="relative z-10 my-auto max-w-[760px] py-8">
-            <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#8eabf5]">Payment risk command center</p>
-            <h1 className="balance mt-5 text-[48px] font-semibold leading-[.98] tracking-[-.055em] xl:text-[58px] 2xl:text-[66px]">One clear view from signal to decision.</h1>
-            <p className="mt-5 max-w-[650px] text-[15px] leading-7 text-[#aab9d4] xl:text-[17px]">Investigate coordinated fraud, understand every recommendation and act before payment risk turns into loss.</p>
+          <div className="relative z-10 mt-auto max-w-[810px] pb-8 xl:pb-10">
+            <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#255df5]">Payment-risk infrastructure</p>
+            <h1 className="mt-5 max-w-[780px] text-[40px] font-semibold leading-[1.05] tracking-[-.052em] text-[#10203a] xl:text-[48px]">Move from risk signal to accountable decision in milliseconds.</h1>
+            <p className="mt-5 max-w-[650px] text-[14px] leading-7 text-[#50617b]">Monitor every payment, connect hidden relationships, accelerate investigations and keep deterministic policy in control.</p>
 
-            <div className="mt-8 overflow-hidden rounded-[12px] border border-white/12 bg-[#0b1b3b]/86 shadow-[0_18px_50px_rgba(0,0,0,.22)]">
-              <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-                <div><p className="text-[10px] font-extrabold uppercase tracking-[.15em] text-[#788baD]">Active intelligence</p><p className="mt-1 text-[14px] font-bold">Coordinated cluster FRC-0184</p></div>
-                <span className="rounded-full border border-[#ff7c83]/25 bg-[#4a2130] px-2.5 py-1 text-[10px] font-bold text-[#ff9ca2]">Critical · 96</span>
-              </div>
-              <div className="grid grid-cols-3 divide-x divide-white/10">
-                {[["Exposure stopped", "₹4.82L"], ["Linked identities", "18"], ["Decision time", "42 ms"]].map(([label, value]) => (
-                  <div key={label} className="px-5 py-5"><p className="text-[10px] font-bold uppercase tracking-[.1em] text-[#7789aa]">{label}</p><p className="mt-2 text-[24px] font-semibold tracking-[-.04em] text-white xl:text-[28px]">{value}</p></div>
-                ))}
-              </div>
-              <div className="flex items-center justify-between border-t border-white/10 px-5 py-3.5 text-[11px] font-semibold text-[#8fa1c1]"><span>Graph + ML + policy evidence synchronized</span><span className="text-[#7fa4ff]">Operational</span></div>
-            </div>
-          </div>
-
-          <div className="relative z-10 flex items-center justify-between border-t border-white/10 pt-5 text-[10px] font-semibold text-[#7082a3]"><span>RiskSentinel X · Demo environment</span><span>No customer data</span></div>
-        </section>
-
-        <section className="relative flex min-h-[100dvh] min-w-0 flex-col bg-[#fbfcff] px-6 py-6 sm:min-h-[calc(100dvh-32px)] sm:px-10 sm:py-8 lg:h-full lg:min-h-0 xl:px-14 2xl:px-16">
-          <div className="flex items-center justify-between">
-            <div className="lg:hidden"><BrandLogo /></div>
-            <Link href="/" className="ml-auto inline-flex items-center gap-2 rounded-lg px-3 py-2 text-[12px] font-semibold text-[#647188] transition hover:bg-[#f0f4fb] hover:text-[#17233f]"><ArrowLeft className="h-4 w-4" />Back to product</Link>
-          </div>
-
-          <div className="my-auto mx-auto w-full max-w-[500px] py-8">
-            <p className="text-[11px] font-extrabold uppercase tracking-[.18em] text-[#255df5]">Credential-free access</p>
-            <h2 className="balance mt-4 text-[36px] font-semibold leading-[1.04] tracking-[-.05em] text-[#071936] sm:text-[42px] xl:text-[46px]">Enter the risk workspace.</h2>
-            <p className="mt-5 max-w-[460px] text-[14px] leading-6 text-[#69768b]">No email, password or setup is required. The complete platform is preloaded for your demo.</p>
-
-            <div className="mt-7 divide-y divide-[#e8ecf2] rounded-2xl border border-[#e0e6ef] bg-white px-5 shadow-[0_16px_50px_rgba(31,51,92,.07)]">
-              {accessPoints.map(([title, detail], index) => (
-                <div key={title} className="grid grid-cols-[26px_1fr] gap-3 py-4">
-                  <span className="font-mono text-[10px] font-bold text-[#8b97aa]">{String(index + 1).padStart(2, "0")}</span>
-                  <div><p className="text-[13px] font-bold text-[#27344c]">{title}</p><p className="mt-1 text-[11px] leading-5 text-[#7b8698]">{detail}</p></div>
+            <div className="mt-9 grid max-w-[760px] border-y border-[#c7d6ea] sm:grid-cols-3">
+              {proof.map(([value, label], index) => (
+                <div key={label} className={`py-4 ${index > 0 ? "border-t border-[#c7d6ea] sm:border-l sm:border-t-0 sm:pl-5" : ""}`}>
+                  <p className="text-[13px] font-semibold text-[#17345f]">{value}</p>
+                  <p className="mt-1 text-[9px] font-medium text-[#718097]">{label}</p>
                 </div>
               ))}
             </div>
-
-            <button onClick={enterWorkspace} disabled={loading} className="group mt-6 flex h-[54px] w-full items-center justify-center gap-2 rounded-xl bg-[#255df5] px-5 text-[14px] font-bold text-white shadow-[0_16px_34px_rgba(37,93,245,.28)] transition hover:-translate-y-0.5 hover:bg-[#174bd4] disabled:translate-y-0 disabled:cursor-wait disabled:opacity-75">
-              {loading ? <><LoaderCircle className="h-4 w-4 animate-spin" />Preparing workspace</> : <>Enter demo workspace <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
-            </button>
-            <div className="mt-5 flex items-center justify-between gap-4 text-[10px] font-semibold text-[#8a95a7]"><span>Credential-free demo</span><span className="text-[#315efb]">Bounded execution</span></div>
           </div>
 
-          <p className="text-center text-[10px] font-medium text-[#9aa4b4]">Local hackathon demo · Built for secure evaluation</p>
+          <div className="relative z-10 flex items-center justify-between border-t border-[#cfdae9] pt-4 text-[9px] font-semibold text-[#6f7e94]"><span>RiskSentinel X secure workspace</span><span>Seeded evaluation environment</span></div>
+        </section>
+
+        <section className="flex min-h-[100dvh] min-w-0 flex-col bg-white px-6 py-6 sm:px-10 sm:py-8 xl:px-12 2xl:px-14">
+          <div className="flex items-center justify-between">
+            <div className="lg:hidden"><BrandLogo /></div>
+            <Link href="/" className="ml-auto inline-flex items-center gap-2 px-1 py-2 text-[11px] font-semibold text-[#647188] transition hover:text-[#1747c9]"><ArrowLeft className="h-4 w-4" /> Back to product</Link>
+          </div>
+
+          <div className="my-auto mx-auto w-full max-w-[420px] py-5">
+            <p className="text-[12px] font-medium text-[#5f6c80]">Welcome to <span className="font-semibold text-[#17233b]">RiskSentinel X</span></p>
+            <h2 className="mt-4 text-[33px] font-semibold leading-[1.07] tracking-[-.047em] text-[#071936] sm:text-[37px]">Get started with your work email.</h2>
+            <p className="mt-3 text-[12px] leading-5 text-[#6d788b]">Access the complete payment-risk operations workspace.</p>
+
+            <form onSubmit={(event) => { event.preventDefault(); enterWorkspace(); }} className="mt-6 space-y-4">
+              <label className="block">
+                <span className="mb-1.5 block text-[10px] font-semibold text-[#344158]">Work email</span>
+                <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete="email" placeholder="you@company.com" className="h-12 w-full rounded-[7px] border border-[#cfd8e5] bg-white px-3.5 text-[13px] text-[#17233b] outline-none transition placeholder:text-[#a4adbc] focus:border-[#2f6bff] focus:ring-4 focus:ring-[#2f6bff]/10" />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 flex items-center justify-between text-[10px] font-semibold text-[#344158]"><span>Password</span><button type="button" onClick={() => setShowPassword((value) => !value)} className="font-semibold text-[#255df5] hover:text-[#1747c9]">{showPassword ? "Hide" : "Show"}</button></span>
+                <input type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} required minLength={6} autoComplete="current-password" placeholder="Enter your password" className="h-12 w-full rounded-[7px] border border-[#cfd8e5] bg-white px-3.5 text-[13px] text-[#17233b] outline-none transition placeholder:text-[#a4adbc] focus:border-[#2f6bff] focus:ring-4 focus:ring-[#2f6bff]/10" />
+              </label>
+
+              <div className="flex items-center justify-between text-[10px]"><label className="flex items-center gap-2 font-medium text-[#69758a]"><input type="checkbox" className="h-3.5 w-3.5 rounded border-[#cbd4e0] accent-[#2f6bff]" />Remember me</label><button type="button" className="font-semibold text-[#255df5] hover:text-[#1747c9]">Forgot password?</button></div>
+
+              <button type="submit" disabled={loading} className="group flex h-12 w-full items-center justify-center gap-2 rounded-[7px] bg-[#2f6bff] px-5 text-[13px] font-semibold text-white shadow-[0_10px_26px_rgba(47,107,255,.20)] transition hover:-translate-y-px hover:bg-[#2458df] disabled:cursor-wait disabled:opacity-70">
+                {loading ? <><LoaderCircle className="h-4 w-4 animate-spin" />Signing in</> : <>Continue <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
+              </button>
+            </form>
+
+            <div className="my-5 flex items-center gap-3"><span className="h-px flex-1 bg-[#e1e6ee]" /><span className="text-[9px] font-medium text-[#929bad]">or continue with</span><span className="h-px flex-1 bg-[#e1e6ee]" /></div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button type="button" onClick={enterWorkspace} disabled={loading} className="flex h-11 items-center justify-center gap-2.5 rounded-[7px] border border-[#d6dee9] bg-white text-[11px] font-semibold text-[#273249] transition hover:border-[#b9c7da] hover:bg-[#fafbfd] disabled:opacity-60"><GoogleMark />Google</button>
+              <button type="button" onClick={enterWorkspace} disabled={loading} className="flex h-11 items-center justify-center gap-2.5 rounded-[7px] border border-[#d6dee9] bg-white text-[11px] font-semibold text-[#273249] transition hover:border-[#b9c7da] hover:bg-[#fafbfd] disabled:opacity-60"><GitHubMark />GitHub</button>
+            </div>
+
+            <div className="mt-5 rounded-[10px] bg-[#f5f7fa] px-4 py-3.5"><p className="text-[10px] leading-5 text-[#66748a]">Evaluating the platform? <button type="button" onClick={enterWorkspace} className="font-semibold text-[#255df5] hover:text-[#1747c9]">Open the credential-free demo <span aria-hidden="true">→</span></button></p></div>
+          </div>
+
+          <p className="text-center text-[9px] leading-4 text-[#929cad]">By continuing, you agree to the secure evaluation workspace terms.<br />RiskSentinel X · Seeded demo data</p>
         </section>
       </div>
     </main>

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     default: "RiskSentinel X | Payment Risk Intelligence",
     template: "%s | RiskSentinel X",
   },
-  description: "AI-native payment risk intelligence, fraud investigation, and decision automation.",
+  description: "Next-gen payment risk intelligence, fraud investigation, and decision automation.",
 };
 
 export default function RootLayout({

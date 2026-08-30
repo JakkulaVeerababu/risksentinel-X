@@ -38,8 +38,8 @@
     --primary-glow: rgba(37, 99, 235, 0.25);
     
     /* Semantic Risk Colors */
-    --success: #315EFB;
-    --success-soft: #EDF3FF;
+    --success: #10B981;
+    --success-soft: #D1FAE5;
     
     --warning: #F59E0B;
     --warning-soft: #FEF3C7;
@@ -174,16 +174,73 @@
 
   .landing-product-frame {
     border: 1px solid #d9e1ec;
-    border-radius: 14px;
+    border-radius: 12px;
     background: #fff;
-    box-shadow: 0 28px 80px rgba(0, 0, 0, .30);
+    box-shadow: 0 24px 70px rgba(27, 55, 105, .14), 0 3px 10px rgba(27, 55, 105, .06);
   }
+
+  .landing-hero-wash {
+    background:
+      radial-gradient(circle at 82% 20%, rgba(47, 107, 255, .12), transparent 27%),
+      radial-gradient(circle at 56% 78%, rgba(155, 221, 255, .13), transparent 30%),
+      linear-gradient(115deg, #fff 0%, #fff 46%, #f5f8ff 76%, #eef3ff 100%);
+  }
+
+  .landing-diagonal-bands,
+  .login-diagonal-bands {
+    overflow: hidden;
+  }
+
+  .landing-diagonal-bands span,
+  .login-diagonal-bands span {
+    position: absolute;
+    top: -22%;
+    bottom: -22%;
+    width: 5%;
+    transform: rotate(18deg);
+    transform-origin: center;
+    animation: bg-wave 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes bg-wave {
+    0% { transform: translateX(3vw) rotate(18deg); }
+    100% { transform: translateX(-3vw) rotate(18deg); }
+  }
+
+  .landing-diagonal-bands span:nth-child(1) { left: 8%; background: linear-gradient(180deg, rgba(99, 139, 255, .03), rgba(99, 139, 255, .22), rgba(99, 139, 255, .04)); }
+  .landing-diagonal-bands span:nth-child(2) { left: 31%; background: linear-gradient(180deg, rgba(110, 209, 255, .02), rgba(110, 209, 255, .20), rgba(110, 209, 255, .03)); }
+  .landing-diagonal-bands span:nth-child(3) { left: 54%; background: linear-gradient(180deg, rgba(77, 111, 255, .03), rgba(77, 111, 255, .17), rgba(77, 111, 255, .02)); }
+  .landing-diagonal-bands span:nth-child(4) { left: 77%; background: linear-gradient(180deg, rgba(160, 191, 255, .02), rgba(160, 191, 255, .19), rgba(160, 191, 255, .03)); }
+
+  .landing-preview-stage {
+    filter: saturate(.97);
+  }
+
+  .login-visual-wash {
+    background:
+      radial-gradient(circle at 85% 15%, rgba(0, 255, 255, 0.22), transparent 25%),
+      radial-gradient(circle at 15% 85%, rgba(0, 123, 255, 0.22), transparent 30%),
+      linear-gradient(135deg, #F5FAFF 0%, #F5FAFF 40%, #e8f2fc 80%, #d5e8ff 100%);
+  }
+
+  .login-diagonal-bands span:nth-child(1) { left: -8%; background: linear-gradient(180deg, transparent, rgba(0, 195, 255, 0.4), transparent); animation-delay: 0s; }
+  .login-diagonal-bands span:nth-child(2) { left: 13%; background: linear-gradient(180deg, transparent, rgba(0, 123, 255, 0.3), transparent); animation-delay: -2s; }
+  .login-diagonal-bands span:nth-child(3) { left: 37%; background: linear-gradient(180deg, transparent, rgba(0, 225, 255, 0.12), transparent); animation-delay: -4s; }
+  .login-diagonal-bands span:nth-child(4) { left: 61%; background: linear-gradient(180deg, transparent, rgba(0, 153, 255, 0.15), transparent); animation-delay: -6s; }
+  .login-diagonal-bands span:nth-child(5) { left: 84%; background: linear-gradient(180deg, transparent, rgba(0, 255, 255, 0.35), transparent); animation-delay: -8s; }
 
   .landing-risk-grid {
     background-image:
       linear-gradient(rgba(57, 79, 119, .045) 1px, transparent 1px),
       linear-gradient(90deg, rgba(57, 79, 119, .045) 1px, transparent 1px);
     background-size: 36px 36px;
+  }
+
+  .landing-relationship-grid {
+    background-image: radial-gradient(circle, rgba(82, 111, 166, .14) 1px, transparent 1px);
+    background-position: 0 0;
+    background-size: 24px 24px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, .65), rgba(0, 0, 0, .22));
   }
 
   .landing-live-dot {
@@ -284,11 +341,6 @@
     background-size: 36px 36px;
   }
 
-  .rsx-blueprint {
-    background:
-      linear-gradient(120deg, transparent 0 44%, rgba(58, 105, 245, .11) 44% 54%, transparent 54% 62%, rgba(113, 76, 232, .10) 62% 70%, transparent 70%),
-      linear-gradient(135deg, #f5f7ff 0%, #eef3ff 52%, #f2efff 100%);
-  }
 
   .rsx-editorial-grid {
     background-image:
@@ -297,39 +349,11 @@
     background-size: 44px 44px;
   }
 
-  .rsx-diagonal-wash {
-    background: linear-gradient(110deg, #fbfcff 0%, #f5f8ff 72%, #edf3ff 100%);
-  }
 
   .rsx-workspace {
     color: var(--text-primary);
   }
 
-  .rsx-workspace :where(h1, h2, h3) {
-    text-wrap: balance;
-  }
-
-  .rsx-workspace :is([class~="text-[8px]"], [class~="text-[9px]"], [class~="text-[10px]"]) {
-    font-size: 11px !important;
-    line-height: 16px !important;
-  }
-
-  .rsx-workspace [class~="text-[11px]"] {
-    font-size: 12px !important;
-    line-height: 17px !important;
-  }
-
-  .rsx-workspace :is([class~="rounded-[24px]"], [class~="rounded-[28px]"], [class~="rounded-[32px]"]) {
-    border-radius: 14px !important;
-  }
-
-  .rsx-workspace :is([class~="rounded-2xl"], [class~="rounded-xl"]) {
-    border-radius: 12px;
-  }
-
-  .rsx-workspace :where(section, article, aside, div)[class*="shadow-["] {
-    box-shadow: 0 10px 32px rgba(11, 23, 57, .055) !important;
-  }
 
   .rsx-section-label {
     color: var(--primary);
@@ -406,41 +430,12 @@
     background: var(--text-muted);
   }
   
-  .glass-effect {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-  }
   
-  .ai-glass-effect {
-    background: rgba(17, 24, 39, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
 
-  .premium-shadow {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), 0 12px 24px -4px rgba(0, 0, 0, 0.05);
-  }
   
-  .premium-shadow-hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-  }
 
-  .text-glow {
-    text-shadow: 0 0 20px var(--primary-glow);
-  }
 
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
 
-  @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-  }
 
   .bg-grid-pattern {
     background-size: 40px 40px;

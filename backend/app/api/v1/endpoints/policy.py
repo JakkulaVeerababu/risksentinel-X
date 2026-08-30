@@ -30,7 +30,7 @@ def get_policy_metadata():
             {"rule_id": "SAFE_FALLBACK_REVIEW", "description": "Unknown Input Combination -> REVIEW (Safe Fallback)"}
         ]
     )
-@router.get("/")
+@router.get("")
 def list_policies():
     """
     Returns READ-ONLY policies for the UI.
@@ -65,7 +65,7 @@ def list_policies():
 
 from fastapi import HTTPException
 
-@router.post("/")
+@router.post("")
 def create_policy():
     raise HTTPException(status_code=405, detail="Policy mutations disabled in V3 certification mode.")
 

@@ -25,6 +25,6 @@ Zero. Because no ML features, thresholds, or policies were altered, the Phase 7 
 - **Explainability > Complexity:** Judges valued the transparent Audit Trail and structured JSON Reason Codes over complex, opaque deep-learning models.
 
 ## 6. Future Work
-1. **Production Graph Infrastructure:** Migrate NetworkX to a distributed graph store (Neo4j or Amazon Neptune) and implement Kafka streaming ingestion for high-throughput scaling.
+1. **Production Graph Infrastructure:** Migrate NetworkX to a distributed graph store (Neo4j or Amazon Neptune) and implement Kafka batch ingestion for high-throughput scaling.
 2. **Model Interpretability:** Integrate SHAP or LIME to provide feature-level contribution visualizations on the Live Dashboard.
 3. **Probability Calibration:** Implement Isotonic Regression or Platt Scaling to convert the XGBoost output into true calibrated probabilities.

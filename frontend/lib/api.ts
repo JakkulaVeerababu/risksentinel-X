@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api/backend";
 const FETCH_TIMEOUT_MS = 15000;
 
 export interface Transaction {
@@ -132,6 +132,12 @@ export async function fetchDashboardMetrics(): Promise<DashboardMetrics> {
   return await response.json();
 }
 
+export async function fetchFraudClusters(): Promise<any[]> {
+  const response = await apiFetch("/graph/clusters");
+  const data = await response.json();
+  return data.clusters || [];
+}
+
 export async function fetchRiskCase(transactionId: string): Promise<PipelineResponse> {
   const response = await apiFetch(`/dashboard/transactions/${transactionId}/case`);
   return await response.json();
@@ -191,6 +197,11 @@ export async function fetchInvestigations(): Promise<{investigations: Investigat
 
 export async function fetchInvestigation(caseId: string): Promise<Investigation> {
   const response = await apiFetch(`/investigations/${caseId}`);
+  return await response.json();
+}
+
+export async function fetchCostSimulation(): Promise<any> {
+  const response = await apiFetch(`/evaluation/cost-simulation`);
   return await response.json();
 }
 

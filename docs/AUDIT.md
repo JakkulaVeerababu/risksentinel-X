@@ -1,7 +1,7 @@
 # Audit Runbook
 
 ## Purpose
-The Audit Log ensures an immutable timeline of every investigation.
+The Audit Log ensures an auditable decision trail of every investigation.
 
 ## Stored Fields
 Each record in the PostgreSQL database contains:
