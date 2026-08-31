@@ -31,3 +31,26 @@ class PolicyDecisionResult(BaseModel):
     agent_recommendation: Optional[str]
     agent_confidence: Optional[float]
     timestamp: str
+
+class PolicyRuleSchema(BaseModel):
+    field: str
+    operator: str
+    value: Any
+
+class PolicyConditionRootSchema(BaseModel):
+    operator: Literal["AND", "OR"]
+    rules: List[PolicyRuleSchema]
+
+class PolicyCreate(BaseModel):
+    name: str
+    priority: int
+    conditions: PolicyConditionRootSchema
+    action: Literal["ALLOW", "REVIEW", "BLOCK"]
+    reason_code: str
+    enabled: bool = True
+
+class PolicyResponse(PolicyCreate):
+    policy_id: str
+    version: str
+    created_at: Any
+    updated_at: Any
