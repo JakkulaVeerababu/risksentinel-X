@@ -15,7 +15,12 @@
   --success-soft: #edf3ff;
 }
 
+/* Avoid a non-scrolling body scroll container trapping the sticky workspace header. */
+body:has(.premium-shell) { overflow-x: clip; }
+
 .premium-shell {
+  --success: #21815f;
+  --success-soft: #edf8f2;
   min-height: 100vh;
   background:
     linear-gradient(180deg, rgba(238, 243, 255, .68) 0, rgba(244, 246, 250, 0) 240px),
@@ -60,10 +65,10 @@
 
 .premium-shell .rsx-eyebrow {
   margin-bottom: 8px;
-  color: var(--primary);
+  color: #758196;
   font-size: 11px;
-  font-weight: 750;
-  letter-spacing: .14em;
+  font-weight: 600;
+  letter-spacing: .08em;
 }
 
 .premium-shell .rsx-eyebrow + h1 {
@@ -74,17 +79,11 @@
 
 .premium-shell .rsx-eyebrow {
   position: relative;
-  padding-left: 26px;
+  padding-left: 0;
 }
 
 .premium-shell .rsx-eyebrow::before {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 18px;
-  height: 1px;
-  content: "";
-  background: var(--primary);
+  content: none;
 }
 
 .premium-shell :is([class~="text-[8px]"], [class~="text-[9px]"], [class~="text-[10px]"]) {
@@ -210,30 +209,7 @@
   text-transform: none;
 }
 
-/* Shared workspace shell refinement. */
-.premium-shell > div > div.fixed aside {
-  width: 244px;
-}
-
-.premium-shell aside > div:nth-child(2) button {
-  border-left: 2px solid var(--primary) !important;
-  border-radius: 0 !important;
-  padding-left: 12px !important;
-}
-
-.premium-shell aside > div:nth-child(2) button > span > span:first-child {
-  display: none;
-}
-
-.premium-shell aside > div:nth-child(2) a[href="/investigations"] {
-  height: 40px;
-  border-radius: 8px;
-  background: var(--primary);
-  box-shadow: 0 8px 20px rgba(36, 93, 245, .18);
-}
-
-
-
+/* Workspace-only styling leaves the public landing and login pages untouched. */
 .premium-shell header a[href="/settings"] > span:first-child {
   display: none;
 }
@@ -247,8 +223,132 @@
 }
 
 .premium-shell main {
-  max-width: 1500px !important;
+  max-width: none !important;
   padding: 30px 32px 48px !important;
+}
+
+.premium-shell .workspace-sidebar .brand-wordmark { font-size: 22px; }
+.premium-shell .workspace-sidebar nav { scrollbar-width: thin; }
+.premium-shell .workspace-sidebar nav a { font-weight: 500; }
+.premium-shell :where(button, a, input, select):focus-visible {
+  outline: 2px solid #245df5;
+  outline-offset: 3px;
+}
+.premium-shell button:disabled { cursor: not-allowed; opacity: .45; }
+.premium-shell .settings-switch {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  min-width: 36px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  background: #d5dbe4;
+  transition: background .16s;
+}
+.premium-shell .settings-switch[aria-checked="true"] { background: #50647e; }
+.premium-shell .settings-switch-thumb {
+  position: absolute;
+  display: block;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px #17233f26;
+  transform: translateX(0);
+  transition: transform .16s;
+}
+.premium-shell .settings-switch[aria-checked="true"] .settings-switch-thumb { transform: translateX(16px); }
+.premium-shell .decision-label { display: inline-flex; align-items: center; gap: 7px; color: #47576d; font-size: 12px; font-weight: 500; white-space: nowrap; }
+.premium-shell .decision-dot { width: 5px; height: 5px; flex-shrink: 0; border-radius: 50%; background: #94a1b3; }
+.premium-shell [data-decision="BLOCK"] .decision-dot { background: #c04d43; }
+.premium-shell [data-decision="REVIEW"] .decision-dot { background: #b88734; }
+.premium-shell .transaction-table :is(th, td) { padding: 16px 20px; vertical-align: middle; }
+.premium-shell .transaction-table td { font-size: 12px; }
+.premium-shell .transaction-table th { white-space: nowrap; }
+.premium-shell .transaction-table tbody tr { border-top: 1px solid #e9edf4; }
+.decision-record-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 36px; padding: 28px; }
+.evidence-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.evidence-section { padding: 24px 28px; }
+.evidence-section + .evidence-section { border-left: 1px solid #e6ebf1; }
+.audit-event-summary { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto 16px; align-items: start; gap: 16px; padding: 22px 28px; cursor: pointer; list-style: none; }
+.audit-event-summary::-webkit-details-marker { display: none; }
+.audit-event-summary:hover { background: #fbfcfe; }
+.audit-event-summary:focus-visible { outline: 2px solid #245df5; outline-offset: -3px; }
+.audit-event[open] .audit-chevron { transform: rotate(180deg); }
+@media (max-width: 1100px) {
+  .decision-record-summary { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+}
+@media (max-width: 640px) {
+  .decision-record-summary { padding: 22px; }
+  .evidence-columns { grid-template-columns: minmax(0, 1fr); }
+  .evidence-section { padding: 22px; }
+  .evidence-section + .evidence-section { border-left: 0; border-top: 1px solid #e6ebf1; }
+  .audit-event-summary { grid-template-columns: 20px minmax(0, 1fr) 16px; gap: 12px; padding: 20px; }
+  .audit-event-time { grid-column: 2; }
+  .audit-chevron { grid-column: 3; grid-row: 1; }
+}
+.premium-shell .workspace-content { transition: padding-left .2s ease; }
+
+.premium-shell .workspace-button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border: 1px solid #dce2eb;
+  background: #fff;
+  color: #46546b;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.premium-shell .workspace-button:hover:not(:disabled) { background: #f5f7fa; border-color: #bfcada; }
+.premium-shell .workspace-button-primary { border-color: #245df5; background: #245df5; color: #fff; }
+.premium-shell .workspace-button-primary:hover:not(:disabled) { background: #1747c9; border-color: #1747c9; }
+.premium-shell .workspace-stat {
+  min-height: 118px;
+  border: 1px solid #dde3ec;
+  border-radius: 12px;
+  background: white;
+  padding: 20px 24px;
+}
+.premium-shell .workspace-stat-priority { background: #245df5; border-color: #245df5; color: white; }
+.premium-shell .workspace-stat-priority p { color: #d9e4ff; }
+.premium-shell .workspace-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #f1f4f7;
+  color: #5a677b;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.premium-shell .workspace-pill[data-tone="danger"] { background: #fff0ef; color: #b93f36; }
+.premium-shell .workspace-pill[data-tone="warning"] { background: #fff6e6; color: #99651a; }
+.premium-shell .workspace-pill[data-tone="success"] { background: #edf8f2; color: #21815f; }
+.premium-shell .cases-table { width: 100%; min-width: 850px; table-layout: fixed; }
+.premium-shell .cases-table :is(th, td) { padding: 16px; text-align: left; }
+.premium-shell .cases-table th { white-space: nowrap; }
+.premium-shell .cases-table td { vertical-align: middle; font-size: 12px; }
+.premium-shell .cases-table :is(th, td):first-child { padding-left: 24px; }
+.premium-shell .cases-table :is(th, td):last-child { padding-right: 24px; text-align: right; }
+.premium-shell .cases-table tbody tr { border-top: 1px solid #e9edf4; }
+.premium-shell .cases-table .case-id { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.premium-shell .cases-table .case-id:hover { color: #245df5; text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) {
+  .premium-shell .workspace-content { transition: none; }
 }
 
 .premium-shell :is(span, div):has(> svg.lucide:only-child)[class*="items-center"][class*="justify-center"]:not(button):not(a) {
@@ -265,15 +365,15 @@
 }
 
 .premium-shell [class*="text-success"] {
-  color: #245df5 !important;
+  color: #21815f !important;
 }
 
 .premium-shell [class*="border-success"] {
-  border-color: #cbd9fb !important;
+  border-color: #c8e6d6 !important;
 }
 
 .premium-shell [class*="bg-success-soft"] {
-  background-color: #edf3ff !important;
+  background-color: #edf8f2 !important;
 }
 
 .premium-shell [data-decorative-icon="true"] {

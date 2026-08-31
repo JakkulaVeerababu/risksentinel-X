@@ -35,8 +35,8 @@ class EvidenceItem(BaseModel):
         return data
 
 class InvestigationResult(BaseModel):
-    recommendation: RecommendationEnum = Field(description="Advisory recommendation: ALLOW, REVIEW, or BLOCK")
-    confidence: float = Field(ge=0.0, le=1.0, description="Agent's self-reported confidence in the recommendation (0 to 1)")
+    recommendation: Optional[RecommendationEnum] = Field(None, description="Advisory recommendation: ALLOW, REVIEW, or BLOCK")
+    confidence: Optional[float] = Field(None, ge=0.0, le=1.0, description="Agent's self-reported confidence in the recommendation (0 to 1)")
     reason_codes: List[ReasonCodeEnum] = Field(description="Applicable reason codes")
     evidence: List[EvidenceItem] = Field(description="Evidence supporting the reason codes and recommendation")
 

@@ -45,11 +45,7 @@ export default function ImpactPage() {
 
   return (
     <div className="rsx-page space-y-5">
-      <div className="rounded-xl border border-[#b96800]/20 bg-[#fff7e8] p-4 text-[#b96800]">
-        <h3 className="text-[12px] font-bold uppercase tracking-wider">Illustrative Business Impact Scenario</h3>
-        <p className="mt-1 text-[11px]">{data.disclaimer}</p>
-      </div>
-      <PageHeader eyebrow="Business outcomes" title="Risk impact" description="Translate risk decisions into protected revenue, customer experience, operational effort, and measurable business value." actions={<button className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#dfe5ee] bg-white px-3 text-[11px] font-bold text-[#536078] opacity-75 cursor-not-allowed" disabled><Download className="h-4 w-4" /> Preview report</button>} />
+      <PageHeader eyebrow="Business Outcomes" title="Risk impact" description="Translate risk decisions into protected revenue, customer experience, operational effort, and measurable business value." actions={<button onClick={() => window.print()} className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#d1d9e2] bg-white px-3.5 text-[11px] font-bold text-[#425066] hover:bg-[#f7f9fc]"><Download className="h-4 w-4" /> Preview report</button>} />
 
       <section className="rsx-blueprint rsx-editorial-grid relative overflow-hidden rounded-[10px] border border-[#d7ded9] text-[#111a2d]">
         <div className="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-end">

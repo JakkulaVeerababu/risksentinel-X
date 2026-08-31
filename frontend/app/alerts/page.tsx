@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { fetchRecentTransactions, Transaction } from "@/lib/api";
 import { PageHeader, Skeleton, ErrorState } from "../../components/ui";
+import SeverityLabel from "../../components/ui/SeverityLabel";
 
 export default function AlertsPage() {
   const [activeTab, setActiveTab] = useState("all");
@@ -110,9 +111,7 @@ export default function AlertsPage() {
                   alerts.map((alert) => (
                     <tr key={alert.id} onClick={() => setSelectedAlertId(alert.id)} className={`group cursor-pointer transition-colors ${selectedAlertId === alert.id ? 'bg-primary-soft/50' : 'hover:bg-surface-secondary/50'}`}>
                       <td className="p-4">
-                        <span className={`inline-flex items-center px-2 py-1 rounded text-caption font-semibold border ${alert.severity === 'CRITICAL' ? 'text-danger bg-danger-soft border-danger/20' : 'text-warning bg-warning-soft border-warning/20'}`}>
-                          {alert.severity}
-                        </span>
+                        <SeverityLabel severity={alert.severity} />
                       </td>
                       <td className="p-4">
                         <div className="flex flex-col gap-1">

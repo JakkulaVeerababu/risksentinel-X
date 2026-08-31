@@ -1,250 +1,124 @@
 "use client";
 
-import React, { useState } from "react";
-import { PageHeader, Card, Badge } from "../../components/ui";
-import { Copy, Check } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, Copy, ExternalLink, RefreshCw } from "lucide-react";
+import { PageHeader } from "../../components/ui";
+import { fetchApiHealth } from "../../lib/api";
+import { API_ENDPOINTS, requestExample } from "../../lib/developer-reference";
+import "../../styles/developer.css";
+
+const configuredUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+const baseUrl = configuredUrl?.startsWith("http") ? configuredUrl.replace(/\/$/, "") : "http://localhost:8000/api/v1";
+const docsUrl = new URL("/docs", baseUrl).toString();
 
 export default function DeveloperPage() {
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [endpointId, setEndpointId] = useState("process");
+  const [view, setView] = useState<"request" | "response">("request");
+  const [language, setLanguage] = useState<"curl" | "javascript">("curl");
+  const [connection, setConnection] = useState<"unchecked" | "checking" | "connected" | "unavailable">("unchecked");
+  const [checkedAt, setCheckedAt] = useState("");
+  const [copied, setCopied] = useState("");
+  const [copyError, setCopyError] = useState("");
+  const copyTimer = useRef<ReturnType<typeof setTimeout>>();
+  const mounted = useRef(true);
+  const checking = useRef(false);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; clearTimeout(copyTimer.current); }; }, []);
+  const endpoint = API_ENDPOINTS.find(item => item.id === endpointId)!;
+  const code = view === "request" ? requestExample(endpoint, baseUrl, language) : JSON.stringify(endpoint.response, null, 2);
+  const copyKey = `${endpointId}-${view}-${language}`;
 
-  const copyToClipboard = (text: string, key: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 2000);
-  };
-
-  const API_ENDPOINTS = [
-    {
-      id: "health",
-      method: "GET",
-      path: "/api/v1/health",
-      title: "API Health Check",
-      description: "Check the status of the local backend and database connection.",
-      req: `curl -X GET "http://localhost:8000/api/v1/health"`,
-      res: `{
-  "status": "healthy",
-  "service": "RiskSentinel X",
-  "version": "0.1.0",
-  "database": "healthy"
-}`
-    },
-    {
-      id: "score",
-      method: "POST",
-      path: "/api/v1/score",
-      title: "Evaluate Transaction Risk",
-      description: "Directly score a transaction payload against the IEEE-CIS baseline model without executing the full orchestration pipeline.",
-      req: `curl -X POST "http://localhost:8000/api/v1/score" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "TransactionID": "tx_req_8923a",
-    "TransactionDT": 1000000,
-    "TransactionAmt": 15000.50,
-    "ProductCD": "W"
-  }'`,
-      res: `{
-  "transaction_id": "tx_req_8923a",
-  "risk_score": 0.5459,
-  "model_version": "xgb-ieeecis-v1"
-}`
-    },
-    {
-      id: "process",
-      method: "POST",
-      path: "/api/v1/transactions/process",
-      title: "Canonical Transaction Processing",
-      description: "Synchronously execute a transaction through the complete Sentinel pipeline (ML, Graph, Agent, Policy).",
-      req: `curl -X POST "http://localhost:8000/api/v1/transactions/process" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "TransactionID": "tx_req_8923a",
-    "TransactionDT": 1000000,
-    "TransactionAmt": 15000.50,
-    "ProductCD": "C",
-    "customer_id": "cust_123",
-    "entity_id": "ent_456"
-  }'`,
-      res: `{
-  "transaction_id": "tx_dev_65c48555",
-  "status": "DECIDED",
-  "ml": {
-    "score": 0.5255,
-    "model_version": "xgb-ieeecis-v1"
-  },
-  "graph": {
-    "score": null,
-    "community_id": null,
-    "signals": {}
-  },
-  "agent": {
-    "state": "SKIPPED",
-    "recommendation": "ALLOW",
-    "confidence": 1.0
-  },
-  "policy": {
-    "decision": "REVIEW",
-    "policy_version": "policy-v1",
-    "matched_rules": [
-      "GRAPH_EVIDENCE_UNAVAILABLE"
-    ]
+  async function copy(text: string, key: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      if (!mounted.current) return;
+      clearTimeout(copyTimer.current);
+      setCopied(key);
+      setCopyError("");
+      copyTimer.current = setTimeout(() => setCopied(""), 2000);
+    } catch {
+      if (mounted.current) setCopyError("Clipboard access is unavailable. Select the code and copy it manually.");
+    }
   }
-}`
-    },
-    {
-      id: "graph",
-      method: "GET",
-      path: "/api/v1/graph/context/{entity_id}",
-      title: "Query Graph Context",
-      description: "Retrieve the interconnected entities and risk signals for a specific entity ID.",
-      req: `curl -X GET "http://localhost:8000/api/v1/graph/context/ent_456"`,
-      res: `{
-  "detail": "Entity 'ent_456' not found."
-}`
-    },
-    {
-      id: "audit",
-      method: "GET",
-      path: "/api/v1/audit/{transaction_id}",
-      title: "Fetch Audit Trail",
-      description: "Retrieve the recorded step-by-step execution timeline for a processed transaction.",
-      req: `curl -X GET "http://localhost:8000/api/v1/audit/tx_req_8923a"`,
-      res: `{
-  "transaction_id": "tx_req_8923a",
-  "events": [
-    {
-      "event_id": "dabbd102-ed52-48f8-a86a-b663ab2e1207",
-      "timestamp": "2026-08-29T15:45:27.127518",
-      "actor": "SYSTEM",
-      "service": "RiskOrchestrator",
-      "event_type": "TRANSACTION_RECEIVED",
-      "status": "SUCCESS"
+
+  async function checkConnection() {
+    if (checking.current) return;
+    checking.current = true;
+    setConnection("checking");
+    try {
+      const health = await fetchApiHealth();
+      if (mounted.current) setConnection(health.status === "healthy" && health.database === "healthy" ? "connected" : "unavailable");
+    } catch {
+      if (mounted.current) setConnection("unavailable");
+    } finally {
+      checking.current = false;
+      if (mounted.current) setCheckedAt(new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }));
     }
-  ]
-}`
-    }
-  ];
+  }
 
   return (
-    <div className="space-y-8 pb-12 h-full flex flex-col">
-      <PageHeader 
-        title="Developer APIs" 
-        description="Integrate Sentinel X intelligence directly into your payment flows and back-office systems." 
-      />
+    <div className="api-page min-w-0 space-y-5">
+      <PageHeader eyebrow="Build with RiskSentinel X" title="Developer APIs" description="Integrate payment scoring, connected evidence and policy decisions with one API." actions={<a className="workspace-button workspace-button-primary" href={docsUrl} target="_blank" rel="noreferrer">Open API reference<ExternalLink className="h-3.5 w-3.5" /></a>} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left Column: API Configuration & Webhooks */}
-        <div className="lg:col-span-1 space-y-8">
-          
-          <Card className="p-6 premium-shadow">
-            <h2 className="rsx-rule-heading mb-5">Environment</h2>
-            
-            <div className="space-y-5">
-              <div>
-                <label className="text-caption text-text-secondary font-semibold uppercase mb-2 block">Local demo API</label>
-                <div className="flex items-center bg-surface-secondary border border-border rounded-xl px-4 py-3 shadow-sm">
-                  <code className="text-label-sm text-text-primary text-mono-sm font-mono flex-1">
-                    http://localhost:8000/api/v1
-                  </code>
-                  <button 
-                    onClick={() => copyToClipboard("http://localhost:8000/api/v1", "base_url")}
-                    className="text-text-muted hover:text-primary transition-colors ml-3 bg-surface p-1.5 rounded border border-border shadow-sm"
-                  >
-                    {copiedKey === "base_url" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                </div>
-                <div className="mt-3">
-                  <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-primary hover:text-primary-dark transition-colors">
-                    View OpenAPI Docs
-                  </a>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-caption text-text-secondary font-semibold uppercase mb-2 block">Authentication</label>
-                <div className="flex items-center bg-surface-secondary border border-border rounded-xl px-4 py-3 shadow-sm">
-                  <span className="text-label-sm text-text-muted flex-1">Not enabled in the local hackathon demo</span>
-                </div>
-              </div>
-              
-              <div className="pt-3 border-t border-border">
-                <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(49,94,251,0.5)]"></div>
-                  <span className="text-label-sm font-semibold text-text-primary">Local backend connected</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 premium-shadow">
-            <h2 className="rsx-rule-heading mb-4">Webhook events</h2>
-            <p className="text-label-sm text-text-secondary leading-relaxed">
-              Webhook integrations are outside the current MVP.
-            </p>
-          </Card>
-          
+      <section className="api-connection-strip" aria-label="API environment">
+        <div className="api-base-url">
+          <span>{configuredUrl?.startsWith("http") ? "Base URL" : "Local API"}</span>
+          <code>{baseUrl}</code>
+          <button type="button" className="api-icon-button" aria-label="Copy base URL" onClick={() => void copy(baseUrl, "base-url")}>{copied === "base-url" ? <Check /> : <Copy />}</button>
         </div>
+        <div className="api-connection-actions">
+          <div className="api-health-state" data-state={connection} role="status" title={checkedAt ? `Last checked ${checkedAt}` : "Read-only backend and database health check"}>
+            <span aria-hidden="true" />{connection === "connected" ? "Backend & database healthy" : connection === "unavailable" ? "Backend unavailable" : connection === "checking" ? "Checking connection…" : "Connection not checked"}
+          </div>
+          <button type="button" className="api-text-button" disabled={connection === "checking"} onClick={() => void checkConnection()}><RefreshCw className={connection === "checking" ? "animate-spin" : ""} />Check connection</button>
+        </div>
+      </section>
 
-        {/* Right Column: API Reference */}
-        <div className="lg:col-span-2 space-y-8">
-          <Card className="p-0 overflow-hidden premium-shadow border border-border">
-            <div className="border-b border-border bg-surface-secondary px-6 py-5">
-              <h2 className="rsx-rule-heading">API reference</h2>
-            </div>
-            
-            <div className="divide-y divide-border bg-surface">
-              {API_ENDPOINTS.map((endpoint) => (
-                <div key={endpoint.id} className="p-6 hover:bg-surface-secondary/20 transition-colors">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className={`px-2 py-1 rounded text-caption font-semibold uppercase ${endpoint.method === 'POST' ? 'bg-success-soft text-success border border-success/20' : 'bg-info-soft text-info border border-info/20'}`}>
-                      {endpoint.method}
-                    </span>
-                    <code className="text-label-sm font-semibold text-text-primary text-mono-sm font-mono">{endpoint.path}</code>
-                  </div>
-                  <h3 className="text-heading-md font-semibold text-text-primary mb-2">{endpoint.title}</h3>
-                  <p className="text-label-sm text-text-secondary mb-6 leading-relaxed max-w-2xl">{endpoint.description}</p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <div className="text-caption font-semibold text-text-muted uppercase mb-2 flex justify-between items-center bg-surface-secondary px-3 py-2 rounded-t-lg border border-border border-b-0">
-                        Request
-                        <button 
-                          onClick={() => copyToClipboard(endpoint.req, `req_${endpoint.id}`)}
-                          className="text-text-muted hover:text-primary transition-colors"
-                        >
-                          {copiedKey === `req_${endpoint.id}` ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                      <div className="bg-[#1e2336] rounded-b-lg rounded-t-none p-4 overflow-x-auto border border-[#3e455e] h-[200px] shadow-inner">
-                        <pre className="text-caption text-[#a8c7fa] text-mono-sm font-mono whitespace-pre-wrap leading-relaxed">
-                          {endpoint.req}
-                        </pre>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="text-caption font-semibold text-text-muted uppercase mb-2 flex justify-between items-center bg-surface-secondary px-3 py-2 rounded-t-lg border border-border border-b-0">
-                        Response
-                        <button 
-                          onClick={() => copyToClipboard(endpoint.res, `res_${endpoint.id}`)}
-                          className="text-text-muted hover:text-primary transition-colors"
-                        >
-                          {copiedKey === `res_${endpoint.id}` ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                      <div className="bg-[#1e2336] rounded-b-lg rounded-t-none p-4 overflow-x-auto border border-[#3e455e] h-[200px] shadow-inner">
-                        <pre className="text-caption text-[#b8f5ed] text-mono-sm font-mono whitespace-pre-wrap leading-relaxed">
-                          {endpoint.res}
-                        </pre>
-                      </div>
-                    </div>
+      <section className="api-document" aria-label="API documentation">
+        <nav className="api-endpoint-nav" aria-label="API endpoints">
+          {API_ENDPOINTS.map(item => <button key={item.id} type="button" aria-pressed={endpointId === item.id} onClick={() => { setEndpointId(item.id); setView("request"); setCopied(""); setCopyError(""); }}>
+            <span>{item.method}</span>{item.label}
+          </button>)}
+        </nav>
+
+        <div className="api-document-body">
+          <header className="api-endpoint-heading">
+            <div className="api-route"><span>{endpoint.method}</span><code>/api/v1{endpoint.path}</code><small>REST · JSON · v1</small></div>
+            <h2>{endpoint.label}</h2>
+            <p>{endpoint.description}</p>
+          </header>
+
+          <div className="api-reference-columns">
+            <section className="api-parameters" aria-label="Endpoint parameters">
+              <div className="api-section-label"><h3>{endpoint.method === "POST" ? "Request body" : "Parameters"}</h3><span>{endpoint.method === "POST" ? "application/json" : "Path parameters"}</span></div>
+              {endpoint.fields.length ? <dl>{endpoint.fields.map(field => <div key={field.name} className="api-parameter-row">
+                <dt><code>{field.name}</code><span>{field.type} · {field.required ? "required" : "optional"}</span></dt>
+                <dd>{field.description}</dd>
+              </div>)}</dl> : <p className="api-no-parameters">No parameters or request body required.</p>}
+              <p className="api-endpoint-note">{endpoint.note}</p>
+            </section>
+
+            <section className="api-code-example" aria-label="Code example">
+              <div className="api-section-label"><h3>Integration example</h3><span>{view === "request" ? "Request" : "Response"}</span></div>
+              <div className="api-code-window">
+                <div className="api-code-toolbar">
+                  <div className="api-code-views" aria-label="Example view">{(["request", "response"] as const).map(item => <button key={item} type="button" aria-pressed={view === item} onClick={() => { setView(item); setCopyError(""); }}>{item === "request" ? "Request" : "Example response"}</button>)}</div>
+                  <div className="api-code-actions">
+                    {view === "request" ? <select aria-label="Code language" value={language} onChange={event => setLanguage(event.target.value as typeof language)}><option value="curl">cURL</option><option value="javascript">JavaScript</option></select> : <span>JSON</span>}
+                    <button type="button" onClick={() => void copy(code, copyKey)} aria-label="Copy code">{copied === copyKey ? <Check /> : <Copy />}{copied === copyKey ? "Copied" : "Copy"}</button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </Card>
+                <pre tabIndex={0} aria-label={view === "request" ? "Request code" : "Example response code"}><code>{code.split("\n").map((line, index) => <span className="api-code-line" key={index}><span aria-hidden="true" className="api-line-number">{index + 1}</span>{line || " "}</span>)}</code></pre>
+              </div>
+              <p className="api-example-caption">{view === "response" ? "Response example. Values depend on the request and active configuration." : "Copy and run in your application. Requests are not sent from this page."}</p>
+            </section>
+          </div>
         </div>
+      </section>
+      <p role="status" className={copyError ? "api-copy-error" : "sr-only"}>{copyError || (copied ? "Copied to clipboard" : "")}</p>
 
+      <div className="api-platform-notes">
+        <div><h3>API access & security</h3><p>API authentication is not enabled in this environment. Do not expose the unauthenticated backend to the public internet.</p></div>
+        <div><h3>Synchronous responses</h3><p>Read the outcome in the processing response. Webhook delivery is not supported in the current version.</p></div>
       </div>
     </div>
   );

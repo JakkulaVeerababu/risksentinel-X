@@ -69,3 +69,28 @@ class DecisionModel(Base):
     input_fingerprint = Column(String, index=True)
     matched_rules = Column(JSON, nullable=True)
     timestamp = Column(DateTime, server_default=func.now())
+
+class WorkspaceSettingsModel(Base):
+    __tablename__ = "workspace_settings"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    workspace_name = Column(String, default="Acme Payments")
+    merchant_id = Column(String, default="K8p2xY14")
+    currency = Column(String, default="INR")
+    timezone = Column(String, default="Asia/Kolkata")
+    auto_block = Column(Boolean, default=True)
+    graph_enrichment = Column(Boolean, default=True)
+    ai_reasoning = Column(Boolean, default=True)
+    step_up = Column(Boolean, default=True)
+    email_critical = Column(Boolean, default=True)
+    email_summary = Column(Boolean, default=True)
+    slack_alerts = Column(Boolean, default=False)
+    review_threshold = Column(Float, default=0.72)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class TeamMemberModel(Base):
+    __tablename__ = "team_members"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String)
+    email = Column(String, unique=True, index=True)
+    role = Column(String)
+    created_at = Column(DateTime, server_default=func.now())

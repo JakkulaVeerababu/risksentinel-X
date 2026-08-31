@@ -1,0 +1,32 @@
+/* Reserve filled blue for an operational priority or a primary action. */
+.workspace-priority-brief.recommendations-brief { padding: 20px 24px; border-radius: 10px; }
+.workspace-priority-brief .recommendations-brief-content { grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; }
+.workspace-priority-brief h2 { margin-top: 7px; font-size: clamp(21px, 1.9vw, 26px); text-wrap: initial; }
+.priority-brief-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 20px; margin-top: 12px; }
+.workspace-priority-brief .recommendations-brief-description { margin: 0; font-size: 11px; }
+.priority-brief-action a { display: inline-flex; min-height: 26px; align-items: center; gap: 8px; color: #fff; font-size: 11px; font-weight: 600; }
+.priority-brief-action a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.priority-brief-action a:focus-visible { outline: 2px solid #fff; outline-offset: 5px; }
+.workspace-priority-brief .recommendations-brief-stats { padding-top: 0; border-top: 0; }
+.workspace-priority-brief .recommendations-brief-stats > div { padding: 4px 14px; }
+.workspace-priority-brief .recommendations-brief-stats dt { min-height: 28px; font-size: 9px; }
+.workspace-priority-brief .recommendations-brief-stats dd { margin-top: 5px; font-size: 25px; }
+@container recommendations-brief (max-width: 680px) {
+  .workspace-priority-brief .recommendations-brief-content { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .workspace-priority-brief .recommendations-brief-stats { padding-top: 14px; border-top: 1px solid rgba(255,255,255,.32); }
+  .workspace-priority-brief .recommendations-brief-stats > div:first-child { padding-left: 0; }
+}
+.transactions-page #payments-list { scroll-margin-top: 84px; }
+.transactions-page .transaction-table :is(th, td):nth-child(2) { text-align: right; padding-right: 28px; }
+.transactions-page .transaction-table td { padding-block: 14px; }
+.transactions-page .transaction-table tbody tr:hover { background: #f8faff; }
+.transactions-page .transaction-table tbody tr:focus-within { background: #f2f6ff; }
+.transactions-page .transaction-table td:first-child a { font-size: 13px; }
+.transactions-page .transaction-table td:first-child p { color: #697a91; }
+.transactions-page .transaction-table th { color: #63738a; font-size: 10px; letter-spacing: .035em; }
+.transactions-page .transaction-search { flex: 1 1 250px; }
+.transactions-page select { border-radius: 8px; }
+.transaction-reset { margin-left: auto; padding: 8px 4px; color: #536780; font-size: 11px; font-weight: 500; }
+.transaction-reset:hover { color: #245df5; }
+.transactions-page :is(input, select, button, a):focus-visible { outline: 2px solid #245df5; outline-offset: 3px; }
+.transactions-page .priority-brief-action a:focus-visible { outline-color: #fff; }

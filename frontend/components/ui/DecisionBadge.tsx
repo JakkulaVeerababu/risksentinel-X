@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge } from "./Badge";
+import { decisionLabel } from "../../lib/transaction-presentation";
 
 export type DecisionType = "ALLOW" | "REVIEW" | "BLOCK" | "UNKNOWN";
 
@@ -11,15 +11,9 @@ interface DecisionBadgeProps {
 export function DecisionBadge({ decision, className }: DecisionBadgeProps) {
   const normalizedDecision = decision?.toUpperCase() || "UNKNOWN";
   
-  let variant: "success-soft" | "warning-soft" | "danger-soft" | "secondary" = "secondary";
-  
-  if (normalizedDecision === "ALLOW") variant = "success-soft";
-  else if (normalizedDecision === "REVIEW") variant = "warning-soft";
-  else if (normalizedDecision === "BLOCK") variant = "danger-soft";
-
   return (
-    <Badge variant={variant} className={className}>
-      {normalizedDecision}
-    </Badge>
+    <span className={`decision-label ${className || ""}`} data-decision={normalizedDecision}>
+      <span aria-hidden="true" className="decision-dot" />{decisionLabel(normalizedDecision)}
+    </span>
   );
 }

@@ -16,15 +16,30 @@ from app.agent.validators import DeterministicValidator
 from app.agent.providers.mock import MockProvider
 from app.agent.providers.ollama import OllamaProvider
 
+class ProviderConfigurationError(ValueError):
+    pass
+
 class InvestigationService:
     def __init__(self):
         # Allow env config to choose provider (mock for Phase 3 testing/default)
         import os
-        provider_name = os.getenv("AGENT_PROVIDER", "mock")
+        provider_name = os.getenv("AGENT_PROVIDER")
+        app_env = os.getenv("APP_ENV", "production")
+        
+        self.provider = None
+        self.provider_error = None
+        
         if provider_name == "ollama":
             self.provider = OllamaProvider()
+        elif provider_name == "mock":
+            if app_env == "test":
+                self.provider = MockProvider()
+            else:
+                self.provider_error = "MockProvider is only allowed in test mode (APP_ENV=test)."
+        elif not provider_name:
+            self.provider_error = "AGENT_PROVIDER is missing. Provider configuration is required."
         else:
-            self.provider = MockProvider()
+            self.provider_error = f"Unsupported AGENT_PROVIDER: {provider_name}"
             
     def _run_tool(self, tool_func, *args) -> ToolCallRecord:
         start_time = time.time()
@@ -56,8 +71,9 @@ class InvestigationService:
         import json
         
         # 1. Deterministic Gate
-        if not InvestigationGate.should_investigate(request.ml_risk_score, request.graph_risk_score):
-            logging.info(f"Investigation SKIPPED for {request.transaction_id}")
+        gate_result = InvestigationGate.evaluate(request.ml_risk_score, request.graph_risk_score)
+        if gate_result.decision == "SKIP_AGENT":
+            logging.info(f"Investigation SKIPPED for {request.transaction_id} by {gate_result.gate_version}")
             
             # Persist skipped state
             inv = InvestigationModel(
@@ -66,7 +82,13 @@ class InvestigationService:
                 recommendation=None,
                 confidence=None,
                 reason_codes=[],
-                evidence=[]
+                evidence=[{
+                    "source": "InvestigationGate",
+                    "gate_version": gate_result.gate_version,
+                    "decision": gate_result.decision,
+                    "ml_threshold": gate_result.ml_threshold,
+                    "graph_threshold": gate_result.graph_threshold
+                }]
             )
             db.add(inv)
             try:
@@ -81,8 +103,8 @@ class InvestigationService:
                 provider_info="none",
                 tool_calls=[],
                 investigation=InvestigationResult(
-                    recommendation="ALLOW", # Advisory safe fallback when skipped
-                    confidence=1.0,
+                    recommendation=None,
+                    confidence=None,
                     reason_codes=[],
                     evidence=[]
                 )
@@ -104,6 +126,9 @@ class InvestigationService:
         
         # 4. Request LLM Analysis
         try:
+            if self.provider_error:
+                raise ProviderConfigurationError(self.provider_error)
+
             import os
             if os.getenv("SIMULATE_AGENT_FAILURE") == "true":
                 raise RuntimeError("Simulated Agent Failure")
@@ -142,7 +167,7 @@ class InvestigationService:
             confidence=validated_result.confidence,
             reason_codes=[rc.value if hasattr(rc, 'value') else str(rc) for rc in validated_result.reason_codes],
             evidence=[e.model_dump() for e in validated_result.evidence],
-            provider=self.provider.provider_info,
+            provider=self.provider.provider_info if self.provider else "unconfigured",
             tool_calls=[tc.model_dump() for tc in clean_tool_calls]
         )
         db.add(inv)
@@ -155,7 +180,7 @@ class InvestigationService:
         return InvestigationResponse(
             transaction_id=request.transaction_id,
             status=investigation_status,
-            provider_info=self.provider.provider_info,
+            provider_info=self.provider.provider_info if self.provider else "unconfigured",
             tool_calls=clean_tool_calls,
             investigation=validated_result
         )

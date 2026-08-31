@@ -79,10 +79,29 @@ def test_threshold_regression():
 def test_investigation_gate():
     with patch("app.risk.inference.RiskModelService.get_instance") as mock_ml_instance:
         mock_ml_instance.return_value.threshold = 0.8
-        assert not InvestigationGate.should_investigate(0.1, 0.1)
-        assert InvestigationGate.should_investigate(0.9, 0.1)
-        assert InvestigationGate.should_investigate(0.1, 0.4)
-        assert InvestigationGate.should_investigate(0.9, 0.9)
+        
+        # Test A: ML LOW, Graph LOW
+        res_low_low = InvestigationGate.evaluate(0.1, 0.1)
+        assert res_low_low.decision == "SKIP_AGENT"
+        assert res_low_low.gate_version == "gate-v1"
+        
+        # Test B: ML HIGH, Graph LOW
+        res_high_low = InvestigationGate.evaluate(0.9, 0.1)
+        assert res_high_low.decision == "RUN_AGENT"
+        assert res_high_low.gate_version == "gate-v1"
+        
+        # Test C: ML LOW, Graph HIGH
+        res_low_high = InvestigationGate.evaluate(0.1, 0.4)
+        assert res_low_high.decision == "RUN_AGENT"
+        assert res_low_high.gate_version == "gate-v1"
+        
+        # Test D: Graph unavailable (None)
+        res_high_none = InvestigationGate.evaluate(0.9, None)
+        assert res_high_none.decision == "RUN_AGENT"
+        assert res_high_none.gate_version == "gate-v1"
+        
+        res_high_high = InvestigationGate.evaluate(0.9, 0.9)
+        assert res_high_high.decision == "RUN_AGENT"
 
 # A-07 10 low/low -> 0 provider calls
 def test_10_low_low_cases():
@@ -96,6 +115,9 @@ def test_10_low_low_cases():
             )
             resp = service.investigate(req, db_mock)
             assert resp.status == "SKIPPED"
+            assert resp.investigation.recommendation is None
+            assert resp.investigation.confidence is None
+            assert len(resp.investigation.evidence) == 0
         assert mock_gen.call_count == 0
 
 # A-08 ML-high & A-09 Graph-high
@@ -143,8 +165,9 @@ def test_schema_confidence_bounds():
         InvestigationResult(recommendation="REVIEW", confidence=8.5, reason_codes=[], evidence=[])
 
 def test_schema_missing_fields():
-    with pytest.raises(ValidationError):
-        InvestigationResult(confidence=0.5, reason_codes=[], evidence=[]) # Missing recommendation
+    # Recommendation is now optional (can be None) but omitting fields that have no defaults will fail
+    with pytest.raises(Exception):
+        InvestigationResult(confidence=0.5) # Missing reason_codes and evidence which don't have defaults
 
 def test_schema_boolean_normalization():
     # Should safely convert boolean to string

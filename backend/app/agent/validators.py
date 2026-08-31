@@ -18,22 +18,32 @@ class DeterministicValidator:
         tx_history = context.get("transaction_history", {})
         graph_ctx = context.get("graph_context", {})
         
-        # Build a flat lookup of allowed facts from context
+        # Build namespaces of allowed facts from context
+        allowed_namespaces = {
+            "transaction_history": {k: str(v) for k, v in tx_history.items()},
+            "graph_context": {k: str(v) for k, v in graph_ctx.items()}
+        }
+        
+        # Keep flat lookup for reason code validation
         allowed_facts = {}
-        for k, v in tx_history.items():
-            allowed_facts[k] = str(v)
-        for k, v in graph_ctx.items():
-            allowed_facts[k] = str(v)
+        allowed_facts.update(allowed_namespaces["transaction_history"])
+        allowed_facts.update(allowed_namespaces["graph_context"])
             
         # 1. Validate Evidence (Anti-Hallucination)
         for item in result.evidence:
-            if item.signal in allowed_facts:
-                if str(item.observed) == allowed_facts[item.signal]:
+            source_namespace = allowed_namespaces.get(item.source)
+            
+            if source_namespace is None:
+                logging.warning(f"Hallucination Blocked: Invalid source {item.source}")
+                continue
+                
+            if item.signal in source_namespace:
+                if str(item.observed) == source_namespace[item.signal]:
                     valid_evidence.append(item)
                 else:
-                    logging.warning(f"Hallucination Blocked: {item.signal} claimed {item.observed}, actual {allowed_facts[item.signal]}")
+                    logging.warning(f"Hallucination Blocked: {item.source}.{item.signal} claimed {item.observed}, actual {source_namespace[item.signal]}")
             else:
-                logging.warning(f"Hallucination Blocked: Unknown signal {item.signal}")
+                logging.warning(f"Hallucination Blocked: Unknown signal {item.signal} in source {item.source}")
                 
         # 2. Validate Reason Codes (Must have backing evidence)
         for rc in result.reason_codes:

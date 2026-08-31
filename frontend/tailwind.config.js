@@ -128,6 +128,7 @@ module.exports = {
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "sans-serif"],
         mono: ["SFMono-Regular", "Roboto Mono", "Consolas", "monospace"],
+        serif: ["var(--font-instrument-serif)", "Georgia", "serif"],
       },
       fontSize: {
         "display-xl": ["48px", { lineHeight: "1.02", fontWeight: "600", letterSpacing: "-0.045em" }],

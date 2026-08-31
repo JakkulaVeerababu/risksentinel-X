@@ -4,16 +4,10 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
 
 const stages = [
-  { number: "01", name: "Detect", summary: "Models score the payment against device, velocity and merchant features.", value: "94 / 100", label: "Calibrated risk score" },
-  { number: "02", name: "Connect", summary: "Graph intelligence resolves the shared infrastructure behind the payment.", value: "11 identities", label: "Connected evidence" },
-  { number: "03", name: "Investigate", summary: "The strongest signals are assembled into one reviewable evidence brief.", value: "High confidence", label: "Analyst recommendation" },
-  { number: "04", name: "Decide", summary: "Policy RS-204 evaluates the evidence and returns the final outcome.", value: "BLOCK", label: "Policy-owned decision" },
-];
-
-const evidence = [
-  ["Device", "DVC-9821", "6 accounts"],
-  ["Customer", "Aarav S.", "Identity verified"],
-  ["Network", "49.37.***.82", "Shared IP"],
+  { name: "Detect", summary: "Device, velocity and merchant signals are scored together.", value: "94 / 100", label: "Calibrated risk score", evidence: ["Unusual transaction velocity", "New account, high-value payment", "Device reused across accounts"] },
+  { name: "Connect", summary: "Shared infrastructure reveals a coordinated payment cluster.", value: "11 identities", label: "Connected to this cluster", evidence: ["Device DVC-9821 shared", "Payment instrument reused", "Shared residential IP range"] },
+  { name: "Investigate", summary: "The strongest signals form one analyst-ready evidence brief.", value: "High confidence", label: "Investigation recommendation", evidence: ["Coordinated activity identified", "Four evidence sources reviewed", "Recommend block for policy review"] },
+  { name: "Decide", summary: "Deterministic policy evaluates the evidence and owns the outcome.", value: "BLOCK", label: "Policy-owned decision", evidence: ["Policy version 12 evaluated", "Rule RS-204 matched", "Decision recorded for audit"] },
 ];
 
 export default function ProductSystem() {
@@ -22,92 +16,57 @@ export default function ProductSystem() {
   const stage = stages[active];
 
   return (
-    <div className="relative grid overflow-hidden rounded-[14px] border border-[#d5dfec] bg-[#d8e0ec] shadow-[0_24px_64px_-40px_rgba(13,34,68,.42)] lg:grid-cols-12">
-      <span className="absolute inset-x-0 top-0 z-20 h-[2px] bg-gradient-to-r from-[#77a0ff] via-[#2f6bff] to-[#78ebf7]" />
-      <section className="relative flex min-h-[440px] flex-col bg-[#f8faff] p-6 sm:p-8 lg:col-span-5 lg:row-span-2 lg:p-9">
-        <div className="absolute inset-0 landing-risk-grid opacity-40" />
-        <div className="relative flex items-start justify-between border-b border-[#dce3ed] pb-5">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#255df5]">Live payment review</p>
-            <p className="mt-2 font-mono text-[10px] text-[#7c8799]">CASE-RSX184 · 14:32:08 IST</p>
-          </div>
-          <span className="border border-[#efb5b1] bg-[#fff5f4] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.08em] text-[#c93830]">Critical</span>
+    <div className="product-preview overflow-hidden rounded-xl border border-[#dce3ec] bg-white shadow-[0_24px_65px_-35px_rgba(31,63,116,.32)]">
+      <div className="flex items-center justify-between gap-3 border-b border-[#e5eaf1] px-5 py-4">
+        <div className="flex items-center gap-2.5"><span className="h-2 w-2 rounded-full bg-[#2f6bff]" /><p className="text-[12px] font-semibold text-[#26364d]">Payment review</p></div>
+        <span className="text-right font-mono text-[10px] text-[#8a96a8]">PREVIEW / CASE-RSX184</span>
+      </div>
+      <div className="grid grid-cols-4 border-b border-[#e5eaf1]" role="tablist" aria-label="Payment decision stages">
+        {stages.map((item, index) => (
+          <button key={item.name} id={"stage-" + index} type="button" role="tab" aria-selected={index === active} aria-controls="payment-stage-panel" tabIndex={index === active ? 0 : -1} onClick={() => setActive(index)} onKeyDown={event => {
+            let next = index;
+            if (event.key === "ArrowRight") next = (index + 1) % stages.length;
+            else if (event.key === "ArrowLeft") next = (index + stages.length - 1) % stages.length;
+            else if (event.key === "Home") next = 0;
+            else if (event.key === "End") next = stages.length - 1;
+            else return;
+            event.preventDefault();
+            setActive(next);
+            document.getElementById("stage-" + next)?.focus();
+          }} className={"relative px-2 py-3.5 text-[11px] font-semibold transition-colors " + (index === active ? "bg-[#f2f6ff] text-[#2f6bff]" : "text-[#7b889d] hover:bg-[#fafbfe]")}>
+            <span className="mr-1.5 hidden font-mono text-[9px] opacity-60 sm:inline">0{index + 1}</span>{item.name}
+            {index === active && <span className="absolute inset-x-0 bottom-0 h-[2px] bg-[#2f6bff]" />}
+          </button>
+        ))}
+      </div>
+      <div className="grid sm:grid-cols-[1.04fr_1fr]">
+        <div className="px-5 py-6 sm:border-r sm:border-[#e5eaf1]">
+          <div className="flex items-center justify-between gap-2"><p className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#8491a4]">Transaction</p><span className="rounded bg-[#fff1ef] px-2 py-1 text-[9px] font-semibold text-[#ca4338]">Critical</span></div>
+          <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-.05em] text-[#17283e]">₹48,900<span className="text-[20px] text-[#9aa5b4]">.00</span></p>
+          <p className="mt-2 font-mono text-[10px] text-[#7c8a9f]">pay_PM71JD29</p>
+          <dl className="mt-5 divide-y divide-[#e9edf3] border-t border-[#e9edf3]">
+            {[["Merchant", "Nova Electronics"], ["Customer", "Aarav S."], ["Device", "DVC-9821"], ["Network", "49.37.***.82"]].map(([label, value]) => (
+              <div key={label} className="flex items-center justify-between gap-3 py-2.5"><dt className="text-[11px] text-[#8290a3]">{label}</dt><dd className="text-[11px] font-medium text-[#3a4b63]">{value}</dd></div>
+            ))}
+          </dl>
         </div>
-
-        <div className="relative mt-7">
-          <p className="text-[10px] font-semibold uppercase tracking-[.12em] text-[#8a95a7]">Transaction under review</p>
-          <p className="mt-3 font-mono text-[18px] font-semibold tracking-[-.02em] text-[#17233f]">pay_PM71JD29</p>
-          <div className="mt-2 flex items-baseline justify-between gap-4">
-            <p className="text-[31px] font-semibold tracking-[-.05em] text-[#17233f]">₹48,900.00</p>
-            <p className="text-right text-[10px] leading-4 text-[#79869a]">Nova Electronics<br />Card payment</p>
-          </div>
-        </div>
-
-        <dl className="relative mt-7 divide-y divide-[#dfe5ee] border-y border-[#dfe5ee]">
-          {evidence.map(([label, value, detail]) => (
-            <div key={label} className="grid grid-cols-[82px_1fr_auto] items-center gap-3 py-4">
-              <dt className="text-[10px] font-medium text-[#7c8799]">{label}</dt>
-              <dd className="font-mono text-[11px] font-semibold text-[#263249]">{value}</dd>
-              <dd className="text-right text-[9px] text-[#8792a4]">{detail}</dd>
-            </div>
-          ))}
-        </dl>
-
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={stage.name} initial={reduceMotion ? false : { opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }} className="relative mt-auto border-t border-[#cfd8e6] pt-6">
-            <p className="text-[9px] font-bold uppercase tracking-[.14em] text-[#6f7d92]">{stage.label}</p>
-            <p className={`mt-2 text-[25px] font-semibold tracking-[-.04em] ${stage.name === "Decide" ? "text-[#c93830]" : "text-[#17233f]"}`}>{stage.value}</p>
-          </motion.div>
-        </AnimatePresence>
-      </section>
-
-      <section className="flex min-h-[270px] flex-col bg-[#edf3ff] p-6 sm:p-8 lg:col-span-7 lg:p-9">
-        <div className="grid gap-7 sm:grid-cols-[1fr_1.15fr] sm:items-start">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#255df5]">Decision infrastructure</p>
-            <h3 className="mt-4 max-w-[390px] text-[28px] font-semibold leading-[1.08] tracking-[-.045em] text-[#12203a] sm:text-[33px]">Evidence moves as one accountable record.</h3>
-          </div>
+        <div id="payment-stage-panel" role="tabpanel" aria-labelledby={"stage-" + active} className="border-t border-[#e5eaf1] bg-[#f8faff] px-5 py-6 sm:border-t-0">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.div key={stage.summary} initial={reduceMotion ? false : { opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="border-l border-[#b8c9e8] pl-5 sm:mt-1">
-              <p className="font-mono text-[9px] font-semibold text-[#6580b2]">STEP {stage.number}</p>
-              <p className="mt-4 text-[18px] font-semibold text-[#17233f]">{stage.name}</p>
-              <p className="mt-3 text-[12px] leading-6 text-[#61718a]">{stage.summary}</p>
+            <motion.div key={active} initial={reduceMotion ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: reduceMotion ? 1 : 0 }} transition={{ duration: reduceMotion ? 0 : .18 }}>
+              <p className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#8491a4]">{stage.label}</p>
+              <p className={"mt-4 text-[28px] font-semibold leading-tight tracking-[-.04em] " + (active === 3 ? "text-[#2f6bff]" : "text-[#17283e]")}>{stage.value}</p>
+              <p className="mt-3 min-h-[42px] text-[12px] leading-[1.7] text-[#697990]">{stage.summary}</p>
+              <ul className="mt-5 space-y-3">
+                {stage.evidence.map(item => <li key={item} className="flex items-start gap-2 text-[11px] leading-4 text-[#51637c]"><span className="mt-[6px] h-1 w-1 shrink-0 rounded-full bg-[#2f6bff]" />{item}</li>)}
+              </ul>
             </motion.div>
           </AnimatePresence>
         </div>
-
-        <div className="mt-auto grid border-y border-[#c7d5ec] sm:grid-cols-4">
-          {stages.map((item, index) => {
-            const isActive = index === active;
-            return (
-              <button key={item.name} type="button" onClick={() => setActive(index)} aria-pressed={isActive} className={`relative min-h-[78px] border-b border-[#c7d5ec] px-3 py-4 text-left transition-colors last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 ${isActive ? "bg-white text-[#17233f]" : "text-[#71809a] hover:bg-white/50"}`}>
-                {isActive && <span className="absolute inset-x-0 top-0 h-[2px] bg-[#2f6bff]" />}
-                <span className="block font-mono text-[8px] text-[#8090ab]">{item.number}</span>
-                <span className="mt-2 block text-[11px] font-semibold">{item.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="min-h-[180px] bg-white p-6 sm:p-8 lg:col-span-4">
-        <p className="text-[9px] font-bold uppercase tracking-[.15em] text-[#8490a3]">Connected evidence</p>
-        <div className="mt-5 flex items-end justify-between border-b border-[#e1e6ee] pb-5">
-          <div><p className="font-mono text-[10px] font-semibold text-[#255df5]">FRC-0184</p><p className="mt-2 text-[17px] font-semibold text-[#17233f]">Coordinated cluster</p></div>
-          <p className="text-[36px] font-semibold leading-none tracking-[-.06em] text-[#17233f]">11</p>
-        </div>
-        <p className="mt-5 text-[11px] leading-5 text-[#6c788c]">One device, four payment instruments and a shared network range connect the identities.</p>
-      </section>
-
-      <section className="relative min-h-[180px] overflow-hidden bg-gradient-to-br from-[#2f6bff] to-[#2459e6] p-6 text-white sm:p-8 lg:col-span-3">
-        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full border-[32px] border-white/[.06]" />
-        <div className="relative flex h-full flex-col">
-          <p className="text-[9px] font-bold uppercase tracking-[.15em] text-white/65">Policy authority</p>
-          <p className="mt-5 font-mono text-[10px] text-white/70">RS-204 · Rule matched</p>
-          <p className="mt-2 text-[31px] font-semibold tracking-[-.05em]">BLOCK</p>
-          <p className="mt-auto border-t border-white/25 pt-4 text-[10px] leading-5 text-white/75">Final enforcement remains deterministic, attributable and ready for audit.</p>
-        </div>
-      </section>
+      </div>
+      <div className="flex items-center justify-between gap-4 border-t border-[#e1e7f0] bg-[#f1f5ff] px-5 py-3.5">
+        <span className="text-[10px] text-[#6d7f99]">One payment. One accountable record.</span>
+        <span className="whitespace-nowrap text-[10px] font-semibold text-[#2f6bff]">Policy owns the outcome</span>
+      </div>
     </div>
   );
 }

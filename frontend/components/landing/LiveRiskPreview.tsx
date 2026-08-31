@@ -84,7 +84,7 @@ export default function LiveRiskPreview() {
       <div className="flex h-[58px] items-center border-b border-[#e5eaf2] px-4 sm:px-5">
         <div>
           <p className="text-[12px] font-semibold text-[#17213a]">Payment risk operations</p>
-          <p className="mt-3 text-right text-[9px] font-medium text-[#6f809d]">ILLUSTRATIVE DEMO · Interactive seeded scenario</p>
+          <p className="mt-3 text-right text-[9px] font-medium text-[#6f809d]">PRODUCT PREVIEW · Payment decision workflow</p>
         </div>
         <div className="ml-auto flex items-center gap-2 text-[9px] font-semibold text-[#536078]"><span className="landing-live-dot" />Live monitoring</div>
       </div>

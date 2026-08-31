@@ -1,33 +1,17 @@
+version: "3.8"
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: risksentinel
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "15432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: ./backend
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=postgresql+psycopg://postgres:postgres@postgres:5432/risksentinel
-      - AGENT_PROVIDER=ollama
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
-    depends_on:
-      postgres:
-        condition: service_healthy
+      - AGENT_PROVIDER=ollama
+      - OLLAMA_MODEL=llama3
     volumes:
       - ./backend/app:/app/app
       - ./models:/app/models:ro
@@ -38,14 +22,13 @@ services:
       context: ./frontend
       args:
         - BACKEND_INTERNAL_URL=http://backend:8000
+        - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
+        - NEXT_PUBLIC_REALTIME_URL=http://localhost:8000/api/v1/stream/events
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=/api/backend
-      - NEXT_PUBLIC_REALTIME_URL=/api/backend/stream/events
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
+      - NEXT_PUBLIC_REALTIME_URL=http://localhost:8000/api/v1/stream/events
       - BACKEND_INTERNAL_URL=http://backend:8000
     depends_on:
       - backend
-
-volumes:
-  postgres_data:

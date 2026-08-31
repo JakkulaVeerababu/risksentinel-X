@@ -48,7 +48,7 @@ class AuditService:
             
     @classmethod
     def _map_to_schema(cls, e: AuditEventModel) -> AuditEvent:
-        payload = e.payload or {}
+        payload = e.payload or e.details or {}
         return AuditEvent(
             event_id=payload.get("event_id", f"migrated-{e.id}"),
             timestamp=e.timestamp,
@@ -57,7 +57,7 @@ class AuditService:
             event_type=e.event_type,
             resource_id=e.transaction_id,
             input_summary=payload.get("input_summary", payload), # Fallback to full payload for legacy events
-            output_summary=payload.get("output_summary", {}),
+            output_summary=payload.get("output_summary", payload if not e.payload else {}),
             model_version=payload.get("model_version"),
             policy_version=payload.get("policy_version"),
             latency=payload.get("latency"),

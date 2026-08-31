@@ -49,7 +49,7 @@ export default function SimulatorPage() {
 
   return (
     <div className="rsx-page space-y-5">
-      <PageHeader eyebrow="Decisioning laboratory" title="Attack simulator" description="Generate synthetic payment behaviour and observe how the complete risk stack reaches a decision." actions={<span className="border-l-2 border-[#d14338] pl-3 text-[10px] font-extrabold uppercase tracking-[.12em] text-[#b64039]">Isolated test environment</span>} />
+      <PageHeader eyebrow="Decisioning laboratory" title="Attack simulator" description="Generate synthetic payment behaviour and observe how the complete risk stack reaches a decision." />
 
       <section className="rsx-data-panel">
         <div className="grid min-h-[600px] lg:grid-cols-[320px_minmax(0,1fr)]">

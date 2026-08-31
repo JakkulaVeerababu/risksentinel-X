@@ -150,6 +150,14 @@ def test_p17_matched_rule_ids(policy_engine):
     assert "P-V1-004" in res.matched_rule_ids
     assert "MULTI_SIGNAL_HIGH_RISK" in res.reason_codes
 
+# P-18 graph unavailable not converted to LOW
+def test_p18_graph_unavailable(policy_engine):
+    inp = PolicyInput(transaction_id="T", ml_score=0.1, ml_model_version="v", graph_score=None, graph_version=None, agent_state="SKIPPED", agent_recommendation=None, agent_confidence=None)
+    res = policy_engine.evaluate(inp)
+    assert res.final_decision == "REVIEW"
+    assert res.graph_score is None
+    assert "GRAPH_EVIDENCE_UNAVAILABLE" in res.matched_rule_ids
+
 # P-18 policy version
 def test_p18_policy_version(policy_engine):
     inp = PolicyInput(transaction_id="T", ml_score=0.1, ml_model_version="v", graph_score=0.1, graph_version="v", agent_state="COMPLETED", agent_recommendation="ALLOW", agent_confidence=0.9)

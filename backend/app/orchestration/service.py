@@ -187,7 +187,10 @@ class RiskOrchestrator:
         # 6. INVESTIGATION GATE
         agent_start = time.perf_counter()
         agent_response = None
-        if not InvestigationGate.should_investigate(ml_score, graph_score):
+        
+        gate_result = InvestigationGate.evaluate(ml_score, graph_score)
+        
+        if gate_result.decision == "SKIP_AGENT":
             # Skip agent
             agent_response = self.agent_service.investigate(
                 InvestigationRequest(
@@ -201,10 +204,19 @@ class RiskOrchestrator:
             )
             agent_latency = (time.perf_counter() - agent_start) * 1000
             self._update_status(tx, LifecycleState.AGENT_SKIPPED)
-            self._record_audit(transaction_id, "AGENT_SKIPPED", {"reason": "Below thresholds"}, latency=agent_latency)
+            self._record_audit(transaction_id, "AGENT_SKIPPED", {
+                "reason": "Below thresholds",
+                "gate_version": gate_result.gate_version,
+                "gate_result": gate_result.decision
+            }, latency=agent_latency)
         else:
             # Run agent
-            self._record_audit(transaction_id, "AGENT_STARTED", {"ml_score": ml_score, "graph_score": graph_score})
+            self._record_audit(transaction_id, "AGENT_STARTED", {
+                "ml_score": ml_score, 
+                "graph_score": graph_score,
+                "gate_version": gate_result.gate_version,
+                "gate_result": gate_result.decision
+            })
             agent_response = self.agent_service.investigate(
                 InvestigationRequest(
                     transaction_id=transaction_id,

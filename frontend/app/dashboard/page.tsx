@@ -95,9 +95,9 @@ export default function DashboardPage() {
     <>
       <section className="mb-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-col gap-1">
-          <div className="mb-2 text-[11px] font-extrabold uppercase tracking-[.16em] text-primary">Illustrative demo scenario</div>
-          <h1 className="text-[34px] font-semibold leading-tight tracking-[-0.04em] text-text-primary">Risk overview</h1>
-          <p className="mt-1 text-[14px] text-text-secondary">Payment risk, coordinated fraud and automated decisions across Acme Payments (seeded demo data).</p>
+          <div className="mb-2 text-[11px] font-extrabold uppercase tracking-[.16em] text-primary">Live Workspace</div>
+          <h1 className="text-[28px] font-semibold tracking-[-.04em] text-text-primary">Acme Payments</h1>
+          <p className="mt-1 text-[14px] text-text-secondary">Payment risk, coordinated fraud and automated decisions across Acme Payments.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <button className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-label-sm font-medium text-text-primary shadow-sm hover:bg-surface-secondary transition-all">

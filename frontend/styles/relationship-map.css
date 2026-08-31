@@ -1,0 +1,40 @@
+.relationship-map { min-width: 0; container: relationship-map / inline-size; }
+.relationship-map-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; padding: 17px 20px; }
+.relationship-map-header h3 { color: #374960; font-size: 13px; font-weight: 600; }
+.relationship-map-header p { margin-top: 4px; color: #7b899c; font-size: 10px; }
+.relationship-map-header label { display: flex; align-items: center; gap: 8px; color: #7b899c; font-size: 10px; }
+.relationship-map-header select { max-width: 150px; height: 30px; border: 1px solid #dce3ec; padding: 3px 8px; border-radius: 5px; background: #fff; color: #51637b; font: 11px var(--font-mono, monospace); }
+.relationship-canvas { position: relative; height: 344px; background: #fff; }
+.relationship-canvas > svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.premium-shell .relationship-vertex { position: absolute; display: flex; flex-direction: column; align-items: center; width: 108px; padding: 0; border: 0; border-radius: 0; background: transparent; transform: translate(-50%, -22px); text-align: center; }
+.relationship-symbol { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #c4cfde; border-radius: 50%; background: #fff; color: #637891; transition: border-color .16s ease, color .16s ease; }
+.relationship-symbol svg { width: 18px; height: 18px; stroke-width: 1.6; }
+.relationship-vertex-id { display: block; max-width: 100%; margin-top: 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #344960; font: 11px var(--font-mono, monospace); }
+.relationship-vertex-type { display: block; margin-top: 3px; color: #7b899c; font-size: 9px; line-height: 1.4; }
+.relationship-vertex-id, .relationship-vertex-type { background: #fff; padding-inline: 3px; }
+.premium-shell .relationship-vertex[data-root="true"] { transform: translate(-50%, -26px); }
+.relationship-vertex[data-root="true"] .relationship-symbol { width: 52px; height: 52px; border-color: #3868d9; background: #3868d9; color: white; }
+.relationship-vertex[data-root="true"] .relationship-vertex-id { font-weight: 600; }
+.relationship-vertex[aria-pressed="true"]:not([data-root="true"]) .relationship-symbol { border: 2px solid #4274de; color: #2d60ca; background: #f6f9ff; }
+.relationship-vertex:hover .relationship-symbol { border-color: #4274de; color: #2d60ca; }
+.relationship-vertex[data-root="true"]:hover .relationship-symbol { color: #fff; background: #2f5ec9; }
+.relationship-vertex:focus-visible { outline: none; }
+.relationship-vertex:focus-visible .relationship-symbol { outline: 2px solid #3266df; outline-offset: 4px; }
+.relationship-map :is(select, .relationship-pagination button):focus-visible { outline: 2px solid #3266df; outline-offset: 3px; }
+.relationship-map-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; border-top: 1px solid #e8edf3; padding: 15px 20px; }
+.relationship-selection { min-width: 0; }
+.relationship-selection strong { color: #475c76; font-size: 11px; font-weight: 500; overflow-wrap: anywhere; }
+.relationship-selection p { margin-top: 4px; color: #7e8c9f; font-size: 10px; }
+.relationship-pagination { display: flex; flex-shrink: 0; align-items: center; gap: 8px; color: #7b899b; font-size: 10px; }
+.relationship-pagination button { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #dce3ec; border-radius: 5px; }
+.relationship-pagination button svg { width: 14px; height: 14px; }
+.relationship-pagination button:disabled { opacity: .4; }
+.relationship-loading { display: flex; align-items: center; justify-content: center; gap: 8px; height: 344px; color: #7b899b; font-size: 12px; }
+.relationship-empty { position: absolute; top: 270px; width: 100%; padding-inline: 30px; text-align: center; font-size: 12px; color: #7b899b; }
+@container relationship-map (max-width: 440px) {
+  .premium-shell .relationship-vertex { width: 90px; }
+  .relationship-map-header { padding-inline: 16px; }
+  .relationship-vertex-type { font-size: 8px; }
+  .relationship-map-footer { padding-inline: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .relationship-symbol { transition: none; } }

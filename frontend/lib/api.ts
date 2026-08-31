@@ -1,5 +1,5 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api/backend";
-const FETCH_TIMEOUT_MS = 15000;
+const FETCH_TIMEOUT_MS = 120000;
 
 export interface Transaction {
   transaction_id: string;
@@ -127,6 +127,11 @@ export async function fetchRecentTransactions(): Promise<Transaction[]> {
   return data.transactions || [];
 }
 
+export async function fetchApiHealth(): Promise<{ status: string; database: string; service: string; version: string }> {
+  const response = await apiFetch("/health", { cache: "no-store" });
+  return await response.json();
+}
+
 export async function fetchDashboardMetrics(): Promise<DashboardMetrics> {
   const response = await apiFetch("/dashboard/metrics");
   return await response.json();
@@ -144,7 +149,7 @@ export async function fetchRiskCase(transactionId: string): Promise<PipelineResp
 }
 
 export async function fetchGraphContext(entityId: string): Promise<any> {
-  const response = await apiFetch(`/graph/context/${entityId}`);
+  const response = await apiFetch(`/graph/context/${encodeURIComponent(entityId)}`);
   return await response.json();
 }
 
@@ -170,14 +175,43 @@ export async function fetchPolicies(): Promise<Policy[]> {
   return Array.isArray(payload) ? payload : (payload.policies || []);
 }
 
-export async function createPolicy(policyData: any): Promise<Policy> {
-  const response = await apiFetch("/policies/", {
+export async function createPolicy(policy: Omit<Policy, "policy_id" | "updated_at">): Promise<Policy> {
+  const response = await apiFetch("/policies", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(policyData)
+    body: JSON.stringify(policy),
   });
   return await response.json();
 }
+
+export async function fetchSettings(): Promise<any> {
+  const response = await apiFetch("/settings");
+  return await response.json();
+}
+
+export async function updateSettings(settings: any): Promise<any> {
+  const response = await apiFetch("/settings", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(settings),
+  });
+  return await response.json();
+}
+
+export async function fetchTeam(): Promise<any[]> {
+  const response = await apiFetch("/settings/team");
+  return await response.json();
+}
+
+export async function addTeamMember(member: {name: string, email: string, role: string}): Promise<any> {
+  const response = await apiFetch("/settings/team", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(member),
+  });
+  return await response.json();
+}
+
 
 export async function togglePolicy(policyId: string): Promise<any> {
   const response = await apiFetch(`/policies/${policyId}/toggle`, { method: "PUT" });
@@ -244,7 +278,7 @@ export async function processTransaction(txData: any): Promise<any> {
 }
 
 export async function aiChatStream(messages: any[], onChunk: (chunk: string) => void): Promise<void> {
-  const msg = "AI chat is not part of the current MVP";
+  const msg = "Conversational chat is not available. Open Investigation AI to review case evidence.";
   onChunk(msg);
   return Promise.resolve();
 }

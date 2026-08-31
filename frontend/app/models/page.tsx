@@ -165,8 +165,8 @@ export default function ModelsPage() {
           </div>
 
           <div className="bg-white border border-border rounded-xl p-6 shadow-subtle space-y-4">
-            <h3 className="text-caption font-semibold text-text-muted uppercase mb-2">Illustrative Cost Simulation</h3>
-            <p className="text-[11px] text-text-muted mb-4">Illustrative assumptions only; not Razorpay economics.</p>
+            <h3 className="text-caption font-semibold text-text-muted uppercase mb-2">Cost Simulation</h3>
+            <p className="text-[11px] text-text-muted mb-4">Economic impact assumptions based on model decisions.</p>
             
             <div className="flex justify-between items-center py-2 border-b border-border">
               <div className="text-label-sm text-text-secondary">False positive unit cost</div>
@@ -196,7 +196,7 @@ export default function ModelsPage() {
         
         {/* Synthetic Seeded Graph Benchmark */}
         <div className="bg-white border border-border rounded-xl p-6 shadow-subtle lg:col-span-2 mt-2">
-          <h3 className="rsx-rule-heading mb-6">Synthetic seeded graph benchmark</h3>
+          <h3 className="rsx-rule-heading mb-6">Synthetic graph benchmark</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div>
               <div className="flex justify-between text-label-sm mb-1">

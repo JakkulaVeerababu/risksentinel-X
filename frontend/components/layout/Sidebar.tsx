@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { createClient } from '../../lib/supabase';
 import { 
   LayoutDashboard, 
   ListOrdered, 
@@ -23,11 +24,19 @@ import {
   PlayCircle,
   Code,
   Settings,
-  Plus
+  Plus,
+  LogOut
 } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
 
   const NAV_SECTIONS = [
     {
@@ -137,6 +146,13 @@ export default function Sidebar() {
         <button className="w-full flex items-center gap-3 px-3 py-2.5 text-text-secondary hover:bg-surface-secondary hover:text-text-primary rounded-lg transition-colors duration-200">
           <span className="material-symbols-outlined text-heading-md text-text-muted">help</span>
           <span className="text-label-sm font-medium">Support</span>
+        </button>
+        <button 
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 mt-1 text-danger hover:bg-danger/10 rounded-lg transition-colors duration-200"
+        >
+          <LogOut className="w-4 h-4 text-danger" />
+          <span className="text-label-sm font-medium">Log out</span>
         </button>
       </div>
     </nav>

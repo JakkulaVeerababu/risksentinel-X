@@ -59,6 +59,7 @@ export default function PoliciesPage() {
         action,
         reason_code: reasonCode,
         enabled: true,
+        version: "v1.0",
         conditions: {
           operator: rootOp,
           rules: validRules.map(r => ({
@@ -111,12 +112,12 @@ export default function PoliciesPage() {
           </p>
         </div>
         {/* Policy Mutation Disabled for MVP */}
-        {/* <button
+        <button
           onClick={() => setIsEditorOpen(true)}
           className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl font-semibold transition-all premium-shadow hover:premium-shadow-hover flex items-center gap-2 text-label-sm"
         >
           <Plus className="w-4 h-4" /> Create Policy
-        </button> */}
+        </button>
       </div>
 
       <div className="bg-surface border border-border rounded-xl overflow-hidden shadow-sm flex flex-col h-full min-h-[600px]">
@@ -180,14 +181,14 @@ export default function PoliciesPage() {
                   </td>
                   <td className="p-4 whitespace-nowrap">
                     <button
-                      disabled
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shadow-inner opacity-60 cursor-not-allowed ${p.enabled ? 'bg-success' : 'bg-border-strong'}`}
+                      onClick={() => handleToggle(p.policy_id)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shadow-inner ${p.enabled ? 'bg-success' : 'bg-border-strong'}`}
                     >
                       <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${p.enabled ? 'translate-x-6' : 'translate-x-1'}`} />
                     </button>
                   </td>
                   <td className="p-4 whitespace-nowrap text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button disabled className="text-text-muted opacity-50 cursor-not-allowed p-2 rounded-lg border border-transparent">
+                    <button onClick={() => handleDelete(p.policy_id)} className="text-text-muted hover:text-danger p-2 rounded-lg border border-transparent hover:bg-danger/10 transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>

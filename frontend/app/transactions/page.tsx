@@ -1,171 +1,99 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import {
-  ArrowDownToLine,
-  CalendarDays,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Filter,
-  MoreHorizontal,
-  PlayCircle,
-  RefreshCcw,
-  Search,
-  SlidersHorizontal,
-  X,
-  Check
-} from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, RefreshCw, Search } from "lucide-react";
 import { fetchRecentTransactions, Transaction } from "@/lib/api";
-import { timeAgo } from "@/lib/utils";
 import { PageHeader } from "../../components/ui";
+import { DecisionBadge } from "../../components/ui/DecisionBadge";
+import { riskLevel, scorePercent } from "../../lib/transaction-presentation";
+import PriorityBrief from "../../components/workspace/PriorityBrief";
+import "../../styles/workspace-refinements.css";
 
-type RiskLevel = "Critical" | "High" | "Medium" | "Low";
-
-function getRiskLevel(score: number): RiskLevel {
-  if (score >= 0.8) return "Critical";
-  if (score >= 0.6) return "High";
-  if (score >= 0.3) return "Medium";
-  return "Low";
-}
-
-function riskStyle(level: RiskLevel) {
-  if (level === "Critical") return "border-danger/20 bg-danger-soft text-danger";
-  if (level === "High") return "border-warning/20 bg-warning-soft text-warning";
-  if (level === "Medium") return "border-info/20 bg-success-soft text-info";
-  return "border-border bg-surface-secondary text-text-secondary";
-}
-
-function decisionStyle(decision: string) {
-  if (decision === "BLOCK") return "border-danger/20 bg-danger-soft text-danger";
-  if (decision === "REVIEW") return "border-info/20 bg-info-soft text-primary";
-  return "border-success/20 bg-success-soft text-success";
-}
+const PAGE_SIZE = 15;
+const filters = [{ id: "all", label: "All payments" }, { id: "REVIEW", label: "In review" }, { id: "BLOCK", label: "Blocked" }, { id: "ALLOW", label: "Allowed" }];
 
 export default function TransactionsPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [query, setQuery] = useState("");
-  const [riskFilter, setRiskFilter] = useState<"Elevated" | "All">("All");
-  const [notice, setNotice] = useState<string | null>(null);
-
+  const [riskFilter, setRiskFilter] = useState("all");
+  const [page, setPage] = useState(1);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
+  const mounted = useRef(true);
+  const fetching = useRef(false);
 
-  const loadData = async () => {
+  async function loadData() {
+    if (fetching.current) return;
+    fetching.current = true;
+    setLoading(true);
     try {
-      setLoading(true);
-      setError(null);
       const data = await fetchRecentTransactions();
-      setTransactions(data);
-    } catch (err: any) {
-      setError(err.message || "Failed to load transactions");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const showNotice = (message: string) => {
-    setNotice(message);
-    window.setTimeout(() => setNotice(null), 2400);
-  };
+      if (mounted.current) { setTransactions(data); setError(false); }
+    } catch { if (mounted.current) setError(true); }
+    finally { fetching.current = false; if (mounted.current) setLoading(false); }
+  }
+  useEffect(() => { mounted.current = true; void loadData(); return () => { mounted.current = false; }; }, []);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return transactions.filter((tx) => {
-      const decisionMap: any = { "BLOCK": "Blocked", "REVIEW": "Review", "ALLOW": "Allowed" };
-      const txDec = decisionMap[tx.decision] || "Allowed";
-      const matchesTab = activeTab === "all" || txDec === activeTab;
-      const level = getRiskLevel(tx.ml_risk || 0);
-      const matchesRisk = riskFilter === "All" || ["Critical", "High"].includes(level);
-      const matchesQuery = !needle || [tx.transaction_id, tx.customer_id].some((value) => value.toLowerCase().includes(needle));
-      return matchesTab && matchesRisk && matchesQuery;
-    });
+    return transactions.filter(transaction => (activeTab === "all" || transaction.decision === activeTab)
+      && (riskFilter === "all" || ["High", "Critical"].includes(riskLevel(transaction.ml_risk)))
+      && (!needle || [transaction.transaction_id, transaction.customer_id].some(value => value?.toLowerCase().includes(needle))));
   }, [activeTab, query, riskFilter, transactions]);
+  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, pages);
+  const visible = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const inReview = transactions.filter(transaction => transaction.decision === "REVIEW").length;
+  const critical = transactions.filter(transaction => riskLevel(transaction.ml_risk) === "Critical").length;
+  const blocked = transactions.filter(transaction => transaction.decision === "BLOCK").length;
+  const resetFilters = () => { setQuery(""); setActiveTab("all"); setRiskFilter("all"); setPage(1); };
 
-  const tabs = [
-    { id: "all", label: "All", count: transactions.length },
-    { id: "Review", label: "In review", count: transactions.filter(t => t.decision === "REVIEW").length },
-    { id: "Blocked", label: "Blocked", count: transactions.filter(t => t.decision === "BLOCK").length },
-    { id: "Allowed", label: "Allowed", count: transactions.filter(t => t.decision === "ALLOW").length },
-  ];
-
-  return (
-    <div className="pb-10">
-      <PageHeader eyebrow="Payment monitoring" title="Transactions" description="Monitor every payment decision, isolate elevated risk and open the full evidence trail without losing context." actions={<div className="flex flex-wrap gap-2.5">
-          <button className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-surface px-4 text-label-sm font-bold text-text-secondary shadow-sm transition hover:border-border-strong opacity-75 cursor-not-allowed" disabled><ArrowDownToLine className="h-4 w-4" />Preview Export</button>
-          <button onClick={loadData} className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-surface px-4 text-label-sm font-bold text-text-secondary shadow-sm transition hover:border-border-strong hover:bg-surface-secondary"><RefreshCcw className="h-4 w-4" />Refresh</button>
-          <Link href="/simulator" className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-label-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-primary-hover"><PlayCircle className="h-4 w-4" />Simulate transaction</Link>
-        </div>} />
-
-      {error && (
-        <div className="mt-6 border border-danger/20 border-l-2 border-l-danger bg-danger-soft p-4 text-danger">
-          <span className="font-semibold">{error}</span>
-        </div>
-      )}
-
-      <section className="mt-6 overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
-        <div className="border-b border-border px-4 pt-4 sm:px-5 sm:pt-5">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div className="hide-scrollbar flex max-w-full gap-1 overflow-x-auto rounded-xl bg-surface-secondary p-1">
-              {tabs.map((tab) => <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex shrink-0 items-center gap-2 rounded-lg px-3.5 py-2 text-label-sm font-bold transition ${activeTab === tab.id ? "bg-surface text-primary shadow-sm" : "text-text-secondary hover:text-text-primary"}`}>{tab.label}<span className={`rounded-md px-1.5 py-0.5 text-caption ${activeTab === tab.id ? "bg-success-soft text-primary" : "bg-border-subtle text-text-muted"}`}>{tab.count}</span></button>)}
-            </div>
-            <div className="relative w-full xl:w-[360px]"><Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" /><input value={query} onChange={(event) => setQuery(event.target.value)} className="h-10 w-full rounded-xl border border-border bg-surface-secondary pl-10 pr-4 text-label-sm font-medium text-text-primary outline-none transition placeholder:text-text-muted focus:border-primary/50 focus:bg-surface focus:ring-4 focus:ring-primary/10" placeholder="Search payment or customer" /></div>
-          </div>
-
-          <div className="mt-4 flex flex-col gap-3 border-t border-border py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="hide-scrollbar flex max-w-full items-center gap-2 overflow-x-auto">
-              <button className="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-border bg-surface px-3 text-caption font-bold text-text-secondary"><CalendarDays className="h-3.5 w-3.5 text-text-muted" />All time<ChevronDown className="h-3.5 w-3.5" /></button>
-              <button onClick={() => setRiskFilter((value) => value === "Elevated" ? "All" : "Elevated")} className={`inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border px-3 text-caption font-bold ${riskFilter === "Elevated" ? "border-primary/30 bg-success-soft text-primary" : "border-border bg-surface text-text-secondary"}`}><SlidersHorizontal className="h-3.5 w-3.5" />{riskFilter === "Elevated" ? "High + Critical risk" : "All risk levels"}</button>
-            </div>
-            <button className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-dashed border-border-strong px-3 text-caption font-bold text-primary hover:bg-primary-soft opacity-75 cursor-not-allowed" disabled><Filter className="h-3.5 w-3.5" />More filters</button>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto min-h-[400px]">
-          {loading ? (
-            <div className="flex items-center justify-center h-full py-20 text-text-secondary">Loading transactions...</div>
-          ) : (
-          <table className="w-full min-w-full md:min-w-[1060px] table-fixed border-collapse text-left">
-            <colgroup><col className="w-[28%] md:w-[19%]" /><col className="w-[0%] md:w-[19%]" /><col className="w-[24%] md:w-[13%]" /><col className="w-[24%] md:w-[15%]" /><col className="w-[0%] md:w-[13%]" /><col className="w-[24%] md:w-[14%]" /><col className="w-[0%] md:w-[7%]" /></colgroup>
-            <thead><tr className="border-b border-border bg-surface-secondary text-caption font-extrabold uppercase tracking-[.1em] text-text-muted"><th className="px-3 sm:px-5 py-3.5">Transaction</th><th className="px-4 py-3.5 hidden md:table-cell">Customer</th><th className="px-3 sm:px-4 py-3.5">Amount</th><th className="px-3 sm:px-4 py-3.5">ML Risk</th><th className="px-4 py-3.5 hidden md:table-cell">Graph Risk</th><th className="px-3 sm:px-4 py-3.5">Decision</th><th className="px-4 py-3.5 text-right hidden lg:table-cell">Time</th></tr></thead>
-            <tbody className="divide-y divide-border">
-              {filtered.map((tx) => {
-                const level = getRiskLevel(tx.ml_risk || 0);
-                const scorePct = Math.round((tx.ml_risk || 0) * 100);
-                return (
-                <tr key={tx.transaction_id} className="group transition hover:bg-surface-secondary/50">
-                  <td className="px-3 sm:px-5 py-4"><div className="flex items-center gap-2 sm:gap-3"><span className={`h-8 w-1 rounded-full shrink-0 ${level === "Critical" ? "bg-danger" : level === "High" ? "bg-warning" : level === "Medium" ? "bg-info" : "bg-border-strong"}`} /><div className="min-w-0"><Link href={`/transactions/${tx.transaction_id}`} className="truncate font-mono text-caption font-bold text-primary hover:underline">{tx.transaction_id}</Link></div></div></td>
-                  <td className="px-4 py-4 hidden md:table-cell"><div className="flex min-w-0 items-center gap-3"><div className="min-w-0"><p className="truncate text-label-sm font-bold text-text-primary">{tx.customer_id}</p></div></div></td>
-                  <td className="px-3 sm:px-4 py-4"><p className="text-label-sm font-bold text-text-primary tabular-nums">₹{tx.amount?.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p></td>
-                  <td className="px-3 sm:px-4 py-4"><div className="flex items-center gap-1 sm:gap-2.5"><span className={`text-label-sm sm:text-body-lg font-bold tabular-nums ${scorePct >= 80 ? "text-danger" : scorePct >= 60 ? "text-warning" : "text-success"}`}>{scorePct}</span><div className="min-w-0 hidden sm:block"><span className={`inline-flex rounded-md border px-2 py-0.5 text-caption font-extrabold uppercase ${riskStyle(level)}`}>{level}</span><div className="mt-1.5 h-1 w-16 overflow-hidden rounded-full bg-[#e7ebf1]"><div className={`h-full rounded-full ${scorePct >= 80 ? "bg-danger" : scorePct >= 60 ? "bg-warning" : "bg-info"}`} style={{ width: `${scorePct}%` }} /></div></div></div></td>
-                  <td className="px-4 py-4 hidden md:table-cell">
-                    {tx.graph_risk === null ? (
-                      <span className="text-label-sm font-bold text-text-muted italic">N/A</span>
-                    ) : (
-                      <span className={`text-body-lg font-bold tabular-nums ${tx.graph_risk >= 0.8 ? "text-danger" : tx.graph_risk >= 0.3 ? "text-warning" : "text-success"}`}>{Math.round(tx.graph_risk * 100)}</span>
-                    )}
-                  </td>
-                  <td className="px-3 sm:px-4 py-4"><span className={`inline-flex items-center rounded-md border px-2 sm:px-2.5 py-1 sm:py-1.5 text-caption font-extrabold uppercase ${decisionStyle(tx.decision || "PENDING")}`}>{tx.decision || "PENDING"}</span></td>
-                  <td className="px-4 py-4 text-right hidden lg:table-cell"><p className="font-mono text-caption font-semibold text-text-muted">{tx.timestamp ? timeAgo(tx.timestamp) : ""}</p><Link href={`/transactions/${tx.transaction_id}`} aria-label={`Open ${tx.transaction_id}`} className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-md text-text-muted opacity-0 transition hover:bg-surface-secondary group-hover:opacity-100"><MoreHorizontal className="h-4 w-4" /></Link></td>
-                </tr>
-              )})}
-            </tbody>
-          </table>
-          )}
-        </div>
-
-        {!loading && filtered.length === 0 && <div className="px-5 py-16 text-center"><Search className="mx-auto h-6 w-6 text-text-muted" /><p className="mt-3 text-body-sm font-bold text-text-secondary">No transactions match these filters.</p><button onClick={() => { setQuery(""); setActiveTab("all"); setRiskFilter("All"); }} className="mt-3 text-label-sm font-bold text-primary">Clear filters</button></div>}
-
-        <div className="flex flex-col gap-3 border-t border-border bg-surface-secondary px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5"><p className="text-caption font-semibold text-text-muted">Showing {filtered.length} transactions</p><div className="flex items-center gap-2"><button disabled className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#dfe5ed] bg-surface text-text-muted disabled:opacity-60"><ChevronLeft className="h-4 w-4" /></button><span className="px-2 text-caption font-bold text-text-primary">Page 1</span><button className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#dfe5ed] bg-surface text-text-secondary transition hover:bg-surface-secondary disabled:opacity-60" disabled><ChevronRight className="h-4 w-4" /></button></div></div>
-      </section>
-
-      {notice && <div className="fixed bottom-6 right-6 z-[140] flex items-center gap-3 rounded-xl border border-border bg-surface px-5 py-3.5 text-label-sm font-bold text-text-primary shadow-sm"><Check className="h-4 w-4 text-success" />{notice}</div>}
-    </div>
-  );
+  return <div className="transactions-page min-w-0 space-y-5">
+    <PageHeader eyebrow="Payment monitoring" title="Transactions" description="Review recent payments and follow the evidence behind each decision." actions={<><button className="workspace-button" onClick={() => void loadData()} disabled={loading}><RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />Refresh</button><Link href="/simulator" className="workspace-button">Simulate transaction<ArrowRight className="h-3.5 w-3.5" /></Link></>} />
+    {error && <p role="alert" className="border-l-2 border-[#c5685e] bg-white px-4 py-3 text-[12px] text-[#9a514a]">Transactions could not be refreshed. {transactions.length ? "Showing the last loaded data." : "Check the backend connection and try again."}</p>}
+    {transactions.length > 0 && <PriorityBrief
+      eyebrow="Payment priorities"
+      title={`${inReview} ${inReview === 1 ? "payment awaiting" : "payments awaiting"} review.`}
+      description={`Latest ${transactions.length} payments`}
+      stats={[{ label: "In review", value: inReview }, { label: "Critical model risk", value: critical }, { label: "Blocked", value: blocked }]}
+      action={<a href="#payments-list" onClick={() => { setActiveTab(inReview ? "REVIEW" : "all"); setQuery(""); setRiskFilter("all"); setPage(1); }}>{inReview ? "Review these payments" : "View payments"}<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></a>}
+    />}
+    <section id="payments-list" className="min-w-0 overflow-hidden rounded-xl border border-[#dde3ec] bg-white" aria-label="Transactions list">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e5eaf0] px-5 pt-4">
+        <div className="flex max-w-full gap-5 overflow-x-auto" aria-label="Filter by decision">{filters.map(tab => <button type="button" aria-pressed={activeTab === tab.id} key={tab.id} onClick={() => { setActiveTab(tab.id); setPage(1); }} className={`flex shrink-0 items-center gap-2 !rounded-none border-b-2 pb-4 text-[12px] font-medium ${activeTab === tab.id ? "border-[#245df5] text-[#263b5b]" : "border-transparent text-[#7b879b] hover:text-[#34445c]"}`}>{tab.label}<span className="text-[11px] font-normal text-[#99a3b2]">{tab.id === "all" ? transactions.length : transactions.filter(item => item.decision === tab.id).length}</span></button>)}</div>
+        <span className="pb-4 text-[11px] text-[#8a95a6]">Latest {transactions.length} payments</span>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e5eaf0] px-5 py-4">
+        <label className="transaction-search relative w-full max-w-[420px]"><Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[#8b97a8]" /><input aria-label="Search transactions" value={query} onChange={event => { setQuery(event.target.value); setPage(1); }} placeholder="Search payment or customer…" className="h-9 w-full rounded-lg border border-[#dce3ec] bg-white pl-9 pr-3 text-[12px] outline-none" /></label>
+        {(query || riskFilter !== "all" || activeTab !== "all") && <button type="button" onClick={resetFilters} className="transaction-reset">Reset filters</button>}
+        <select aria-label="Filter transaction risk" value={riskFilter} onChange={event => { setRiskFilter(event.target.value); setPage(1); }} className="h-9 max-w-full border border-[#dce3ec] bg-white px-3 text-[12px] text-[#58667b]"><option value="all">All risk levels</option><option value="elevated">High + critical risk</option></select>
+      </div>
+      <div className="min-w-0 overflow-x-auto" role="region" tabIndex={0} aria-label="Payments table, scroll horizontally on small screens">
+        <table className="transaction-table w-full min-w-[880px] table-fixed text-left">
+          <caption className="sr-only">Recent payments with model and graph scores out of 100</caption>
+          <colgroup><col style={{ width: "29%" }} /><col style={{ width: "14%" }} /><col style={{ width: "16%" }} /><col style={{ width: "14%" }} /><col style={{ width: "13%" }} /><col style={{ width: "14%" }} /></colgroup>
+          <thead><tr>{["Payment / customer", "Amount", "Model risk", "Graph risk", "Decision", "Received"].map(heading => <th scope="col" key={heading}>{heading}</th>)}</tr></thead>
+          <tbody>
+            {loading && !transactions.length ? <tr><td colSpan={6} className="!py-16 !text-center text-[#8b97a8]">Loading payments…</td></tr> : visible.map(transaction => {
+              const level = riskLevel(transaction.ml_risk);
+              const date = new Date(transaction.timestamp || "");
+              const validDate = !Number.isNaN(date.getTime());
+              return <tr key={transaction.transaction_id}>
+                <td><Link className="block truncate font-mono text-[12px] font-medium text-[#34445d] hover:text-[#245df5] hover:underline" href={`/transactions/${encodeURIComponent(transaction.transaction_id)}`} title={transaction.transaction_id}>{transaction.transaction_id}</Link><p className="mt-1 truncate text-[11px] text-[#8a95a6]">{transaction.customer_id || "Customer not recorded"}</p></td>
+                <td className="font-medium tabular-nums text-[#3c4c63]">{transaction.amount == null ? "—" : `₹${transaction.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</td>
+                <td><span className="text-[14px] font-medium tabular-nums text-[#3c4c63]">{scorePercent(transaction.ml_risk)}</span><span className="ml-1 text-[10px] text-[#758398]">/ 100</span><p className={`mt-1 text-[11px] font-medium ${level === "Critical" ? "text-[#ad493f]" : level === "High" ? "text-[#99651b]" : "text-[#66778e]"}`}>{level}</p></td>
+                <td><span className="text-[14px] font-medium tabular-nums text-[#3c4c63]">{scorePercent(transaction.graph_risk)}</span>{transaction.graph_risk != null && <span className="ml-1 text-[10px] text-[#99a3b2]">/ 100</span>}</td>
+                <td><DecisionBadge decision={transaction.decision || "PENDING"} /></td>
+                <td><time className="text-[11px] text-[#66758b]" dateTime={validDate ? date.toISOString() : undefined}>{validDate ? date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "—"}</time><p className="mt-1 text-[10px] text-[#98a2b1]">{validDate ? date.toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : ""}</p></td>
+              </tr>;
+            })}
+            {!loading && !visible.length && <tr><td colSpan={6} className="!py-14 !text-center"><p className="text-[13px] font-medium text-[#58677d]">No matching payments</p><p className="mt-2 text-[12px] text-[#8a95a6]">Try a different ID or clear your filters.</p><button className="workspace-button mt-4" onClick={() => { setQuery(""); setActiveTab("all"); setRiskFilter("all"); setPage(1); }}>Clear filters</button></td></tr>}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e5eaf0] px-5 py-3 text-[11px] text-[#8490a2]"><p role="status">{filtered.length ? `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, filtered.length)}` : "0"} of {filtered.length} payments</p><div className="flex items-center gap-3"><button aria-label="Previous payments page" className="workspace-button !min-h-8 !p-1.5" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}><ChevronLeft className="h-4 w-4" /></button><span>{currentPage} / {pages}</span><button aria-label="Next payments page" className="workspace-button !min-h-8 !p-1.5" disabled={currentPage === pages} onClick={() => setPage(currentPage + 1)}><ChevronRight className="h-4 w-4" /></button></div></div>
+    </section>
+  </div>;
 }

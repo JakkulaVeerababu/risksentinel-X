@@ -178,7 +178,7 @@ export default function AnalyticsPage() {
       <section className="space-y-4">
         <div className="flex items-end justify-between gap-4 border-b border-border pb-3">
           <h2 className="rsx-rule-heading">Graph benchmark</h2>
-          <span className="text-[10px] font-semibold text-primary">Synthetic seeded evaluation</span>
+          <span className="text-[10px] font-semibold text-primary">Synthetic graph evaluation</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

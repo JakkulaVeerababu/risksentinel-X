@@ -1,0 +1,32 @@
+/* The operational summary is the only large blue surface on this page. */
+.recommendations-brief {
+  container: recommendations-brief / inline-size;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #285af5;
+  border-radius: 12px;
+  padding: 28px 30px;
+  background: #285af5;
+  color: #fff;
+}
+.recommendations-brief-content { display: grid; grid-template-columns: minmax(0, 1fr) 320px; align-items: center; gap: 32px; }
+.recommendations-brief-copy { min-width: 0; }
+.recommendations-brief-eyebrow { color: #e3ebff; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.recommendations-brief h2 { max-width: 640px; margin-top: 12px; font-size: clamp(23px, 2.1vw, 29px); font-weight: 600; line-height: 1.2; letter-spacing: -.035em; text-wrap: balance; }
+.recommendations-brief-description { max-width: 580px; margin-top: 10px; color: #edf2ff; font-size: 12px; line-height: 1.7; }
+.recommendations-brief-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; }
+.recommendations-brief-stats > div { padding: 8px 16px; border-left: 1px solid rgba(255, 255, 255, .32); }
+.recommendations-brief-stats dt { min-height: 30px; color: #edf2ff; font-size: 10px; font-weight: 500; line-height: 1.5; }
+.recommendations-brief-stats dd { margin-top: 8px; color: #fff; font-size: 28px; font-weight: 600; line-height: 1.1; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+@container recommendations-brief (max-width: 760px) {
+  .recommendations-brief-content { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .recommendations-brief-stats { padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, .32); }
+  .recommendations-brief-stats > div:first-child { padding-left: 0; border-left: 0; }
+  .recommendations-brief-stats dt { min-height: 0; }
+}
+@media (max-width: 639px) {
+  .recommendations-brief { padding: 23px 20px; }
+  .recommendations-brief-stats > div { padding-inline: 12px; }
+  .recommendations-brief-stats dt { min-height: 30px; }
+  .recommendations-brief-stats dd { font-size: 25px; }
+}

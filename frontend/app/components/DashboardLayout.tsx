@@ -1,19 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
-  ChevronDown,
   ChevronRight,
   CircleHelp,
-  Command,
   Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
   Plus,
   Search,
   X,
+  LogOut,
 } from "lucide-react";
+import { createClient } from "../../lib/supabase";
 import BrandLogo from "../../components/brand/BrandLogo";
 import PageTransition from "./PageTransition";
 
@@ -55,7 +57,7 @@ const navigation: NavSection[] = [
   {
     label: "Operations",
     items: [
-      { label: "Investigations", href: "/investigations" },
+      { label: "Investigations", href: "/investigation" },
       { label: "Audit trail", href: "/audit" },
       { label: "Analytics", href: "/analytics" },
       { label: "Risk impact", href: "/impact" },
@@ -76,25 +78,24 @@ function isRouteActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function Sidebar({ mobile = false, onNavigate }: { mobile?: boolean; onNavigate?: () => void }) {
+function Sidebar({ mobile = false, onNavigate, onClose }: { mobile?: boolean; onNavigate?: () => void; onClose: () => void }) {
   const pathname = usePathname();
 
   return (
-    <aside className={`${mobile ? "flex" : "hidden lg:flex"} h-full w-[244px] flex-col border-r border-[#e2e6ef] bg-white`}>
-      <div className="flex h-16 items-center border-b border-[#edf0f5] px-5">
+    <aside id={mobile ? "mobile-sidebar" : "workspace-sidebar"} className={`workspace-sidebar ${mobile ? "flex" : "hidden lg:flex"} h-full w-[244px] flex-col border-r border-[#e2e6ef] bg-white`}>
+      <div className="flex h-16 items-center justify-between gap-2 border-b border-[#edf0f5] px-4">
         <BrandLogo href="/dashboard" />
+        {mobile && <button type="button" onClick={onClose} aria-label="Close navigation" className="shrink-0 rounded-md p-1.5 text-[#7b8799] hover:bg-[#f0f3f8] hover:text-[#17233f]">
+          <X className="h-4 w-4" />
+        </button>}
       </div>
 
       <div className="border-b border-[#eef1f5] px-4 py-4">
-        <button className="group flex w-full items-center justify-between border-l-2 border-[#245df5] px-3 py-1 text-left transition-colors hover:bg-[#f8faff]">
-          <span className="min-w-0">
-            <span className="block truncate text-[13px] font-semibold text-[#17233f]">Acme Payments</span>
-            <span className="mt-0.5 block truncate text-[11px] font-medium text-[#8791a4]">Production workspace</span>
-          </span>
-          <ChevronDown className="h-4 w-4 text-[#9aa3b3] transition-transform group-hover:translate-y-0.5" />
-        </button>
+        <div className="flex items-center justify-between px-1 text-[12px] font-medium text-[#647086]">
+          <span>Risk operations</span>
+        </div>
         <Link
-          href="/investigations"
+          href="/investigation"
           onClick={onNavigate}
           className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-[#245df5] px-3 text-[12px] font-semibold text-white shadow-[0_8px_20px_rgba(36,93,245,.18)] transition-colors hover:bg-[#1747c9]"
         >
@@ -113,6 +114,7 @@ function Sidebar({ mobile = false, onNavigate }: { mobile?: boolean; onNavigate?
                   <Link
                     key={item.label}
                     href={item.href}
+                    aria-current={active ? "page" : undefined}
                     onClick={onNavigate}
                     className={`group relative flex h-8 items-center rounded-md px-2.5 text-label-sm font-semibold transition-colors ${active ? "bg-[#edf3ff] text-[#315efb]" : "text-[#5f6b80] hover:bg-[#f5f7fb] hover:text-[#17233f]"}`}
                   >
@@ -128,12 +130,11 @@ function Sidebar({ mobile = false, onNavigate }: { mobile?: boolean; onNavigate?
       </nav>
 
       <div className="border-t border-[#eef1f5] p-3">
-        <div className="border-t border-[#edf0f5] px-1 py-2">
+        <div className="px-1 py-1">
           <div className="flex items-center gap-2 text-caption font-semibold text-[#344158]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#315efb]" />
-            All risk engines operational
+            Risk workspace
           </div>
-          <p className="mt-1 pl-4 text-[10px] font-medium text-[#8d958f]">ML · Graph · Policy</p>
+          <p className="mt-1 text-[10px] font-medium text-[#8791a4]">ML · Graph · Policy</p>
         </div>
       </div>
     </aside>
@@ -144,10 +145,56 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [mode, setMode] = useState<"Test" | "Prod">("Test");
+  const [sidebarHidden, setSidebarHidden] = useState(false);
+  const sidebarToggleRef = useRef<HTMLButtonElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const notificationsButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    setNotificationsOpen(false);
+    setSearchOpen(false);
+    setMobileNavOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (searchOpen) setNotificationsOpen(false);
+  }, [searchOpen]);
+
+  useEffect(() => {
+    if (!notificationsOpen) return;
+    const dismissOutside = (event: Event) => {
+      if (event.target instanceof Node && !notificationsRef.current?.contains(event.target)) {
+        setNotificationsOpen(false);
+      }
+    };
+    const dismissOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setNotificationsOpen(false);
+        notificationsButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", dismissOutside);
+    document.addEventListener("focusin", dismissOutside);
+    document.addEventListener("keydown", dismissOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", dismissOutside);
+      document.removeEventListener("focusin", dismissOutside);
+      document.removeEventListener("keydown", dismissOnEscape);
+    };
+  }, [notificationsOpen]);
+
+  useEffect(() => {
+    try { setSidebarHidden(localStorage.getItem("rsx-sidebar-hidden") === "true"); } catch { /* Storage can be disabled. */ }
+  }, []);
+
+  const toggleSidebar = (hidden: boolean) => {
+    setSidebarHidden(hidden);
+    try { localStorage.setItem("rsx-sidebar-hidden", String(hidden)); } catch { /* The control works without persistence. */ }
+    requestAnimationFrame(() => sidebarToggleRef.current?.focus());
+  };
 
   const currentRoute = allNavigation.find((item) => isRouteActive(pathname, item.href));
   const filteredRoutes = useMemo(() => {
@@ -177,23 +224,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.push(href);
   };
 
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
+
   return (
     <div className="rsx-workspace min-h-screen bg-[#f4f6fa] text-[#17233f]">
-      <div className="fixed inset-y-0 left-0 z-40 hidden lg:block"><Sidebar /></div>
+      {!sidebarHidden && <div className="fixed inset-y-0 left-0 z-40 hidden lg:block"><Sidebar onClose={() => toggleSidebar(true)} /></div>}
 
       {mobileNavOpen && (
         <div className="fixed inset-0 z-[80] lg:hidden">
-          <button className="absolute inset-0 bg-[#0b1224]/50 backdrop-blur-[3px]" aria-label="Close navigation" onClick={() => setMobileNavOpen(false)} />
-          <div className="relative h-full w-[284px] max-w-[88vw] shadow-2xl">
-            <Sidebar mobile onNavigate={() => setMobileNavOpen(false)} />
-            <button aria-label="Close navigation" onClick={() => setMobileNavOpen(false)} className="absolute right-3 top-4 rounded-lg p-1.5 text-[#768196] hover:bg-[#f0f3f8]"><X className="h-4 w-4" /></button>
+          <button className="absolute inset-0 bg-[#0b1224]/50 backdrop-blur-[3px]" aria-label="Dismiss navigation overlay" onClick={() => setMobileNavOpen(false)} />
+          <div className="relative h-full w-[244px] max-w-[88vw] shadow-2xl">
+            <Sidebar mobile onNavigate={() => setMobileNavOpen(false)} onClose={() => setMobileNavOpen(false)} />
           </div>
         </div>
       )}
 
-      <div className="flex min-h-screen flex-col lg:pl-[244px]">
+      <div className={`workspace-content flex min-h-screen min-w-0 flex-col ${sidebarHidden ? "" : "lg:pl-[244px]"}`}>
         <header className="sticky top-0 z-50 flex h-16 items-center border-b border-[#e2e6ef] bg-white/95 px-4 backdrop-blur-xl sm:px-7">
           <button className="mr-2 rounded-lg p-2 text-[#566177] hover:bg-[#f2f5f9] lg:hidden" aria-label="Open navigation" onClick={() => setMobileNavOpen(true)}><Menu className="h-5 w-5" /></button>
+          <button ref={sidebarToggleRef} className="mr-3 hidden shrink-0 rounded-lg p-2 text-[#647086] hover:bg-[#f2f5f9] lg:block" aria-label={sidebarHidden ? "Show sidebar" : "Collapse sidebar"} aria-expanded={!sidebarHidden} aria-controls="workspace-sidebar" title={sidebarHidden ? "Show sidebar" : "Collapse sidebar"} onClick={() => toggleSidebar(!sidebarHidden)}>
+            {sidebarHidden ? <PanelLeftOpen className="h-[18px] w-[18px]" /> : <PanelLeftClose className="h-[18px] w-[18px]" />}
+          </button>
           <div className="mr-3 lg:hidden"><BrandLogo compact /></div>
 
           <div className="hidden min-w-0 items-center gap-2 sm:flex">
@@ -201,55 +256,42 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <ChevronRight className="h-3.5 w-3.5 text-[#bdc3ce]" />
             <span className="truncate text-caption font-semibold text-[#344158]">{currentRoute?.label ?? "Workspace"}</span>
           </div>
-
           <div className="ml-auto flex items-center gap-1.5 sm:gap-2.5">
             <button onClick={() => setSearchOpen(true)} className="group hidden h-9 w-[300px] items-center gap-2 rounded-lg border border-[#dfe4ed] bg-[#f8fafd] px-3 text-left text-caption text-[#929cad] transition-all hover:border-[#cdd6e5] hover:bg-white xl:flex">
               <Search className="h-4 w-4" />
-              <span className="flex-1">Search payments, customers, devices…</span>
-              <span className="flex items-center gap-0.5 rounded border border-[#e0e5ed] bg-white px-1.5 py-0.5 text-caption font-semibold text-[#8e98a9]"><Command className="h-2.5 w-2.5" /> K</span>
+              <span className="flex-1">Search workspace…</span>
             </button>
             <button onClick={() => setSearchOpen(true)} className="rounded-lg p-2 text-[#647086] hover:bg-[#f2f5f9] xl:hidden" aria-label="Search"><Search className="h-[18px] w-[18px]" /></button>
 
-            <div className="flex items-center rounded-lg border border-[#e1e6ee] bg-[#f4f6f9] p-0.5">
-              {(["Test"] as const).map((item) => (
-                <button key={item} onClick={() => setMode(item)} className={`rounded-md px-2 py-1.5 text-caption font-semibold transition-all sm:px-2.5 sm:text-caption ${mode === item ? "bg-white text-[#255df5] shadow-[0_1px_3px_rgba(16,24,40,.1)]" : "text-[#8590a2] hover:text-[#4c5870]"}`}>{item}</button>
-              ))}
-            </div>
-
-            <div className="relative">
-              <button onClick={() => setNotificationsOpen((value) => !value)} className="relative rounded-lg p-2 text-[#647086] hover:bg-[#f2f5f9]" aria-label="Notifications" aria-expanded={notificationsOpen}>
+            <div ref={notificationsRef} className="relative">
+              <button ref={notificationsButtonRef} type="button" onClick={() => setNotificationsOpen((value) => !value)} className="relative rounded-lg p-2 text-[#647086] hover:bg-[#f2f5f9]" aria-label="Notifications" aria-expanded={notificationsOpen} aria-controls={notificationsOpen ? "workspace-notifications" : undefined}>
                 <Bell className="h-[18px] w-[18px]" />
-                <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#e5484d] ring-2 ring-white" />
               </button>
               {notificationsOpen && (
-                <div className="absolute right-0 top-11 w-[320px] max-w-[86vw] overflow-hidden rounded-xl border border-[#e3e8f0] bg-white shadow-[0_18px_50px_rgba(26,36,58,.16)]">
-                  <div className="flex items-center justify-between border-b border-[#edf0f5] px-4 py-3"><span className="text-label-sm font-semibold">Notifications</span><span className="text-caption font-semibold text-[#255df5]">3 new</span></div>
-                  <div className="space-y-1 p-2">
-                    {[
-                      ["Critical cluster FRC-0184", "11 linked accounts · ₹4.82L exposure", "danger"],
-                      ["Policy change published", "Velocity Guard v12 is now updated", "primary"],
-                      ["Daily review complete", "126 decisions verified by Fraud Ops", "success"],
-                    ].map(([title, detail, tone]) => (
-                      <button key={title} className="flex w-full gap-3 rounded-lg p-2.5 text-left hover:bg-[#f7f9fc]">
-                        <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${tone === "danger" ? "bg-[#e5484d]" : tone === "success" ? "bg-[#315efb]" : "bg-[#255df5]"}`} />
-                        <span><span className="block text-caption font-semibold text-[#28344c]">{title}</span><span className="mt-0.5 block text-caption leading-4 text-[#7f899b]">{detail}</span></span>
-                      </button>
-                    ))}
+                <div id="workspace-notifications" role="region" aria-label="Notifications panel" className="absolute right-0 top-11 w-[320px] max-w-[86vw] overflow-hidden rounded-xl border border-[#e3e8f0] bg-white shadow-[0_18px_50px_rgba(26,36,58,.16)]">
+                  <div className="flex items-center justify-between border-b border-[#edf0f5] px-4 py-3"><span className="text-label-sm font-semibold">Notifications</span><button type="button" aria-label="Close notifications" onClick={() => { setNotificationsOpen(false); notificationsButtonRef.current?.focus(); }} className="rounded p-1 text-[#7f899b] hover:bg-[#f4f6f9]"><X className="h-4 w-4" /></button></div>
+                  <div className="px-4 py-5">
+                    <p className="text-[13px] font-semibold text-[#34445d]">Notification feed not connected</p>
+                    <p className="mt-2 text-[12px] leading-5 text-[#66778e]">Recorded workspace activity is available in the audit trail.</p>
+                    <Link href="/audit" onClick={() => setNotificationsOpen(false)} className="mt-4 inline-flex items-center gap-2 text-[12px] font-semibold text-[#245df5]">Open audit trail <ChevronRight className="h-3.5 w-3.5" /></Link>
                   </div>
                 </div>
               )}
             </div>
 
-            <button className="hidden rounded-lg p-2 text-[#647086] hover:bg-[#f2f5f9] sm:block" aria-label="Help"><CircleHelp className="h-[18px] w-[18px]" /></button>
-            <Link href="/settings" className="ml-0.5 hidden border-l border-[#e7ebf1] py-0.5 pl-3 text-left sm:block">
+            <Link href="/developer" className="hidden rounded-lg p-2 text-[#647086] hover:bg-[#f2f5f9] sm:block" aria-label="API documentation"><CircleHelp className="h-[18px] w-[18px]" /></Link>
+            <Link href="/settings" className="ml-0.5 hidden border-l border-[#e7ebf1] py-0.5 pl-3 text-left sm:block hover:bg-[#f2f5f9] px-2 rounded-lg transition-colors">
               <span className="block text-[12px] font-semibold text-[#2d3950]">Fraud Ops</span>
               <span className="block text-[10px] font-medium text-[#8b95a7]">Administrator</span>
             </Link>
+            <button onClick={handleLogout} className="rounded-lg p-2 text-[#e5484d] hover:bg-[#fff5f5] hover:text-[#c33b34] transition-colors" aria-label="Log out">
+              <LogOut className="h-[18px] w-[18px]" />
+            </button>
           </div>
         </header>
 
         <PageTransition>
-          <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-7 sm:py-7 xl:px-9 xl:py-8">
+          <main className="mx-auto w-full min-w-0 px-4 py-6 sm:px-7 sm:py-7 xl:px-9 xl:py-8">
             {children}
           </main>
         </PageTransition>
