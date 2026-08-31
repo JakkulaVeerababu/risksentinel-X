@@ -165,7 +165,7 @@ All metrics are frozen Phase-7 held-out results. No post-test tuning.
 
 ```bash
 # Clone
-git clone https://github.com/your-org/risksentinel-x.git
+git clone https://github.com/JakkulaVeerababu/risksentinel-X.git
 cd risksentinel-x
 
 # Configure
@@ -215,14 +215,19 @@ If Ollama is unavailable, the agent becomes DEGRADED — ML, graph and policy co
 risksentinel-x/
 ├── backend/           # FastAPI application
 │   ├── app/
-│   │   ├── agent/     # Ollama provider, tools, gate, schemas
+│   │   ├── agent/     # Ollama provider, tools, gate
 │   │   ├── api/       # REST endpoints
+│   │   ├── audit/     # Audit logging
+│   │   ├── core/      # Core configuration
+│   │   ├── db/        # Database setup
 │   │   ├── graph/     # NetworkX risk engine
 │   │   ├── ml/        # XGBoost scoring service
+│   │   ├── models/    # DB models
 │   │   ├── orchestration/  # Pipeline coordinator
-│   │   └── policy/    # Deterministic rule engine
+│   │   ├── policy/    # Deterministic rule engine
+│   │   └── schemas/   # Pydantic schemas
 │   └── tests/         # 90 tests (88 pass, 2 skip)
-├── frontend/          # Next.js dashboard
+├── frontend/          # Next.js 14 dashboard
 ├── evaluation/        # Frozen evaluation artifacts
 │   └── results/       # ml_heldout_metrics.json, evaluation_summary.json
 ├── models/            # Frozen model artifacts
@@ -261,7 +266,7 @@ Phase-8 security audit scope: **local/containerized hackathon prototype**.
 - Prompt injection: 3/3 vectors blocked
 - Concurrent/duplicate replay handled (409)
 
-Before public deployment, additional hardening is required: authentication, rate limiting, TLS, reverse proxy, container non-root users, production secret management, observability, and dependency upgrades.
+**Authentication Status**: For this prototype, authentication (SSO, 2FA) in the UI is mocked/demo-only. API routes do not currently verify credentials. Before public deployment, additional hardening is required: actual authentication, rate limiting, TLS, reverse proxy, container non-root users, production secret management, observability, and dependency upgrades.
 
 ---
 

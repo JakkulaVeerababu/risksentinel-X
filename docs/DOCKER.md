@@ -1,19 +1,17 @@
 # Docker Runbook
 
 ## Standard Startup
-To launch the full MVP environment (Backend, Frontend, PostgreSQL DB, Admin):
+To launch the MVP environment (Backend API, Frontend Dashboard):
 ```bash
 docker compose up --build
 ```
-This maps local volumes and exposes ports (e.g., UI on 3000, API on 8000, DB on 5432).
+This maps local volumes and exposes ports (e.g., UI on 3000, API on 8000).
 
 ## Standard Shutdown
 To stop the services safely:
 ```bash
 docker compose down
 ```
-> **WARNING:** `docker compose down -v` is safe ONLY IF you intend to permanently delete the persistent PostgreSQL audit logs. Use with caution.
-
 ## Environment Variables
 The `.env` file must never be committed. 
 

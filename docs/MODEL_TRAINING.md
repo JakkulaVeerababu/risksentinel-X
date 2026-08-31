@@ -9,6 +9,11 @@ data/raw/
 └── train_identity.csv
 ```
 
+## Fresh Clone Setup
+Because trained model binaries are not tracked in Git, you must either:
+1. Run the training script locally (see **Training Execution** below).
+2. Download the pre-compiled `xgb-ieeecis-v1.json`, `preprocessor-v1.joblib`, and `threshold-v1.json` artifacts from the release page and place them into the `models/` directory.
+
 ## Methodology
 The dataset is split chronologically to prevent temporal leakage:
 - **Train (70%):** Model fitting.

@@ -16,14 +16,11 @@ To accurately reproduce the frozen `v1.0.0` MVP environment, the following stack
 - **Agent Version:** `agent-v1-mock`
 
 ## Reproducing Evaluation
-From a clean environment:
+From a clean environment, ensure the model is trained or present in `models/`:
 ```bash
-python scripts/evaluate_final.py --model models/xgb-ieeecis-v1
+python evaluation/run_final.py
 ```
-This requires `data/raw/train_transaction.csv` to be present.
+This requires the dataset and `models/xgb-ieeecis-v1.json` to be present.
 
-## Artifact Hashes (Illustrative)
-To verify artifact integrity in the future, these hashes represent the finalized MVP state:
-- `model.json`: `frozen-hash-xyz`
-- `policy_threshold_selection.json`: `frozen-hash-abc`
-- `final_test_metrics.json`: `frozen-hash-def`
+## Artifact Hashes
+The finalized MVP state results can be verified directly against the JSON payloads stored in `evaluation/results/`. Due to active development, strict SHA-256 hash enforcement of model binaries is currently bypassed in this repository version.
