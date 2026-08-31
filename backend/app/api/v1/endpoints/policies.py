@@ -22,7 +22,6 @@ def create_policy(policy: PolicyCreate, db: Session = Depends(get_db)):
     """
     Create a new deterministic policy rule.
     """
-    raise HTTPException(status_code=405, detail="Policy mutation is disabled in the read-only MVP.")
     new_policy = PolicyModel(
         policy_id=f"POL-{uuid.uuid4().hex[:8].upper()}",
         name=policy.name,
@@ -44,7 +43,6 @@ def delete_policy(policy_id: str, db: Session = Depends(get_db)):
     """
     Deletes a policy.
     """
-    raise HTTPException(status_code=405, detail="Policy mutation is disabled in the read-only MVP.")
     policy = db.query(PolicyModel).filter(PolicyModel.policy_id == policy_id).first()
     if not policy:
         raise HTTPException(status_code=404, detail="Policy not found")
@@ -58,7 +56,6 @@ def toggle_policy(policy_id: str, db: Session = Depends(get_db)):
     """
     Toggles the enabled status of a policy.
     """
-    raise HTTPException(status_code=405, detail="Policy mutation is disabled in the read-only MVP.")
     policy = db.query(PolicyModel).filter(PolicyModel.policy_id == policy_id).first()
     if not policy:
         raise HTTPException(status_code=404, detail="Policy not found")
