@@ -35,6 +35,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:3004",
         "http://127.0.0.1:3004",
+        "https://risksentinel-x.vercel.app",
+        "https://risksentinel-backend.onrender.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
