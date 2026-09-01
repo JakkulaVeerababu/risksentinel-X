@@ -3,7 +3,7 @@ services:
     name: risksentinel-backend
     env: docker
     region: oregon
-    plan: starter
+    plan: free
     dockerContext: ./backend
     dockerfilePath: ./backend/Dockerfile
     envVars:
