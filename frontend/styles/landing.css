@@ -2,6 +2,7 @@
 .landing-public-page {
   --landing-gutter: clamp(20px, 3.125vw, 48px);
   --landing-column-gap: clamp(32px, 4vw, 56px);
+  --landing-decision-blue: #2f6bff;
 }
 .landing-public-page .landing-container {
   width: min(1320px, calc(100% - var(--landing-gutter) * 2));
@@ -194,7 +195,7 @@
   overflow: hidden;
   scroll-margin-top: 74px;
   padding-block: 64px;
-  background: #2f6bff;
+  background: var(--landing-decision-blue);
   color: #fff;
 }
 .landing-governance::before {
@@ -220,16 +221,33 @@
 .governance-step[data-final="true"] { background: rgba(255, 255, 255, .1); }
 .governance-step-arrow { position: absolute; top: 50%; right: -9px; z-index: 1; width: 16px; height: 16px; color: #eaf0ff; transform: translateY(-50%); }
 .governance-flow-caption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px 24px; margin-top: 25px; color: #fff; font-size: 11px; }
-.landing-footer { position: relative; isolation: isolate; overflow: hidden; background: linear-gradient(180deg, #d5e4ff 0%, #eaf2ff 60%, #f5f8ff 100%); color: #52657e; }
-.landing-footer::before { position: absolute; z-index: -1; inset: -100px -10% 15%; content: ""; pointer-events: none; background: radial-gradient(ellipse at 22% 0%, rgba(47,107,255,.3), transparent 58%), radial-gradient(ellipse at 88% 10%, rgba(100,167,255,.22), transparent 52%); filter: blur(34px); }
-.landing-footer-main { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 28px; padding-block: 36px; }
-.landing-footer-main > div > p { margin-top: 10px; font-size: 12px; }
+.landing-footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(180deg, #d5e4ff 0%, #eaf2ff 60%, #f5f8ff 100%);
+  color: #52657e;
+}
+/* A compact, light-blue surface beneath the solid decision section. */
+.landing-footer::before {
+  position: absolute;
+  z-index: -1;
+  inset: -100px -10% 15%;
+  content: "";
+  pointer-events: none;
+  background: radial-gradient(ellipse at 22% 0%, rgba(47, 107, 255, .3), transparent 58%), radial-gradient(ellipse at 88% 10%, rgba(100, 167, 255, .22), transparent 52%);
+  filter: blur(34px);
+}
+.landing-footer-main { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px 40px; padding-block: 36px; }
+.landing-footer-main > div > p { margin-top: 10px; font-size: 12px; line-height: 1.7; }
 .landing-footer nav { display: flex; align-items: center; flex-wrap: wrap; gap: 20px 28px; font-size: 12px; font-weight: 500; }
-.landing-footer nav a { transition: color 160ms ease; }
+.landing-footer nav a { display: inline-flex; min-height: 40px; align-items: center; transition: color 160ms ease; }
 .landing-footer nav a:hover { color: #2454ed; }
 .landing-footer .landing-footer-demo { display: inline-flex; align-items: center; gap: 8px; color: #2454ed; font-weight: 600; }
+.landing-footer-demo svg { transition: transform 180ms ease; }
+.landing-footer-demo:hover svg { transform: translateX(3px); }
 .landing-footer nav a:focus-visible { outline: 2px solid #2454ed; outline-offset: 5px; }
-.landing-footer-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding-block: 18px; border-top: 1px solid rgba(77,112,172,.16); color: #66778e; font-size: 11px; }
+.landing-footer-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding-block: 18px; border-top: 1px solid rgba(77,112,172,.14); color: #66778e; font-size: 11px; line-height: 1.7; }
 
 @media (min-width: 1024px) {
   .landing-split-grid { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: var(--landing-column-gap); }
@@ -281,9 +299,10 @@
   .landing-governance { padding-block: 44px; }
   .governance-flow { margin-top: 28px; }
   .landing-footer-main { padding-block: 28px; }
+  .landing-footer nav { gap: 4px 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .landing-masthead, .landing-masthead-link::after, .landing-nav-login, .landing-nav-demo, .landing-public-page .feature-card, .landing-public-page .feature-card-surface { transition: none; }
   .landing-public-page .letter-heading .reveal-letter { opacity: 1 !important; transform: none !important; filter: none !important; animation: none !important; }
-  .landing-footer nav a { transition: none; }
+  .landing-footer nav a, .landing-footer-demo svg { transition: none; }
 }

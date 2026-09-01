@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: risksentinel-backend
+    env: docker
+    region: oregon
+    plan: starter
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: AGENT_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: DATABASE_URL
+        sync: false
+      - key: APP_ENV
+        value: production
+      - key: STRIPE_API_KEY
+        sync: false

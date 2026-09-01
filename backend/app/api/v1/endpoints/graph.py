@@ -1,5 +1,8 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
+from app.db.session import get_db
+from app.models.domain import RiskScoreModel
 from app.graph.schemas import GraphCheckResponse
 from app.graph.service import GraphRiskService
 import logging
@@ -40,15 +43,25 @@ def check_graph(entity_id: str = Query(..., description="The ID of the entity to
         raise HTTPException(status_code=500, detail="Internal server error during graph check.")
 
 @router.get("/context/{entity_id}")
-def get_graph_context(entity_id: str):
+def get_graph_context(entity_id: str, db: Session = Depends(get_db)):
     service = GraphRiskService.get_instance()
     if not service.is_loaded:
         raise HTTPException(status_code=503, detail="Graph data is not available")
         
     try:
         result = service.check_entity(entity_id)
-        # We also want to return some neighbors to form a context
-        neighbors = list(service.graph.neighbors(entity_id))[:10]
+        
+        # Override graph_score if RiskScoreModel exists (crucial for simulations where the graph is mocked)
+        if entity_id.startswith("SIM-TX-") or entity_id.startswith("TX-"):
+            risk_model = db.query(RiskScoreModel).filter(RiskScoreModel.transaction_id == entity_id).first()
+            if risk_model and risk_model.graph_score is not None:
+                result["graph_risk"] = risk_model.graph_score
+
+        try:
+            neighbors = list(service.graph.neighbors(entity_id))[:10]
+        except Exception:
+            neighbors = []
+            
         nodes = [{"id": entity_id, "group": result["entity_type"]}]
         links = []
         for n in neighbors:

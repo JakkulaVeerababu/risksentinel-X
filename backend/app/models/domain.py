@@ -37,6 +37,8 @@ class InvestigationModel(Base):
     evidence = Column(JSON, nullable=True)
     provider = Column(String, nullable=True)
     tool_calls = Column(JSON, nullable=True)
+    status = Column(String, default="OPEN")
+    assignee = Column(String, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
 
@@ -94,3 +96,23 @@ class TeamMemberModel(Base):
     email = Column(String, unique=True, index=True)
     role = Column(String)
     created_at = Column(DateTime, server_default=func.now())
+
+class GraphEntityModel(Base):
+    __tablename__ = "graph_entities"
+    entity_id = Column(String, primary_key=True, index=True)
+    entity_type = Column(String)
+
+class GraphRelationshipModel(Base):
+    __tablename__ = "graph_relationships"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    source = Column(String, ForeignKey("graph_entities.entity_id"), index=True)
+    target = Column(String, ForeignKey("graph_entities.entity_id"), index=True)
+    relationship_type = Column(String)
+
+class StripeEventModel(Base):
+    __tablename__ = "stripe_events"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    stripe_event_id = Column(String, unique=True, index=True)
+    status = Column(String, default="RECEIVED")  # RECEIVED, PROCESSING, COMPLETED, FAILED
+    timestamp = Column(DateTime, server_default=func.now())
+    payload = Column(JSON, nullable=True)

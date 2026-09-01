@@ -1,3 +1,5 @@
+import { ruleIds } from "./audit-presentation";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api/backend";
 const FETCH_TIMEOUT_MS = 120000;
 
@@ -145,7 +147,9 @@ export async function fetchFraudClusters(): Promise<any[]> {
 
 export async function fetchRiskCase(transactionId: string): Promise<PipelineResponse> {
   const response = await apiFetch(`/dashboard/transactions/${transactionId}/case`);
-  return await response.json();
+  const data = await response.json();
+  if (data.policy) data.policy.triggered_rules = ruleIds(data.policy.triggered_rules);
+  return data;
 }
 
 export async function fetchGraphContext(entityId: string): Promise<any> {
@@ -281,4 +285,13 @@ export async function aiChatStream(messages: any[], onChunk: (chunk: string) => 
   const msg = "Conversational chat is not available. Open Investigation AI to review case evidence.";
   onChunk(msg);
   return Promise.resolve();
+}
+
+export async function resolveRiskCase(transactionId: string, decision: "ALLOW" | "BLOCK"): Promise<any> {
+  const response = await apiFetch(`/dashboard/transactions/${transactionId}/resolve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ decision })
+  });
+  return await response.json();
 }

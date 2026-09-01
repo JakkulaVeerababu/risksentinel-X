@@ -20,7 +20,7 @@ class InvestigationGate:
     VERSION = INVESTIGATION_GATE_VERSION
 
     @classmethod
-    def evaluate(cls, ml_score: float, graph_score: float | None) -> GateResult:
+    def evaluate(cls, ml_score: float | None, graph_score: float | None) -> GateResult:
         """
         Evaluate risk scores against frozen thresholds.
         Returns a structured GateResult.
@@ -34,8 +34,9 @@ class InvestigationGate:
         run_agent = is_ml_suspicious or is_graph_suspicious
         decision = "RUN_AGENT" if run_agent else "SKIP_AGENT"
         
+        ml_str = f"{ml_score:.3f}" if ml_score is not None else "None"
         graph_str = f"{graph_score:.3f}" if graph_score is not None else "None"
-        logging.info(f"InvestigationGate {cls.VERSION}: ML ({ml_score:.3f} >= {ml_threshold:.3f}) -> {is_ml_suspicious}, "
+        logging.info(f"InvestigationGate {cls.VERSION}: ML ({ml_str} >= {ml_threshold:.3f}) -> {is_ml_suspicious}, "
                      f"Graph ({graph_str} >= {graph_threshold:.3f}) -> {is_graph_suspicious}. "
                      f"Decision: {decision}")
 
@@ -47,7 +48,7 @@ class InvestigationGate:
         )
 
     @classmethod
-    def should_investigate(cls, ml_score: float, graph_score: float | None) -> bool:
+    def should_investigate(cls, ml_score: float | None, graph_score: float | None) -> bool:
         """
         Legacy wrapper. Evaluate risk scores against frozen thresholds.
         Returns True if either score exceeds its respective threshold, False otherwise.

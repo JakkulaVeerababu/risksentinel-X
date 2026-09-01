@@ -10,7 +10,7 @@ class PolicyDecisionEnum(str, Enum):
 
 class PolicyInput(BaseModel):
     transaction_id: str
-    ml_score: float = Field(ge=0.0, le=1.0)
+    ml_score: Optional[float] = Field(None, ge=0.0, le=1.0)
     ml_model_version: Optional[str]
     graph_score: Optional[float] = Field(None, ge=0.0, le=1.0)
     graph_version: Optional[str]
@@ -25,7 +25,7 @@ class PolicyDecisionResult(BaseModel):
     policy_version: str
     matched_rule_ids: List[str]
     reason_codes: List[str]
-    ml_score: float
+    ml_score: Optional[float] = None
     graph_score: Optional[float]
     agent_state: str
     agent_recommendation: Optional[str]

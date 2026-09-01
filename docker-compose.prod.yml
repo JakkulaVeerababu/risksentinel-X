@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - AGENT_PROVIDER=${AGENT_PROVIDER:-ollama}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3}
+      - APP_ENV=production
+    volumes:
+      - ./models:/app/models:ro
+      - ./data:/app/data:ro
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - BACKEND_INTERNAL_URL=http://backend:8000
+        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000/api/v1}
+        - NEXT_PUBLIC_REALTIME_URL=${NEXT_PUBLIC_REALTIME_URL:-http://localhost:8000/api/v1/stream/events}
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000/api/v1}
+      - NEXT_PUBLIC_REALTIME_URL=${NEXT_PUBLIC_REALTIME_URL:-http://localhost:8000/api/v1/stream/events}
+      - BACKEND_INTERNAL_URL=http://backend:8000
+      - NODE_ENV=production
+    depends_on:
+      - backend

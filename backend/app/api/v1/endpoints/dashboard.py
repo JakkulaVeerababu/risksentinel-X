@@ -110,7 +110,7 @@ def get_recent_transactions(db: Session = Depends(get_db)):
             "ml_risk": t.ml_risk_score if t.ml_risk_score is not None else 0.0,
             "graph_risk": t.graph_risk_score,
             "decision": t.decision or "PENDING",
-            "timestamp": t.timestamp.isoformat() if t.timestamp else None,
+            "timestamp": t.timestamp.isoformat() + "Z" if t.timestamp else None,
             "customer_id": t.customer_id
         })
 
@@ -133,7 +133,7 @@ def get_full_case(transaction_id: str, db: Session = Depends(get_db)):
             "id": tx.transaction_id,
             "amount": tx.amount,
             "customer_id": tx.customer_id,
-            "timestamp": tx.timestamp.isoformat() if tx.timestamp else None,
+            "timestamp": tx.timestamp.isoformat() + "Z" if tx.timestamp else None,
             "status": tx.status
         },
         "ml": {
@@ -160,3 +160,41 @@ def get_full_case(transaction_id: str, db: Session = Depends(get_db)):
             "triggered_rules": dec.matched_rules if dec else []
         }
     }
+
+from pydantic import BaseModel
+
+class ResolutionRequest(BaseModel):
+    decision: str
+
+@router.post("/transactions/{transaction_id}/resolve")
+def resolve_case(transaction_id: str, req: ResolutionRequest, db: Session = Depends(get_db)):
+    from app.models.domain import AuditEventModel, DecisionModel
+    
+    tx = db.query(TransactionModel).filter(TransactionModel.transaction_id == transaction_id).first()
+    if not tx:
+        return {"error": "Transaction not found"}
+        
+    old_decision = tx.decision
+    tx.decision = req.decision
+    
+    # Optional: also update the decision model if it exists
+    dec = db.query(DecisionModel).filter(DecisionModel.transaction_id == transaction_id).first()
+    if dec:
+        dec.decision = req.decision
+        
+    # Create audit event
+    audit_event = AuditEventModel(
+        transaction_id=transaction_id,
+        event_type="MANUAL_RESOLUTION",
+        details={
+            "old_decision": old_decision,
+            "new_decision": req.decision,
+            "resolved_by": "Fraud Analyst",
+            "timestamp": datetime.utcnow().isoformat()
+        },
+        component="DashboardUI"
+    )
+    db.add(audit_event)
+    db.commit()
+    
+    return {"status": "success", "decision": req.decision}

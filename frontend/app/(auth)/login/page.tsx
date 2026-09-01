@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, LoaderCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Info, LoaderCircle } from "lucide-react";
 import BrandLogo from "../../../components/brand/BrandLogo";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createClient } from "../../../lib/supabase";
@@ -102,48 +102,50 @@ export default function LoginPage() {
             <Link href="/" className="inline-flex items-center gap-1.5 py-2 text-[11px] font-medium text-[#8290a2] transition-colors hover:text-[#2f6bff]"><ArrowLeft className="h-3.5 w-3.5" />Back to product</Link>
           </div>
 
-          <div className="auth-form-content mx-auto my-auto w-full py-6">
-            <p className="auth-welcome">Welcome to RiskSentinel X</p>
-            <h1 className="auth-access-title">{step === "email" ? "Your workspace awaits." : "You’re one step away."}</h1>
-            <p className="auth-access-description">{step === "email" ? "See every signal, connection and decision in one place." : "Continue to your risk workspace."}</p>
-            <p className="auth-security-note">Email/password access does not currently verify credentials. Do not enter a real password.</p>
-            <form className="mt-7" onSubmit={event => {
-              event.preventDefault();
-              setNotice("");
-              if (step === "email") setStep("password");
-              else enterWorkspace();
-            }}>
-              <AnimatePresence initial={false} mode="wait">
-                <motion.div key={step} initial={reduceMotion ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: reduceMotion ? 1 : 0 }} transition={{ duration: reduceMotion ? 0 : .18 }} onAnimationComplete={() => { if (step === "password") passwordInput.current?.focus(); }}>
-                  {step === "email" ? (
-                    <label className="block"><span className="auth-field-label">Work email</span><input name="email" type="email" value={email} onChange={event => setEmail(event.target.value)} required autoComplete="email" placeholder="you@company.com" className="auth-input" /></label>
-                  ) : (
-                    <div>
-                      <div className="mb-5 flex min-w-0 items-center justify-between gap-3 rounded-md border border-[#e3e9f0] bg-[#f9fbfd] px-3.5 py-3"><span className="truncate text-[12px] text-[#5f7087]">{email}</span><button type="button" onClick={() => { setStep("email"); setPassword(""); }} className="text-[11px] font-semibold text-[#2f6bff]">Change</button></div>
-                      <div className="mb-2 flex items-center justify-between"><label htmlFor="workspace-password" className="text-[12px] font-medium text-[#5d6d84]">Temporary password</label><button type="button" onClick={() => setShowPassword(value => !value)} aria-controls="workspace-password" aria-pressed={showPassword} className="text-[11px] font-semibold text-[#2f6bff]">{showPassword ? "Hide" : "Show"}</button></div>
-                      <input ref={passwordInput} id="workspace-password" name="password" type={showPassword ? "text" : "password"} value={password} onChange={event => setPassword(event.target.value)} required minLength={6} autoComplete="off" placeholder="Use a temporary value" className="auth-input" />
-                      <p className="mt-2 text-[11px] leading-4 text-[#66778e]">Credentials entered here are not verified or saved.</p>
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-              <button type="submit" disabled={loading} className="auth-submit group mt-4">{loading ? <><LoaderCircle className="h-4 w-4 animate-spin" />Opening workspace</> : <>{step === "email" ? "Continue" : "Continue to workspace"}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></>}</button>
-            </form>
+          <div className="auth-access-body">
+            <div className="auth-form-content">
+              <p className="auth-welcome">Welcome to RiskSentinel X</p>
+              <h1 className="auth-access-title">{step === "email" ? "Your workspace awaits." : "You’re one step away."}</h1>
+              <p className="auth-access-description">{step === "email" ? "See every signal, connection and decision in one place." : "Continue to your risk workspace."}</p>
+              <p className="auth-security-note"><Info aria-hidden="true" /><span>Email/password access does not currently verify credentials. Do not enter a real password.</span></p>
+              <form className="auth-access-form" onSubmit={event => {
+                event.preventDefault();
+                setNotice("");
+                if (step === "email") setStep("password");
+                else enterWorkspace();
+              }}>
+                <AnimatePresence initial={false} mode="wait">
+                  <motion.div key={step} initial={reduceMotion ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: reduceMotion ? 1 : 0 }} transition={{ duration: reduceMotion ? 0 : .18 }} onAnimationComplete={() => { if (step === "password") passwordInput.current?.focus(); }}>
+                    {step === "email" ? (
+                      <label className="block"><span className="auth-field-label">Work email</span><input name="email" type="email" value={email} onChange={event => setEmail(event.target.value)} required autoComplete="email" placeholder="you@company.com" className="auth-input" /></label>
+                    ) : (
+                      <div>
+                        <div className="mb-5 flex min-w-0 items-center justify-between gap-3 rounded-md border border-[#e3e9f0] bg-[#f9fbfd] px-3.5 py-3"><span className="truncate text-[12px] text-[#5f7087]">{email}</span><button type="button" onClick={() => { setStep("email"); setPassword(""); }} className="text-[11px] font-semibold text-[#2f6bff]">Change</button></div>
+                        <div className="mb-2 flex items-center justify-between"><label htmlFor="workspace-password" className="text-[12px] font-medium text-[#5d6d84]">Temporary password</label><button type="button" onClick={() => setShowPassword(value => !value)} aria-controls="workspace-password" aria-pressed={showPassword} className="text-[11px] font-semibold text-[#2f6bff]">{showPassword ? "Hide" : "Show"}</button></div>
+                        <input ref={passwordInput} id="workspace-password" name="password" type={showPassword ? "text" : "password"} value={password} onChange={event => setPassword(event.target.value)} required minLength={6} autoComplete="off" placeholder="Use a temporary value" className="auth-input" />
+                        <p className="mt-2 text-[11px] leading-4 text-[#66778e]">Credentials entered here are not verified or saved.</p>
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+                <button type="submit" disabled={loading} className="auth-submit group mt-4">{loading ? <><LoaderCircle className="h-4 w-4 animate-spin" />Opening workspace</> : <>{step === "email" ? "Continue" : "Continue to workspace"}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></>}</button>
+              </form>
 
-            <div className="auth-provider-divider my-6 flex items-center gap-3"><span className="h-px flex-1 bg-[#e4e8ee]" /><span>or continue with</span><span className="h-px flex-1 bg-[#e4e8ee]" /></div>
-            <div className="grid grid-cols-2 gap-3">
-              <button type="button" onClick={() => handleOAuthLogin("google")} className="auth-provider"><GoogleMark />Google</button>
-              <button type="button" onClick={() => handleOAuthLogin("github")} className="auth-provider"><GitHubMark />GitHub</button>
+              <div className="auth-provider-divider my-6 flex items-center gap-3"><span className="h-px flex-1 bg-[#e4e8ee]" /><span>or continue with</span><span className="h-px flex-1 bg-[#e4e8ee]" /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <button type="button" onClick={() => handleOAuthLogin("google")} className="auth-provider"><GoogleMark />Google</button>
+                <button type="button" onClick={() => handleOAuthLogin("github")} className="auth-provider"><GitHubMark />GitHub</button>
+              </div>
+              {notice && <p role="status" className="mt-4 rounded-md border border-[#dce6f5] bg-[#f5f8fe] p-3 text-[11px] leading-5 text-[#687d99]">{notice}</p>}
             </div>
-            {notice && <p role="status" className="mt-4 rounded-md border border-[#dce6f5] bg-[#f5f8fe] p-3 text-[11px] leading-5 text-[#687d99]">{notice}</p>}
-          </div>
 
-          <div className="auth-access-footer mx-auto w-full">
-            <div className="auth-demo-invite">
-              <div><p>Go directly to your workspace</p><span>Current access is unrestricted.</span></div>
-              <button type="button" onClick={enterWorkspace} disabled={loading} className="auth-demo-button">Open workspace <ArrowRight aria-hidden="true" className="h-4 w-4" /></button>
+            <div className="auth-access-footer">
+              <div className="auth-workspace-invite">
+                <div><p>Direct workspace access</p><span>Current access is unrestricted.</span></div>
+                <button type="button" onClick={enterWorkspace} disabled={loading} className="auth-workspace-button">Open workspace <ArrowRight aria-hidden="true" className="h-4 w-4" /></button>
+              </div>
+              <p className="auth-environment-note">Enable and enforce authentication before making this workspace publicly accessible.</p>
             </div>
-            <p className="auth-environment-note">Enable and enforce authentication before making this workspace publicly accessible.</p>
           </div>
         </section>
       </div>

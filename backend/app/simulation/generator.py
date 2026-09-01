@@ -14,17 +14,20 @@ class ScenarioGenerator:
         
         if scenario_type == "Normal Customer":
             for i in range(count):
-                transactions.append(self._create_tx(base_time, amount=random.uniform(10.0, 100.0), is_synthetic=False))
+                offset = (count - 1 - i) * 3600 + random.randint(60, 1800)
+                transactions.append(self._create_tx(base_time - offset, amount=random.uniform(10.0, 100.0), is_synthetic=False))
                 
         elif scenario_type == "High-Value Anomaly":
             for i in range(count - 1):
-                transactions.append(self._create_tx(base_time, amount=random.uniform(10.0, 50.0)))
+                offset = (count - 1 - i) * 7200 + random.randint(60, 1800)
+                transactions.append(self._create_tx(base_time - offset, amount=random.uniform(10.0, 50.0)))
             transactions.append(self._create_tx(base_time, amount=random.uniform(10000.0, 50000.0)))
             
         elif scenario_type == "Device Velocity Attack":
             device_id = f"D-ATK-{uuid.uuid4().hex[:6]}"
             for i in range(count):
-                tx = self._create_tx(base_time + i*5)
+                offset = (count - 1 - i) * 45
+                tx = self._create_tx(base_time - offset)
                 tx["device_id"] = device_id
                 tx["velocity_5m"] = count
                 transactions.append(tx)
@@ -32,14 +35,16 @@ class ScenarioGenerator:
         elif scenario_type == "Shared Device Attack":
             device_id = f"D-ATK-{uuid.uuid4().hex[:6]}"
             for i in range(count):
-                tx = self._create_tx(base_time + i*60)
+                offset = (count - 1 - i) * 3600
+                tx = self._create_tx(base_time - offset)
                 tx["device_id"] = device_id
                 transactions.append(tx)
                 
         elif scenario_type == "Shared IP Attack":
             ip_addr = f"192.168.1.{random.randint(1,255)}"
             for i in range(count):
-                tx = self._create_tx(base_time + i*60)
+                offset = (count - 1 - i) * 3600
+                tx = self._create_tx(base_time - offset)
                 tx["ip_address"] = ip_addr
                 transactions.append(tx)
                 
@@ -47,28 +52,32 @@ class ScenarioGenerator:
             device_pool = [f"D-RING-{i}" for i in range(3)]
             ip_pool = [f"10.0.0.{i}" for i in range(2)]
             for i in range(count):
-                tx = self._create_tx(base_time + i*30, amount=random.uniform(1000.0, 5000.0))
+                offset = (count - 1 - i) * 1800
+                tx = self._create_tx(base_time - offset, amount=random.uniform(1000.0, 5000.0))
                 tx["device_id"] = random.choice(device_pool)
                 tx["ip_address"] = random.choice(ip_pool)
                 transactions.append(tx)
                 
         elif scenario_type == "New Account Burst":
             for i in range(count):
-                tx = self._create_tx(base_time + i*10, amount=random.uniform(500.0, 2000.0))
+                offset = (count - 1 - i) * 120
+                tx = self._create_tx(base_time - offset, amount=random.uniform(500.0, 2000.0))
                 tx["customer_age_days"] = 0
                 transactions.append(tx)
                 
         elif scenario_type == "Merchant Anomaly":
             merchant_id = f"M-ATK-{uuid.uuid4().hex[:6]}"
             for i in range(count):
-                tx = self._create_tx(base_time + i*60, amount=random.uniform(200.0, 400.0))
+                offset = (count - 1 - i) * 3600
+                tx = self._create_tx(base_time - offset, amount=random.uniform(200.0, 400.0))
                 tx["merchant_id"] = merchant_id
                 transactions.append(tx)
         
         else:
             # Default fallback
             for i in range(count):
-                transactions.append(self._create_tx(base_time))
+                offset = (count - 1 - i) * 3600
+                transactions.append(self._create_tx(base_time - offset))
                 
         return transactions
         

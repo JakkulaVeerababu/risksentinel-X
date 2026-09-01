@@ -59,5 +59,5 @@ class InvestigationRequest(BaseModel):
     graph_entity_id: str
     # Simulating internal context retrieval for MVP
     amount: float = 0.0 
-    ml_risk_score: float = 0.0
+    ml_risk_score: Optional[float] = 0.0
     graph_risk_score: Optional[float] = None

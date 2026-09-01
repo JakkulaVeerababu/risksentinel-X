@@ -48,10 +48,14 @@ class AuditService:
             
     @classmethod
     def _map_to_schema(cls, e: AuditEventModel) -> AuditEvent:
+        from datetime import timezone
         payload = e.payload or e.details or {}
+        # Ensure timestamp is timezone-aware so it serializes with +00:00/Z
+        aware_timestamp = e.timestamp.replace(tzinfo=timezone.utc) if e.timestamp else None
+        
         return AuditEvent(
             event_id=payload.get("event_id", f"migrated-{e.id}"),
-            timestamp=e.timestamp,
+            timestamp=aware_timestamp,
             actor=payload.get("actor", "SYSTEM"),
             service=e.component or "SYSTEM",
             event_type=e.event_type,

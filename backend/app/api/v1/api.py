@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import health, score, graph, investigate, decision, policy, policies, stream, dashboard, simulation, audit, evaluation, transactions, investigations, settings
+from app.api.v1.endpoints import health, score, graph, investigate, decision, policy, policies, stream, dashboard, simulation, audit, evaluation, transactions, investigations, settings, stripe_webhook, checkout_demo
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["health"])
@@ -17,3 +17,5 @@ api_router.include_router(evaluation.router, tags=["evaluation"], prefix="/evalu
 api_router.include_router(transactions.router, tags=["transactions"], prefix="/transactions")
 api_router.include_router(investigations.router, tags=["investigations"], prefix="/investigations")
 api_router.include_router(settings.router, tags=["settings"], prefix="/settings")
+api_router.include_router(stripe_webhook.router, tags=["stripe"], prefix="/stripe")
+api_router.include_router(checkout_demo.router, tags=["checkout_demo"], prefix="/checkout")

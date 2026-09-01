@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, Bar, BarChart, CartesianGrid, Cell, ComposedChart, Line, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Filter } from "lucide-react";
 import { PageHeader, Skeleton, ErrorState } from "../../components/ui";
 import { fetchDashboardMetrics, DashboardMetrics } from "../../lib/api";
@@ -205,31 +205,55 @@ export default function AnalyticsPage() {
         </div>
 
         <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,.75fr)]">
-          <div className="rsx-card overflow-hidden">
-            <div className="flex flex-col gap-3 border-b border-[#edf0f5] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-[13px] font-bold text-[#253149]">Decision performance (24H timeline)</h2>
-                <p className="mt-0.5 text-[10px] text-[#8b95a7]">Processed volume showing reviewed and blocked actions</p>
+          <div className="rsx-card overflow-hidden border-[#dce5f1] bg-white shadow-[0_18px_52px_rgba(37,93,245,0.07)]">
+            <div className="relative border-b border-[#e9eef6] px-5 py-5 sm:px-6">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2f6bff] to-transparent opacity-70" />
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="h-2 w-2 rounded-full bg-[#2f6bff] shadow-[0_0_0_5px_rgba(47,107,255,0.10)]" />
+                    <h2 className="text-[15px] font-semibold tracking-[-.015em] text-[#18243a]">Decision activity</h2>
+                  </div>
+                  <p className="mt-1.5 text-[11px] leading-5 text-[#75839a]">Payment volume and the decisions requiring risk intervention.</p>
+                </div>
+                <span className="w-fit rounded-full border border-[#dbe6fa] bg-[#f5f8ff] px-3 py-1.5 text-[10px] font-semibold text-[#45617f]">Last 24 hours</span>
+              </div>
+              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] font-semibold text-[#5f6f86]" aria-label="Chart legend">
+                <span className="inline-flex items-center gap-2"><i className="h-2 w-2 rounded-full bg-[#2f6bff]" />Analysed</span>
+                <span className="inline-flex items-center gap-2"><i className="h-2 w-2 rounded-full bg-[#f0a020]" />Review</span>
+                <span className="inline-flex items-center gap-2"><i className="h-2 w-2 rounded-full bg-[#e5484d]" />Blocked</span>
               </div>
             </div>
-            <div className="h-[330px] p-4 sm:p-5">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <defs>
-                    <linearGradient id="analyticsVolume" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#255df5" stopOpacity={0.24}/><stop offset="100%" stopColor="#255df5" stopOpacity={0}/></linearGradient>
-                  </defs>
-                  <CartesianGrid vertical={false} stroke="#edf0f5"/>
-                  <XAxis dataKey="time" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "#8a94a6" }}/>
-                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 9, fill: "#8a94a6" }} />
-                  <Tooltip contentStyle={{ borderRadius: 10, borderColor: "#e1e6ee", fontSize: 11, boxShadow: "0 10px 30px rgba(16,24,40,.1)" }}/>
-                  <Area type="step" dataKey="volume" name="Analysed" stroke="#255df5" strokeWidth={2.5} fill="url(#analyticsVolume)"/>
-                  <Area type="step" dataKey="blocked" name="Blocked" stroke="#e5484d" strokeWidth={2} fill="transparent"/>
-                  <Area type="step" dataKey="reviewed" name="Reviewed" stroke="#d17a22" strokeWidth={2} fill="transparent"/>
-                </AreaChart>
-              </ResponsiveContainer>
+            <div className="px-4 pb-5 pt-4 sm:px-6 sm:pt-5">
+              <div className="h-[318px] rounded-2xl border border-[#edf1f7] bg-[linear-gradient(180deg,#fbfdff_0%,#ffffff_100%)] px-2 pb-2 pt-4 sm:px-3">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={chartData} margin={{ top: 6, right: 10, bottom: 2, left: -10 }}>
+                    <defs>
+                      <linearGradient id="analyticsVolume" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#2f6bff" stopOpacity={0.22}/><stop offset="72%" stopColor="#2f6bff" stopOpacity={0.035}/><stop offset="100%" stopColor="#2f6bff" stopOpacity={0}/></linearGradient>
+                    </defs>
+                    <CartesianGrid vertical={false} stroke="#e8edf5" strokeDasharray="3 5" />
+                    <XAxis dataKey="time" tickLine={false} axisLine={false} minTickGap={22} tickMargin={12} tick={{ fontSize: 10, fill: "#8491a6" }} />
+                    <YAxis tickLine={false} axisLine={false} width={34} tick={{ fontSize: 9, fill: "#96a1b3" }} />
+                    <Tooltip cursor={{ stroke: "#b8caff", strokeWidth: 1, strokeDasharray: "4 4" }} contentStyle={{ borderRadius: 12, border: "1px solid #dce5f2", background: "rgba(255,255,255,.97)", padding: "10px 12px", fontSize: 11, boxShadow: "0 14px 36px rgba(25,45,90,.12)" }} labelStyle={{ color: "#738198", fontWeight: 600, marginBottom: 6 }} itemStyle={{ fontWeight: 600 }} />
+                    <Area type="monotone" dataKey="volume" name="Analysed" stroke="#2f6bff" strokeWidth={2.5} fill="url(#analyticsVolume)" activeDot={{ r: 4, fill: "#ffffff", stroke: "#2f6bff", strokeWidth: 2 }} />
+                    <Line type="monotone" dataKey="reviewed" name="Review" stroke="#f0a020" strokeWidth={2} dot={false} activeDot={{ r: 3.5, fill: "#ffffff", stroke: "#f0a020", strokeWidth: 2 }} />
+                    <Line type="monotone" dataKey="blocked" name="Blocked" stroke="#e5484d" strokeWidth={2} dot={false} activeDot={{ r: 3.5, fill: "#ffffff", stroke: "#e5484d", strokeWidth: 2 }} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-            <div className="grid grid-cols-3 border-t border-[#edf0f5] bg-[#fafbfd]">
-              {[["Analysed (24H)", metrics?.kpis?.transactions_analysed ?? 0], ["Review (24H)", metrics?.kpis?.under_review ?? 0], ["Blocked (24H)", metrics?.kpis?.blocked ?? 0]].map(([label,value]) => <div key={label} className="border-r border-[#edf0f5] px-4 py-3 last:border-r-0"><p className="text-[10px] font-bold uppercase tracking-wider text-[#909aab]">{label}</p><p className="mt-1 text-[14px] font-bold text-[#344158]">{value}</p></div>)}
+            <div className="grid grid-cols-1 border-t border-[#e9eef6] bg-[#fbfcfe] sm:grid-cols-3">
+              {[
+                { label: "Analysed", note: "Total processed", value: metrics?.kpis?.transactions_analysed ?? 0, color: "#2f6bff" },
+                { label: "Review", note: "Requires attention", value: metrics?.kpis?.under_review ?? 0, color: "#f0a020" },
+                { label: "Blocked", note: "Risk prevented", value: metrics?.kpis?.blocked ?? 0, color: "#e5484d" }
+              ].map(item => <div key={item.label} className="relative border-b border-[#e9eef6] px-5 py-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+                <span className="absolute bottom-4 left-0 top-4 w-0.5 rounded-full" style={{ backgroundColor: item.color }} />
+                <div className="flex items-end justify-between gap-4">
+                  <div><p className="text-[10px] font-bold uppercase tracking-[.12em] text-[#8995a8]">{item.label}</p><p className="mt-1 text-[10px] text-[#98a3b4]">{item.note}</p></div>
+                  <p className="text-[22px] font-semibold tracking-[-.04em] text-[#1b2a42]">{item.value}</p>
+                </div>
+              </div>)}
             </div>
           </div>
 

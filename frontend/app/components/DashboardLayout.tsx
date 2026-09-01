@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
   ChevronRight,
-  CircleHelp,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
@@ -78,16 +77,16 @@ function isRouteActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function Sidebar({ mobile = false, onNavigate, onClose }: { mobile?: boolean; onNavigate?: () => void; onClose: () => void }) {
+function Sidebar({ mobile = false, onNavigate, onClose, toggleRef }: { mobile?: boolean; onNavigate?: () => void; onClose: () => void; toggleRef?: RefObject<HTMLButtonElement> }) {
   const pathname = usePathname();
 
   return (
     <aside id={mobile ? "mobile-sidebar" : "workspace-sidebar"} className={`workspace-sidebar ${mobile ? "flex" : "hidden lg:flex"} h-full w-[244px] flex-col border-r border-[#e2e6ef] bg-white`}>
-      <div className="flex h-16 items-center justify-between gap-2 border-b border-[#edf0f5] px-4">
+      <div className="workspace-brand-row flex h-16 shrink-0 items-center justify-between gap-5 border-b border-[#edf0f5] px-4">
         <BrandLogo href="/dashboard" />
-        {mobile && <button type="button" onClick={onClose} aria-label="Close navigation" className="shrink-0 rounded-md p-1.5 text-[#7b8799] hover:bg-[#f0f3f8] hover:text-[#17233f]">
-          <X className="h-4 w-4" />
-        </button>}
+        <button ref={mobile ? undefined : toggleRef} type="button" onClick={onClose} aria-label={mobile ? "Close navigation" : "Collapse sidebar"} aria-expanded={true} aria-controls={mobile ? "mobile-sidebar" : "workspace-sidebar"} title={mobile ? "Close navigation" : "Collapse sidebar"} className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[#647086] transition-colors hover:bg-[#f0f4fa] hover:text-[#245df5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245df5]">
+          {mobile ? <X aria-hidden="true" className="h-[18px] w-[18px]" /> : <PanelLeftClose aria-hidden="true" className="h-[18px] w-[18px]" />}
+        </button>
       </div>
 
       <div className="border-b border-[#eef1f5] px-4 py-4">
@@ -232,7 +231,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="rsx-workspace min-h-screen bg-[#f4f6fa] text-[#17233f]">
-      {!sidebarHidden && <div className="fixed inset-y-0 left-0 z-40 hidden lg:block"><Sidebar onClose={() => toggleSidebar(true)} /></div>}
+      {!sidebarHidden && <div className="fixed inset-y-0 left-0 z-40 hidden lg:block"><Sidebar toggleRef={sidebarToggleRef} onClose={() => toggleSidebar(true)} /></div>}
 
       {mobileNavOpen && (
         <div className="fixed inset-0 z-[80] lg:hidden">
@@ -246,9 +245,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className={`workspace-content flex min-h-screen min-w-0 flex-col ${sidebarHidden ? "" : "lg:pl-[244px]"}`}>
         <header className="sticky top-0 z-50 flex h-16 items-center border-b border-[#e2e6ef] bg-white/95 px-4 backdrop-blur-xl sm:px-7">
           <button className="mr-2 rounded-lg p-2 text-[#566177] hover:bg-[#f2f5f9] lg:hidden" aria-label="Open navigation" onClick={() => setMobileNavOpen(true)}><Menu className="h-5 w-5" /></button>
-          <button ref={sidebarToggleRef} className="mr-3 hidden shrink-0 rounded-lg p-2 text-[#647086] hover:bg-[#f2f5f9] lg:block" aria-label={sidebarHidden ? "Show sidebar" : "Collapse sidebar"} aria-expanded={!sidebarHidden} aria-controls="workspace-sidebar" title={sidebarHidden ? "Show sidebar" : "Collapse sidebar"} onClick={() => toggleSidebar(!sidebarHidden)}>
-            {sidebarHidden ? <PanelLeftOpen className="h-[18px] w-[18px]" /> : <PanelLeftClose className="h-[18px] w-[18px]" />}
-          </button>
+          {sidebarHidden && (
+            <button ref={sidebarToggleRef} type="button" className="mr-3 hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[#647086] transition-colors hover:bg-[#f0f4fa] hover:text-[#245df5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245df5] lg:inline-flex" aria-label="Show sidebar" aria-expanded={false} aria-controls="workspace-sidebar" title="Show sidebar" onClick={() => toggleSidebar(false)}>
+              <PanelLeftOpen aria-hidden="true" className="h-[18px] w-[18px]" />
+            </button>
+          )}
           <div className="mr-3 lg:hidden"><BrandLogo compact /></div>
 
           <div className="hidden min-w-0 items-center gap-2 sm:flex">
@@ -279,7 +280,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               )}
             </div>
 
-            <Link href="/developer" className="hidden rounded-lg p-2 text-[#647086] hover:bg-[#f2f5f9] sm:block" aria-label="API documentation"><CircleHelp className="h-[18px] w-[18px]" /></Link>
             <Link href="/settings" className="ml-0.5 hidden border-l border-[#e7ebf1] py-0.5 pl-3 text-left sm:block hover:bg-[#f2f5f9] px-2 rounded-lg transition-colors">
               <span className="block text-[12px] font-semibold text-[#2d3950]">Fraud Ops</span>
               <span className="block text-[10px] font-medium text-[#8b95a7]">Administrator</span>

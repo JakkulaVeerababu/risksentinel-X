@@ -1,264 +1,113 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft } from "lucide-react";
-import { fetchRiskCase, fetchAuditTimeline, PipelineResponse, AuditEvent } from "@/lib/api";
-import { PageHeader, Skeleton, ErrorState } from "../../../components/ui";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, ArrowDown, ArrowUpRight } from "lucide-react";
+import { fetchRiskCase, fetchAuditTimeline, resolveRiskCase, type PipelineResponse, type AuditEvent } from "@/lib/api";
+import { Skeleton, ErrorState, DecisionBadge } from "../../../components/ui";
+import AuditTimeline from "../../../components/workspace/AuditTimeline";
+import InvestigationEvidence from "../../../components/workspace/InvestigationEvidence";
+import { money, recordedAt, reasonText, policyExplanation } from "../../../lib/audit-presentation";
+import { readableCode, riskLevel, scorePercent } from "../../../lib/transaction-presentation";
 
 export default function CaseDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const caseId = params.id as string;
-  
+  const caseId = useParams().id as string;
   const [data, setData] = useState<PipelineResponse | null>(null);
-  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
+  const [events, setEvents] = useState<AuditEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [auditError, setAuditError] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const [resolvingDecision, setResolvingDecision] = useState<"ALLOW" | "BLOCK" | null>(null);
+
+  const handleResolve = async (finalDecision: "ALLOW" | "BLOCK") => {
+    setResolvingDecision(finalDecision);
+    try {
+      await resolveRiskCase(caseId, finalDecision);
+      setData(prev => prev ? { ...prev, policy: { ...prev.policy, decision: finalDecision } } : prev);
+      const audit = await fetchAuditTimeline(caseId).catch(() => ({ events: [] }));
+      if (audit.events) setEvents(audit.events);
+    } catch (err) {
+      alert("Failed to resolve case.");
+    } finally {
+      setResolvingDecision(null);
+    }
+  };
 
   useEffect(() => {
-    async function loadData() {
-      setLoading(true);
+    let active = true;
+    setLoading(true);
+    async function load() {
       try {
-        const [caseData, auditData] = await Promise.all([
+        const [result, audit] = await Promise.all([
           fetchRiskCase(caseId),
-          fetchAuditTimeline(caseId).catch(() => ({ events: [] }))
+          fetchAuditTimeline(caseId).then(value => ({ events: value.events, failed: false })).catch(() => ({ events: [], failed: true })),
         ]);
-        if ((caseData as any).error) throw new Error((caseData as any).error);
-        setData(caseData);
-        setAuditEvents(auditData.events || []);
+        if (!active) return;
+        if (!result?.transaction) throw new Error("Case unavailable");
+        setData(result);
+        setEvents(audit.events || []);
+        setAuditError(audit.failed);
         setError(false);
-      } catch (err) {
-        console.error("Failed to fetch case details:", err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
+      } catch { if (active) setError(true); }
+      finally { if (active) setLoading(false); }
     }
-    if (caseId) loadData();
-  }, [caseId]);
+    void load();
+    return () => { active = false; };
+  }, [caseId, retry]);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Case Detail" description="Loading case evidence hierarchy..." />
-        <Skeleton className="h-96" />
-      </div>
-    );
-  }
+  const back = <Link href="/cases" className="record-text-link inline-flex items-center gap-2"><ArrowLeft size={14} />Back to cases</Link>;
+  if (loading) return <div className="review-workspace case-evidence">{back}<Skeleton className="h-80" /></div>;
+  if (error || !data) return <div className="review-workspace case-evidence">{back}<ErrorState title="Case unavailable" description="This payment's evidence could not be loaded." onRetry={() => setRetry(value => value + 1)} /></div>;
 
-  if (error || !data) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Case Detail" description="Manage fraud investigation." />
-        <ErrorState title="Case Not Found" description={`Failed to load case data for ID: ${caseId}`} />
-        <button onClick={() => router.push('/cases')} className="text-primary font-semibold hover:underline flex items-center gap-2">
-          <ArrowLeft className="w-4 h-4" /> Back to Cases
-        </button>
-      </div>
-    );
-  }
+  const { transaction, ml, graph, agent, policy } = data;
+  const decision = policy?.decision || "PENDING";
+  const status = agent?.status || "NOT_RECORDED";
+  const reason = reasonText(policy?.reason);
+  const modelScore = scorePercent(ml?.risk_score, 1);
+  const graphScore = scorePercent(graph?.risk_score, 1);
+  const rules = policy?.triggered_rules || [];
+  return <div className="review-workspace case-evidence">
+    {back}
+    <header className="case-heading"><div><p>Case evidence</p><h1>{transaction.id || caseId}</h1></div><a href="#case-audit" className="workspace-button">View audit trail <ArrowDown size={14} /></a></header>
 
-  return (
-    <div className="mx-auto flex max-w-[1040px] flex-col gap-8 pb-16">
-      <div className="flex items-center gap-4">
-        <button onClick={() => router.push('/cases')} className="p-2 rounded-lg border border-border bg-surface text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
+    {(decision === "PENDING" || decision === "REVIEW") && (
+      <section className="record-card case-action-banner" aria-labelledby="case-resolution-heading">
         <div>
-          <h1 className="text-display-lg font-semibold leading-tight tracking-[-.04em] text-text-primary">Case: {caseId}</h1>
-          <p className="text-label-sm text-text-secondary">Evidence Hierarchy</p>
+          <h3 id="case-resolution-heading">Manual resolution required</h3>
+          <p>Review the evidence below and record the final payment decision.</p>
         </div>
+        <div className="case-action-buttons" aria-label="Manual resolution actions">
+          <button type="button" className="case-action-button case-action-button-approve" disabled={resolvingDecision !== null} aria-busy={resolvingDecision === "ALLOW"} onClick={() => handleResolve("ALLOW")}>
+            {resolvingDecision === "ALLOW" ? "Recording…" : "Approve payment"}
+          </button>
+          <button type="button" className="case-action-button case-action-button-decline" disabled={resolvingDecision !== null} aria-busy={resolvingDecision === "BLOCK"} onClick={() => handleResolve("BLOCK")}>
+            {resolvingDecision === "BLOCK" ? "Recording…" : "Decline payment"}
+          </button>
+        </div>
+      </section>
+    )}
+
+    <section className="record-card case-decision" aria-label="Final policy outcome">
+      <div className="case-decision-top">
+        <div><p className="case-decision-label">Final policy outcome</p><h2>{readableCode(decision)}</h2><p className="case-decision-reason">{reason || "No policy reason recorded"}</p><p className="record-note case-explanation">{policyExplanation(decision, agent?.recommendation, policy?.reason)}</p></div>
+        <dl className="record-fields"><div><dt>Payment amount</dt><dd>{money(transaction.amount)}</dd></div><div><dt>Customer</dt><dd className="record-code">{transaction.customer_id || "Not recorded"}</dd></div><div><dt>Received</dt><dd>{recordedAt(transaction.timestamp)}</dd></div></dl>
       </div>
+      <div className="case-policy-meta"><span>Policy version <strong className="record-code">{policy?.version || "Not recorded"}</strong></span><span>Matched rules <strong className="record-code">{rules.length ? rules.join(" · ") : "No rule IDs recorded"}</strong></span></div>
+    </section>
 
-      <div className="relative flex flex-col gap-4">
-        
-        {/* 1. Transaction */}
-        <div className="flex gap-4 relative">
-          <div className="w-12 shrink-0 pt-2 text-right font-mono text-[10px] font-semibold text-text-muted">01</div>
-          <div className="rounded-xl border border-border bg-surface p-6 shadow-sm flex-1">
-            <h2 className="text-label-md font-semibold text-text-primary mb-4 uppercase tracking-widest">Transaction Context</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <p className="text-caption font-semibold text-text-muted mb-1">AMOUNT</p>
-                <div className="text-label-lg font-bold tabular-nums text-text-primary">
-                  ₹{data.transaction.amount?.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </div>
-              </div>
-              <div>
-                <p className="text-caption font-semibold text-text-muted mb-1">CUSTOMER ID</p>
-                <div className="text-label-sm text-mono-sm font-mono text-primary font-medium truncate">
-                  {data.transaction.customer_id}
-                </div>
-              </div>
-              <div className="col-span-2">
-                <p className="text-caption font-semibold text-text-muted mb-1">TIMESTAMP</p>
-                <div className="text-label-sm text-text-secondary">
-                  {data.transaction.timestamp ? new Date(data.transaction.timestamp).toLocaleString() : '--'}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 2. Machine Risk */}
-        <div className="flex gap-4 relative">
-          <div className="w-12 shrink-0 pt-2 text-right font-mono text-[10px] font-semibold text-text-muted">02</div>
-          <div className="rounded-xl border border-border bg-surface p-6 shadow-sm flex-1">
-            <h2 className="text-label-md font-semibold text-text-primary mb-4 uppercase tracking-widest">Machine Risk (ML)</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-caption font-semibold text-text-muted mb-1">RISK SCORE</p>
-                <div className="text-2xl font-bold tabular-nums text-text-primary">
-                  {data.ml.risk_score.toFixed(3)}
-                </div>
-              </div>
-              <div>
-                <p className="text-caption font-semibold text-text-muted mb-1">MODEL VERSION</p>
-                <div className="text-label-sm text-text-secondary font-mono bg-surface-secondary px-2 py-1 rounded border border-border w-fit">
-                  {data.ml.version}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 3. Graph Context */}
-        <div className="flex gap-4 relative">
-          <div className="w-12 shrink-0 pt-2 text-right font-mono text-[10px] font-semibold text-text-muted">03</div>
-          <div className="rounded-xl border border-border bg-surface p-6 shadow-sm flex-1">
-            <h2 className="text-label-md font-semibold text-text-primary mb-4 uppercase tracking-widest">Graph Context</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <p className="text-caption font-semibold text-text-muted mb-1">GRAPH SCORE</p>
-                <div className="text-2xl font-bold tabular-nums text-text-primary">
-                  {data.graph.risk_score ? data.graph.risk_score.toFixed(3) : '0.000'}
-                </div>
-              </div>
-              <div>
-                <p className="text-caption font-semibold text-text-muted mb-1">CLUSTER</p>
-                <div className={`text-label-sm font-semibold ${data.graph.cluster_detected ? 'text-warning' : 'text-success'}`}>
-                  {data.graph.cluster_detected ? 'YES' : 'NO'}
-                </div>
-              </div>
-              <div>
-                <p className="text-caption font-semibold text-text-muted mb-1">SHARED DEVICES</p>
-                <p className="text-label-sm font-medium text-text-primary">{data.graph.shared_devices}</p>
-              </div>
-              <div>
-                <p className="text-caption font-semibold text-text-muted mb-1">CONNECTIONS</p>
-                <p className="text-label-sm font-medium text-text-primary">{data.graph.connected_customers}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 4. Agent Investigation */}
-        <div className="flex gap-4 relative">
-          <div className="w-12 shrink-0 pt-2 text-right font-mono text-[10px] font-semibold text-text-muted">04</div>
-          <div className="rounded-xl border border-border bg-surface p-6 shadow-sm flex-1">
-            <h2 className="text-label-md font-semibold text-text-primary mb-4 uppercase tracking-widest">Agent Recommendation (Advisory)</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-surface-secondary rounded-lg p-3 border border-border-subtle">
-                <p className="text-caption font-semibold text-text-muted mb-1">RECOMMENDATION</p>
-                <div className={`text-label-lg font-bold ${data.agent.recommendation === 'BLOCK' ? 'text-danger' : data.agent.recommendation === 'REVIEW' ? 'text-warning' : data.agent.recommendation === 'ALLOW' ? 'text-success' : 'text-text-primary'}`}>
-                  {data.agent.recommendation || 'PENDING'}
-                </div>
-              </div>
-              <div className="bg-surface-secondary rounded-lg p-3 border border-border-subtle">
-                <p className="text-caption font-semibold text-text-muted mb-1">CONFIDENCE</p>
-                <div className="text-label-lg font-bold text-text-primary">
-                  {data.agent.confidence ? `${(data.agent.confidence * 100).toFixed(1)}%` : '--'}
-                </div>
-              </div>
-              <div className="bg-surface-secondary rounded-lg p-3 border border-border-subtle">
-                <p className="text-caption font-semibold text-text-muted mb-1">STATUS</p>
-                <div className="text-label-lg font-bold text-text-primary">
-                  {data.agent.status}
-                </div>
-              </div>
-            </div>
-            <div>
-              <p className="text-caption font-semibold text-text-muted mb-2">REASON CODES</p>
-              <ul className="list-disc pl-5 text-label-sm text-text-secondary">
-                {data.agent.reason_codes && data.agent.reason_codes.length > 0 ? (
-                  data.agent.reason_codes.map((rc, idx) => <li key={idx} className="mb-1">{rc}</li>)
-                ) : (
-                  <li>None provided.</li>
-                )}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* 5. Policy Decision */}
-        <div className="flex gap-4 relative">
-          <div className="w-12 shrink-0 pt-2 text-right font-mono text-[10px] font-bold text-primary">05</div>
-          <div className="rounded-xl border-2 border-primary bg-primary-soft p-6 shadow-md flex-1">
-            <h2 className="text-label-lg font-bold text-primary mb-4 uppercase tracking-widest">Final Policy Enforcement</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-surface rounded-lg p-4 border border-border-strong">
-                <p className="text-caption font-semibold text-text-muted mb-1">DECISION</p>
-                <div className={`text-2xl font-bold ${data.policy.decision === 'BLOCK' ? 'text-danger' : data.policy.decision === 'REVIEW' ? 'text-warning' : 'text-success'}`}>
-                  {data.policy.decision || 'PENDING'}
-                </div>
-              </div>
-              <div className="bg-surface rounded-lg p-4 border border-border-strong">
-                <p className="text-caption font-semibold text-text-muted mb-1">REASON</p>
-                <div className="text-label-sm font-medium text-text-primary">
-                  {data.policy.reason || 'N/A'}
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 bg-surface rounded-lg p-4 border border-border-strong">
-              <p className="text-caption font-semibold text-text-muted mb-2">TRIGGERED RULES</p>
-              <div className="flex flex-wrap gap-2">
-                {data.policy.triggered_rules && data.policy.triggered_rules.length > 0 ? (
-                  data.policy.triggered_rules.map((rule, idx) => (
-                    <span key={idx} className="px-2 py-1 bg-surface-secondary text-text-primary text-mono-sm font-mono rounded border border-border">
-                      {rule}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-label-sm text-text-muted">None</span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* 6. Audit Trail */}
-      <div className="mt-12 pt-8 border-t border-border">
-        <div className="mb-6 flex items-center gap-2 text-text-primary">
-          <h2 className="rsx-rule-heading">Recorded audit trail</h2>
-        </div>
-        
-        <div className="overflow-y-auto max-h-[400px] border border-border rounded-xl bg-surface shadow-sm">
-          {auditEvents.length === 0 ? (
-            <div className="text-label-sm text-text-muted text-center py-8">No audit events found.</div>
-          ) : (
-            <table className="w-full text-left border-collapse">
-              <thead className="bg-surface-secondary sticky top-0 border-b border-border">
-                <tr>
-                  <th className="px-4 py-3 text-caption font-semibold text-text-muted uppercase">Time</th>
-                  <th className="px-4 py-3 text-caption font-semibold text-text-muted uppercase">Service</th>
-                  <th className="px-4 py-3 text-caption font-semibold text-text-muted uppercase">Event</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {auditEvents.map((evt, idx) => (
-                  <tr key={idx} className="hover:bg-surface-secondary/50 transition-colors">
-                    <td className="px-4 py-3 text-mono-sm font-mono text-text-secondary w-32">{new Date(evt.timestamp).toLocaleTimeString()}</td>
-                    <td className="px-4 py-3 text-caption font-bold uppercase text-text-primary w-32">{evt.service}</td>
-                    <td className="px-4 py-3 text-label-sm text-text-secondary">{evt.event_type}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
+    <div className="case-evidence-grid">
+      <section className="record-card" aria-label="Model evidence"><h2>Model evidence</h2><div className="case-score"><strong>{modelScore}</strong><span>/ 100</span></div><p className="record-note">{riskLevel(ml?.risk_score)}{modelScore !== "—" ? " model risk" : ""}</p><dl className="record-fields mt-4"><div><dt>Model version</dt><dd className="record-code">{ml?.version || "Not recorded"}</dd></div></dl></section>
+      <section className="record-card" aria-label="Graph evidence"><h2>Graph evidence</h2><div className="case-score"><strong>{graphScore}</strong><span>/ 100</span></div><p className="record-note">{graphScore === "—" ? "Graph evidence unavailable" : graph?.cluster_detected ? "Cluster flag recorded" : "No cluster flag recorded"}</p><p className="record-note">Graph and model scores are separate signals. Policy evaluates them together.</p><Link href="/graph" className="record-text-link mt-4 inline-flex items-center gap-2">Explore network evidence <ArrowUpRight size={13} /></Link></section>
     </div>
-  );
+
+    <section className="record-card case-investigation case-investigation-highlight" aria-label="Assisted investigation">
+      <div className="case-investigation-heading"><div className="case-investigation-title"><p>Evidence-backed analysis</p><h2>Assisted investigation</h2></div><span className="case-investigation-status">{readableCode(status)}</span></div>
+      {status === "SKIPPED" ? <p className="record-note">No assisted investigation was run for this payment. The outcome was determined by policy.</p> : <><dl className="case-agent-metrics"><div><dt>Advisory recommendation</dt><dd>{agent?.recommendation ? <DecisionBadge decision={agent.recommendation} /> : "Not recorded"}</dd></div><div><dt>Confidence</dt><dd>{agent?.confidence != null ? `${scorePercent(agent.confidence, 1)}%` : "Not recorded"}</dd></div></dl><p className="record-note">{reasonText(agent?.reason_codes) || "No investigation reason recorded."}</p></>}
+      {status === "DEGRADED" && <p className="record-inline-error">Investigation ran in degraded mode. Review the policy outcome and audit evidence.</p>}
+      <InvestigationEvidence evidence={agent?.evidence} />
+    </section>
+    <AuditTimeline id="case-audit" events={events} error={auditError} onRetry={() => setRetry(value => value + 1)} />
+  </div>;
 }

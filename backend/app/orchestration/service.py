@@ -123,24 +123,32 @@ class RiskOrchestrator:
 
         # 3. REAL XGBOOST SCORE
         ml_start = time.perf_counter()
-        try:
-            ml_score = self.ml_service.score(request.model_dump())
-            ml_version = self.ml_service.version
+        if getattr(request, 'skip_ml', False):
+            ml_score = None
+            ml_version = "UNAVAILABLE_FOR_STRIPE_SCHEMA"
             ml_latency = (time.perf_counter() - ml_start) * 1000
-            
-            tx.ml_risk_score = ml_score
+            tx.ml_risk_score = None
             self._update_status(tx, LifecycleState.SCORED)
-            self._record_audit(transaction_id, "ML_SCORED", {"ml_score": ml_score, "model_version": ml_version}, latency=ml_latency)
-            
-        except Exception as e:
-            logging.error(f"ML Service Failed: {e}")
-            self._update_status(tx, LifecycleState.DEGRADED)
-            return OrchestrationErrorResponse(
-                transaction_id=transaction_id,
-                status=LifecycleState.DEGRADED.value,
-                failed_stage="ML",
-                error=ErrorDetail(code="503", message="ML Service unavailable")
-            )
+            self._record_audit(transaction_id, "ML_SKIPPED", {"reason": ml_version}, latency=ml_latency)
+        else:
+            try:
+                ml_score = self.ml_service.score(request.model_dump())
+                ml_version = self.ml_service.version
+                ml_latency = (time.perf_counter() - ml_start) * 1000
+                
+                tx.ml_risk_score = ml_score
+                self._update_status(tx, LifecycleState.SCORED)
+                self._record_audit(transaction_id, "ML_SCORED", {"ml_score": ml_score, "model_version": ml_version}, latency=ml_latency)
+                
+            except Exception as e:
+                logging.error(f"ML Service Failed: {e}")
+                self._update_status(tx, LifecycleState.DEGRADED)
+                return OrchestrationErrorResponse(
+                    transaction_id=transaction_id,
+                    status=LifecycleState.DEGRADED.value,
+                    failed_stage="ML",
+                    error=ErrorDetail(code="503", message="ML Service unavailable")
+                )
             
         # 4. REAL GRAPH ANALYSIS
         graph_start = time.perf_counter()

@@ -1,6 +1,7 @@
 import { Inter, Instrument_Serif } from "next/font/google";
 import "../styles/globals.css";
 import "../styles/premium.css";
+import "../styles/record-workspace.css";
 import type { Metadata } from "next";
 import RootFrame from "../components/layout/RootFrame";
 

@@ -9,9 +9,7 @@ from app.graph.risk import GraphRiskCalculator
 class GraphRiskService:
     _instance = None
     
-    def __init__(self, entities_path: str = "data/synthetic/entities.csv", relationships_path: str = "data/synthetic/relationships.csv"):
-        self.entities_path = entities_path
-        self.relationships_path = relationships_path
+    def __init__(self):
         self.graph = None
         self.extractor = None
         self.is_loaded = False
@@ -19,26 +17,16 @@ class GraphRiskService:
     @classmethod
     def get_instance(cls):
         if cls._instance is None:
-            # Assume paths relative to backend root
-            entities = str(Path("data/synthetic/entities.csv").resolve())
-            if not Path(entities).exists():
-                # Fallback if running from root
-                entities = str(Path("../data/synthetic/entities.csv").resolve())
-            
-            rels = str(Path("data/synthetic/relationships.csv").resolve())
-            if not Path(rels).exists():
-                rels = str(Path("../data/synthetic/relationships.csv").resolve())
-                
-            cls._instance = cls(entities, rels)
+            cls._instance = cls()
             try:
                 cls._instance.load_graph()
             except Exception as e:
-                logging.warning(f"Failed to load synthetic graph: {e}")
+                logging.warning(f"Failed to load graph from database: {e}")
         return cls._instance
         
     def load_graph(self):
         logging.info("Initializing GraphRiskService...")
-        builder = GraphBuilder(self.entities_path, self.relationships_path)
+        builder = GraphBuilder()
         self.graph = builder.build()
         
         # Detect communities and add to graph node attributes
@@ -54,7 +42,7 @@ class GraphRiskService:
             raise RuntimeError("Graph is not loaded.")
             
         if entity_id not in self.graph:
-            if str(entity_id).startswith("TX-"):
+            if str(entity_id).startswith("TX-") or str(entity_id).startswith("SIM-TX-"):
                 import random
                 # Dynamically seed missing transactions (like E2E live data) into the graph for demo
                 self.graph.add_node(entity_id, entity_type="transaction", community_id=random.randint(1000, 9999))
@@ -71,7 +59,16 @@ class GraphRiskService:
                 self.graph.add_edge(entity_id, ip_id, relationship_type="FROM_IP")
                 self.graph.add_edge(cust_id, dev_id, relationship_type="USES_DEVICE")
             else:
-                raise ValueError(f"Entity '{entity_id}' not found.")
+                logging.warning(f"Entity '{entity_id}' not found in Graph. Defaulting to empty risk.")
+                return {
+                    "entity_id": entity_id,
+                    "entity_type": "unknown",
+                    "cluster_detected": False,
+                    "community_id": "unknown",
+                    "graph_risk": 0.0,
+                    "related_entities": 0,
+                    "signals": {"connected_customer_count": 0, "connected_device_count": 0, "shared_velocity": 0, "ip_risk_score": 0.0, "graph_degree": 0}
+                }
             
         # Get basic metadata
         entity_type = self.graph.nodes[entity_id].get("entity_type", "unknown")
@@ -122,7 +119,7 @@ class GraphRiskService:
             if types.get("customer", 0) > 2 and types.get("device", 0) > 1:
                 score = max(score, random.randint(70, 95))
                 
-            if score < 30:
+            if score < 0:
                 continue
                 
             exposure_val = types.get("transaction", 1) * random.randint(10, 100) * 1000

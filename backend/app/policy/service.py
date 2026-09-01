@@ -79,8 +79,10 @@ class PolicyService:
                 timestamp=existing_decision.timestamp.isoformat() if existing_decision.timestamp else ""
             )
             
-        # 4. Evaluate
-        decision_result = self.engine.evaluate(inputs)
+        # 4. Fetch Active Policies and Evaluate
+        from app.models.domain import PolicyModel
+        active_policies = self.db.query(PolicyModel).filter(PolicyModel.enabled == True).order_by(PolicyModel.priority.desc()).all()
+        decision_result = self.engine.evaluate(inputs, active_policies)
         
         # 5. Persist DecisionModel
         new_decision = DecisionModel(

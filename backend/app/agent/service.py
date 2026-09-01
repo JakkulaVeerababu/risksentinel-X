@@ -36,6 +36,9 @@ class InvestigationService:
                 self.provider = MockProvider()
             else:
                 self.provider_error = "MockProvider is only allowed in test mode (APP_ENV=test)."
+        elif provider_name == "gemini":
+            from app.agent.providers.gemini import GeminiProvider
+            self.provider = GeminiProvider()
         elif not provider_name:
             self.provider_error = "AGENT_PROVIDER is missing. Provider configuration is required."
         else:
@@ -170,7 +173,7 @@ class InvestigationService:
             provider=self.provider.provider_info if self.provider else "unconfigured",
             tool_calls=[tc.model_dump() for tc in clean_tool_calls]
         )
-        db.add(inv)
+        db.merge(inv)
         try:
             db.commit()
         except Exception as e:

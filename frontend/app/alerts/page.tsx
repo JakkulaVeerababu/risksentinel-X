@@ -1,179 +1,80 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import {
-  Download, Plus, AlertTriangle, Search, ChevronDown, X, Network, Activity, ArrowUpRight
-} from "lucide-react";
-import { fetchRecentTransactions, Transaction } from "@/lib/api";
-import { PageHeader, Skeleton, ErrorState } from "../../components/ui";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { RefreshCw, Search, ArrowUpRight } from "lucide-react";
+import { fetchRecentTransactions, fetchRiskCase, type Transaction } from "@/lib/api";
+import { PageHeader, Skeleton, ErrorState, DecisionBadge } from "../../components/ui";
 import SeverityLabel from "../../components/ui/SeverityLabel";
+import RecordInspector from "../../components/workspace/RecordInspector";
+import { money, recordedAt } from "../../lib/audit-presentation";
+import { scorePercent } from "../../lib/transaction-presentation";
 
 export default function AlertsPage() {
-  const [activeTab, setActiveTab] = useState("all");
-  const [selectedAlertId, setSelectedAlertId] = useState<string | null>(null);
-  
-  const [alerts, setAlerts] = useState<any[]>([]);
+  const [payments, setPayments] = useState<Transaction[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
+  const [policyRecord, setPolicyRecord] = useState<{ id: string; decision: string | null; failed: boolean } | null>(null);
+  const trigger = useRef<HTMLButtonElement | null>(null);
+  const busy = useRef(false);
   async function loadData() {
+    if (busy.current) return;
+    busy.current = true;
     setLoading(true);
-    try {
-      const txs = await fetchRecentTransactions();
-      // Derive alerts from blocked or review transactions
-      const derivedAlerts = txs
-        .filter(t => t.decision === 'BLOCK' || t.decision === 'REVIEW')
-        .map(t => ({
-          id: `ALT-${t.transaction_id}`,
-          tx_id: t.transaction_id,
-          severity: t.decision === 'BLOCK' ? 'CRITICAL' : 'HIGH',
-          title: t.decision === 'BLOCK' ? 'Policy Block' : 'Risk Review',
-          entity: t.customer_id,
-          source: 'Risk Engine',
-          evidence: `ML Risk: ${t.ml_risk}, Graph Risk: ${t.graph_risk}`,
-          exposure: `₹${t.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-          status: 'Unacknowledged',
-          statusColor: 'text-warning',
-          time: new Date(t.timestamp).toLocaleString(),
-          isCritical: t.decision === 'BLOCK'
-        }));
-      setAlerts(derivedAlerts);
-      setError(false);
-    } catch (err) {
-      console.error(err);
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
+    try { setPayments(await fetchRecentTransactions()); setError(false); }
+    catch { setError(true); }
+    finally { setLoading(false); busy.current = false; }
   }
+  useEffect(() => { void loadData(); }, []);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    let active = true;
+    setPolicyRecord(null);
+    if (selectedId) {
+      fetchRiskCase(selectedId).then(data => {
+        if (active) setPolicyRecord({ id: selectedId, decision: data.policy?.decision || null, failed: false });
+      }).catch(() => {
+        if (active) setPolicyRecord({ id: selectedId, decision: null, failed: true });
+      });
+    }
+    return () => { active = false; };
+  }, [selectedId, payments]);
 
-  if (loading && alerts.length === 0) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Risk Alerts" description="Monitor and triage processed fraud and policy alerts." />
-        <Skeleton className="h-64" />
-      </div>
-    );
-  }
+  const flagged = payments.filter(payment => ["BLOCK", "REVIEW"].includes(payment.decision));
+  const visible = flagged.filter(payment => (filter === "all" || payment.decision === filter) && `${payment.transaction_id} ${payment.customer_id}`.toLowerCase().includes(search.trim().toLowerCase()));
+  const selected = visible.find(payment => payment.transaction_id === selectedId);
+  const closeDetails = () => { setSelectedId(null); trigger.current?.focus({ preventScroll: true }); };
 
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Risk Alerts" description="Monitor and triage processed fraud and policy alerts." />
-        <ErrorState title="Alerts Data Unavailable" description="Failed to fetch transactions from the backend." />
-      </div>
-    );
-  }
-
-  const selectedAlert = alerts.find(a => a.id === selectedAlertId);
-  
-  const metrics = [
-    { label: "Alert Engine", value: "Operational", icon: <span className="h-2.5 w-2.5 rounded-full bg-success"></span>, highlight: false },
-    { label: "Recent Alerts", value: alerts.length, highlight: false },
-    { label: "Critical", value: alerts.filter(a => a.severity === 'CRITICAL').length, highlight: true },
-  ];
-
-  return (
-    <div className="flex h-full flex-col gap-6 pb-12">
-      <PageHeader eyebrow="Risk queue" title="Risk alerts" description="Monitor and triage processed fraud and policy alerts." actions={<span className="border-l-2 border-primary pl-3 text-[10px] font-semibold text-primary">Live API data</span>} />
-
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {metrics.map((m, i) => (
-          <div key={i} className="rsx-stat-card">
-            <div className="rsx-stat-label">{m.label}</div>
-            <div className={`rsx-stat-value ${m.highlight ? 'text-danger' : ''}`}>{m.value}</div>
+  return <div className="review-workspace">
+    <PageHeader eyebrow="Payment monitoring" title="Risk queue" description="Review the payments that need a closer look." actions={<button className="workspace-button" onClick={loadData} disabled={loading}><RefreshCw size={14} className={loading ? "animate-spin" : ""} />{loading ? "Refreshing…" : "Refresh"}</button>} />
+    {error && !payments.length ? <ErrorState title="Risk queue unavailable" description="Recent payments could not be loaded." onRetry={loadData} /> : <>
+      <div className="record-metrics queue-metrics-highlight" aria-label="Queue summary"><div><span>Flagged payments</span><strong>{loading && !payments.length ? "—" : flagged.length}</strong></div><div><span>Recorded reviews</span><strong>{loading && !payments.length ? "—" : flagged.filter(p => p.decision === "REVIEW").length}</strong></div><div><span>Recorded blocks</span><strong>{loading && !payments.length ? "—" : flagged.filter(p => p.decision === "BLOCK").length}</strong></div></div>
+      <p className="record-scope">From the latest {payments.length} loaded payments. Queue entries reflect payment-list status; inspect the case for the policy decision.</p>
+      {error && <p className="record-inline-error" role="alert">Refresh failed. Previously loaded payments are still shown.</p>}
+      <div className="record-toolbar"><div className="record-filters" role="group" aria-label="Queue filter">{[["all", "All flagged"], ["REVIEW", "Needs review"], ["BLOCK", "Blocked"]].map(([value, label]) => <button key={value} type="button" aria-pressed={filter === value} onClick={() => { setFilter(value); setSelectedId(null); }}>{label}</button>)}</div><label className="record-search"><Search size={15} aria-hidden="true" /><input aria-label="Search risk queue" placeholder="Search payment or customer…" value={search} onChange={event => { setSearch(event.target.value); setSelectedId(null); }} /></label></div>
+      {loading && !payments.length ? <Skeleton className="h-64" /> : <div className={`record-layout ${selected ? "has-inspector" : ""}`}>
+        <section className="record-card record-list" aria-label="Flagged payments" aria-busy={loading}>
+          <header className="record-list-heading"><h2>Flagged payments <span>{visible.length}</span></h2><span>Newest first</span></header>
+          <table className="records-table queue-records-table"><caption className="sr-only">Flagged payments. Select a payment to inspect its risk signals.</caption><colgroup><col style={{ width: "17%" }} /><col style={{ width: "37%" }} /><col style={{ width: "23%" }} /><col style={{ width: "23%" }} /></colgroup><thead><tr><th scope="col">Priority</th><th scope="col">Payment / customer</th><th scope="col">Amount</th><th scope="col">Recorded status</th></tr></thead><tbody>{visible.map(payment => <tr key={payment.transaction_id} data-selected={selected?.transaction_id === payment.transaction_id} onClick={event => { trigger.current = event.currentTarget.querySelector("button"); setSelectedId(payment.transaction_id); }}>
+            <td data-label="Priority"><SeverityLabel severity={payment.decision === "BLOCK" ? "CRITICAL" : "HIGH"} /></td>
+            <td><button className="record-row-button record-code" aria-label={`Inspect payment ${payment.transaction_id}`} aria-expanded={selected?.transaction_id === payment.transaction_id} aria-controls={selected?.transaction_id === payment.transaction_id ? "record-inspector" : undefined}>{payment.transaction_id}</button><span className="record-cell-secondary">{payment.customer_id || "Customer not recorded"}</span></td>
+            <td data-label="Amount" className="record-amount">{money(payment.amount)}</td>
+            <td data-label="Recorded status"><DecisionBadge decision={payment.decision} /><time className="record-cell-secondary" dateTime={payment.timestamp}>{recordedAt(payment.timestamp, true)}</time></td>
+          </tr>)}</tbody></table>
+          {!visible.length && <div className="record-empty"><h3>No matching payments</h3><p>{search ? "Try another payment or customer reference." : "No loaded payments match this queue filter."}</p>{(search || filter !== "all") && <button className="workspace-button" onClick={() => { setSearch(""); setFilter("all"); }}>Clear filters</button>}</div>}
+        </section>
+        {selected && <RecordInspector recordId={selected.transaction_id} title={selected.decision === "BLOCK" ? "Blocked by policy" : "Payment needs review"} subtitle="Payment details" onClose={closeDetails}>
+          <div className="event-detail-content"><div className="queue-payment-amount"><span>Payment amount</span><strong>{money(selected.amount)}</strong><DecisionBadge decision={selected.decision} /></div>
+            {policyRecord?.id === selected.transaction_id ? policyRecord.decision ? <div className="queue-policy-check"><span>Policy record</span><DecisionBadge decision={policyRecord.decision} />{policyRecord.decision !== selected.decision && <p role="status">The payment-list status differs from the policy record. Verify the decision history before taking action.</p>}</div> : <p className="record-note">{policyRecord.failed ? "The policy record could not be checked. Open the case to retry." : "No policy decision was returned for this payment."}</p> : <p className="record-note" role="status">Checking the policy record…</p>}
+            <dl className="record-fields"><div><dt>Payment</dt><dd className="record-code">{selected.transaction_id}</dd></div><div><dt>Customer</dt><dd className="record-code">{selected.customer_id || "Not recorded"}</dd></div><div><dt>Received</dt><dd>{recordedAt(selected.timestamp)}</dd></div></dl>
+            <section className="queue-signals" aria-label="Recorded risk signals"><h3>Recorded risk signals</h3><div><span>Model risk</span><strong>{scorePercent(selected.ml_risk, 1)} <small>/ 100</small></strong></div><div><span>Graph risk</span><strong>{scorePercent(selected.graph_risk, 1)} <small>/ 100</small></strong></div><p className="record-note">These scores support {selected.decision === "BLOCK" ? "blocking the payment" : "a manual review"}. Open the payment to inspect matched policy rules and investigation evidence.</p></section>
           </div>
-        ))}
-      </div>
-
-      <div className="flex h-full min-h-[600px] flex-col gap-6 2xl:flex-row">
-        <div className="flex-1 flex flex-col rounded-xl border border-border bg-surface shadow-sm overflow-hidden">
-          <div className="flex-1 overflow-x-auto">
-            <table className="w-full min-w-[860px] border-collapse whitespace-nowrap text-left">
-              <thead className="bg-surface-secondary text-caption font-semibold uppercase text-text-muted border-b border-border">
-                <tr>
-                  <th className="p-4">Severity</th>
-                  <th className="p-4">Alert</th>
-                  <th className="p-4">Entity</th>
-                  <th className="p-4">Exposure</th>
-                  <th className="p-4">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border bg-surface">
-                {alerts.length === 0 ? (
-                  <tr><td colSpan={5} className="p-8 text-center text-text-secondary">No alerts found.</td></tr>
-                ) : (
-                  alerts.map((alert) => (
-                    <tr key={alert.id} onClick={() => setSelectedAlertId(alert.id)} className={`group cursor-pointer transition-colors ${selectedAlertId === alert.id ? 'bg-primary-soft/50' : 'hover:bg-surface-secondary/50'}`}>
-                      <td className="p-4">
-                        <SeverityLabel severity={alert.severity} />
-                      </td>
-                      <td className="p-4">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-label-sm font-medium text-text-primary">{alert.title}</span>
-                          <span className="text-caption text-mono-sm font-mono text-text-secondary">{alert.id.substring(0, 16)}...</span>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <Link className="text-label-sm text-mono-sm font-mono font-semibold text-primary hover:underline" href={`/transactions/${alert.tx_id}`}>{alert.entity}</Link>
-                      </td>
-                      <td className="p-4 text-label-sm text-mono-sm font-mono font-semibold text-text-primary tabular-nums">{alert.exposure}</td>
-                      <td className="p-4">
-                        <div className={`flex items-center gap-2 text-caption font-semibold ${alert.statusColor}`}>
-                          <span className={`w-2 h-2 rounded-full bg-warning`}></span>
-                          {alert.status}
-                        </div>
-                        <div className="text-caption text-text-muted mt-1 text-mono-sm font-mono">{alert.time}</div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {selectedAlert && (
-          <div className="flex w-full shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm 2xl:w-[450px]">
-            <div className="p-6 border-b border-border bg-surface-secondary/50 flex justify-between items-start">
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <h3 className="text-heading-md font-semibold text-text-primary ">Alert Details</h3>
-                </div>
-              </div>
-              <button onClick={() => setSelectedAlertId(null)} className="h-8 w-8 rounded-lg flex items-center justify-center text-text-muted hover:bg-surface hover:text-text-primary transition-colors border border-transparent hover:border-border">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
-              <div>
-                <h4 className="text-body font-semibold text-text-primary mb-2">{selectedAlert.title}</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="rounded-xl border border-border bg-surface-secondary/50 p-4 flex flex-col gap-2">
-                    <span className="text-caption font-semibold uppercase text-text-muted">Target Entity</span>
-                    <span className="text-label-sm text-mono-sm font-mono font-semibold text-primary">{selectedAlert.entity}</span>
-                  </div>
-                  <div className="rounded-xl border border-border bg-surface-secondary/50 p-4 flex flex-col gap-2">
-                    <span className="text-caption font-semibold uppercase text-text-muted">Exposure</span>
-                    <span className="text-label-sm text-mono-sm font-mono font-semibold text-text-primary">{selectedAlert.exposure}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-caption font-semibold uppercase text-text-muted mb-4 border-b border-border pb-2">Trigger Evidence</h4>
-                <p className="text-label-sm text-text-secondary">{selectedAlert.evidence}</p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+          <div className="inspector-actions"><Link className="workspace-button workspace-button-primary" href={`/transactions/${encodeURIComponent(selected.transaction_id)}`}>Review payment <ArrowUpRight size={14} /></Link><Link className="record-text-link" href={`/cases/${encodeURIComponent(selected.transaction_id)}`}>Open case evidence</Link></div>
+        </RecordInspector>}
+      </div>}
+    </>}
+  </div>;
 }

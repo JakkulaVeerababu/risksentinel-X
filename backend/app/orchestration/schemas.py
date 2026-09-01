@@ -5,6 +5,7 @@ from app.schemas.score import ScoreRequest
 class ProcessTransactionRequest(ScoreRequest):
     customer_id: Optional[str] = Field(None, max_length=255)
     entity_id: Optional[str] = Field(None, max_length=255)
+    skip_ml: bool = Field(False, description="If true, bypasses ML scoring (e.g. for incompatible schema from webhooks)")
 
 class OrchestrationResponse(BaseModel):
     transaction_id: str

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Check, ChevronRight, X, Loader2 } from "lucide-react";
 import { PageHeader, Skeleton, ErrorState } from "../../components/ui";
-import { fetchInvestigations, Investigation } from "@/lib/api";
+import { fetchInvestigations, updateInvestigationStatus } from "@/lib/api";
 import "../../styles/recommendations.css";
 
 export default function RecommendationsPage() {
@@ -17,8 +17,8 @@ export default function RecommendationsPage() {
       try {
         const data = await fetchInvestigations();
         const valid = (data.investigations || [])
-          .filter(i => i.agent_state === 'COMPLETED' && i.recommendation)
-          .map(i => ({
+          .filter((i: any) => i.agent_state === 'COMPLETED' && i.recommendation)
+          .map((i: any) => ({
             id: i.transaction_id,
             title: `Recommend ${i.recommendation} for Transaction ${i.transaction_id}`,
             detail: i.reason_codes?.length ? `Based on: ${i.reason_codes.join(', ')}` : 'Investigation complete. Review transaction for details.',
@@ -26,9 +26,20 @@ export default function RecommendationsPage() {
             impact: "Transaction specific",
             confidence: Math.round((i.confidence || 0.8) * 100),
             urgency: i.recommendation === 'BLOCK' ? 'High' : (i.recommendation === 'REVIEW' ? 'Medium' : 'Low'),
-            evidence: i.evidence ? `${i.evidence.length} data points` : 'No extra evidence'
+            evidence: i.evidence ? `${i.evidence.length} data points` : 'No extra evidence',
+            backend_status: i.status
           }));
         setRecommendations(valid);
+
+        setResolved(prev => {
+          const next = { ...prev };
+          valid.forEach((item: any) => {
+            if (item.backend_status === 'DISMISSED' || item.backend_status === 'APPLIED') {
+              next[item.id] = item.backend_status.toLowerCase() as "applied" | "dismissed";
+            }
+          });
+          return next;
+        });
       } catch (e) {
         console.error(e);
       } finally {
@@ -123,7 +134,18 @@ export default function RecommendationsPage() {
                     </div>
                     {!status && (
                       <div className="mt-5 flex gap-2">
-                        <button onClick={() => setResolved((state) => ({ ...state, [item.id]: "dismissed" }))} aria-label={`Dismiss ${item.title}`} className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#dfe5ee] bg-white text-[#7c8799] hover:bg-[#f5f7fa]">
+                        <button 
+                          onClick={async () => {
+                            setResolved((state) => ({ ...state, [item.id]: "dismissed" }));
+                            try {
+                              await updateInvestigationStatus(item.id, "DISMISSED");
+                            } catch (e) {
+                              console.error("Failed to dismiss case", e);
+                            }
+                          }} 
+                          aria-label={`Dismiss ${item.title}`} 
+                          className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#dfe5ee] bg-white text-[#7c8799] hover:bg-[#f5f7fa]"
+                        >
                           <X className="h-4 w-4" />
                         </button>
                         <Link href={`/cases/${item.id}`} className="flex h-9 flex-1 items-center justify-center gap-2 rounded-lg bg-[#255df5] px-3 text-[10px] font-bold text-white hover:bg-[#174bd4]">

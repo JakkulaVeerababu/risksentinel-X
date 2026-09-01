@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { PageHeader, Skeleton, ErrorState } from "../../components/ui";
 import { modelsService, ModelPerformanceData } from "../../services/models";
-import { 
+import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Legend, Area, AreaChart
 } from "recharts";
@@ -63,9 +63,9 @@ export default function ModelsPage() {
   return (
     <div className="space-y-8 pb-12">
       <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4">
-        <PageHeader 
-          title="Model Evaluation" 
-          description="Analyze fraud detection performance using the IEEE-CIS held-out evaluation." 
+        <PageHeader
+          title="Model Evaluation"
+          description="Analyze fraud detection performance using the IEEE-CIS held-out evaluation."
         />
         <div className="flex items-center gap-3 bg-white border border-border px-4 py-2 rounded-lg shadow-subtle">
           <label className="text-label-sm font-medium text-text-secondary">Frozen evaluation threshold:</label>
@@ -93,12 +93,12 @@ export default function ModelsPage() {
 
       {/* Grid: Confusion Matrix & Core Metrics */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* ML Metrics */}
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white border border-border rounded-xl p-6 shadow-subtle h-full">
             <h3 className="rsx-rule-heading mb-6">Machine learning metrics</h3>
-            
+
             <div className="space-y-6">
               <div>
                 <div className="flex justify-between text-label-sm mb-1">
@@ -129,7 +129,7 @@ export default function ModelsPage() {
                   <div className="bg-primary h-full" style={{ width: `${metrics.f1 * 100}%` }}></div>
                 </div>
               </div>
-              
+
               <div className="pt-4 border-t border-border mt-4">
                 <div className="flex justify-between items-center">
                   <span className="text-label-sm font-medium text-text-secondary">IEEE-CIS AP</span>
@@ -167,12 +167,12 @@ export default function ModelsPage() {
           <div className="bg-white border border-border rounded-xl p-6 shadow-subtle space-y-4">
             <h3 className="text-caption font-semibold text-text-muted uppercase mb-2">Cost Simulation</h3>
             <p className="text-[11px] text-text-muted mb-4">Economic impact assumptions based on model decisions.</p>
-            
+
             <div className="flex justify-between items-center py-2 border-b border-border">
               <div className="text-label-sm text-text-secondary">False positive unit cost</div>
               <div className="font-semibold text-success tabular-nums">₹150.00</div>
             </div>
-            
+
             <div className="flex justify-between items-center py-2 border-b border-border">
               <div className="text-label-sm text-text-secondary">False negative unit cost</div>
               <div className="font-semibold text-danger tabular-nums">₹2,000.00</div>
@@ -193,7 +193,7 @@ export default function ModelsPage() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
+
         {/* Synthetic Seeded Graph Benchmark */}
         <div className="bg-white border border-border rounded-xl p-6 shadow-subtle lg:col-span-2 mt-2">
           <h3 className="rsx-rule-heading mb-6">Synthetic graph benchmark</h3>
