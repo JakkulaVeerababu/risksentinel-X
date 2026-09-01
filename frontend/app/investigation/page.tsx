@@ -44,7 +44,7 @@ export default function AIHubPage() {
     setResult(null);
 
     try {
-      const response = await fetch("http://localhost:8000/api/v1/investigate", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/investigate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
