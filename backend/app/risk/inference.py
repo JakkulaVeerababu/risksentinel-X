@@ -15,7 +15,7 @@ class RiskModelService:
     _instance = None
     
     def __init__(self, version: str = "xgb-ieeecis-v1"):
-        default_model_dir = Path(__file__).resolve().parent.parent.parent.parent / "models"
+        default_model_dir = Path(__file__).resolve().parent.parent.parent / "models"
         self.base_path = Path("/app/models") if os.path.exists("/app/models") else default_model_dir
         
         self.version = version

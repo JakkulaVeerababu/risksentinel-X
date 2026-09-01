@@ -1,0 +1,7 @@
+{
+  "model_version": "xgb-ieeecis-v1",
+  "threshold": 0.8,
+  "selection_dataset": "validation",
+  "selection_metric": "F1",
+  "metric_value": 0.4954349698535745
+}
