@@ -1,0 +1,123 @@
+=======================================================
+RISKSENTINEL X - COMPREHENSIVE PRESENTATION SCRIPT
+(Extended Version for Deep-Dive Explanations)
+=======================================================
+
+PART 1: THE INTRODUCTION & THE PROBLEM
+-------------------------------------------------------
+"Hi, I'm VEERABABU JAKKULA, and this is RiskSentinel X. 
+
+Today, the global financial system is facing a massive problem. Online payments are moving faster than ever, but so is fraud. Modern hackers don't just steal a credit card; they use automated bots, hidden VPNs, and coordinated fraud rings to attack systems in milliseconds. 
+
+Old, rule-based systems simply cannot keep up. Companies are wasting thousands of hours investigating fake alarms, while the real hackers sneak through the cracks. To solve this, we needed a system that thinks like a human but acts at the speed of a machine. We built RiskSentinel X to fix this."
+
+PART 2: ARCHITECTURE & DEPLOYMENT
+-------------------------------------------------------
+"Here is our deployed landing page. RiskSentinel X is built for enterprise-grade scalability. 
+- Our frontend is deployed live on Vercel to ensure incredibly fast load times globally.
+- Our Python-based AI backend is deployed on Render, allowing us to handle massive API loads.
+- And our database is running entirely in Supabase, using advanced PostgreSQL to handle real-time data streaming."
+
+PART 3: THE 4-STEP AI PIPELINE
+-------------------------------------------------------
+"So, what exactly does our platform do? Instead of relying on slow, manual reviews, our platform intercepts a payment the millisecond it happens and runs it through a 4-Step AI System:
+
+1. First, we use Machine Learning (XGBoost) to spot strange behavioral anomalies. For example, if a user is suddenly spending way too fast, or their location doesn't match their normal habits.
+2. Second, we use Graph AI. This is critical. Hackers often use the same device or IP address to test hundreds of stolen cards. Our Graph AI maps these hidden connections to instantly catch coordinated fraud rings.
+3. Third, our Gemini AI works like a human detective. Instead of just giving a risk score, it reads all the complex data and writes a clear, plain-English report explaining exactly why the payment is safe or dangerous.
+4. Finally, our Policy Engine takes all this AI intelligence and makes the final, deterministic choice to ALLOW, REVIEW, or BLOCK the payment."
+
+PART 4: THE PLATFORM WALKTHROUGH
+-------------------------------------------------------
+"As you can see on our landing page, we have 12 connected capabilities, which include Real-Time Monitoring, Graph Intelligence, Assisted Investigation, and more. 
+
+Let's log in. We have Google, GitHub, and Email login options securely configured. But for this demo, we've enabled a quick-access button. We will just click 'Open Workspace'."
+
+[Action: Enter the Dashboard]
+
+"Welcome to the RiskSentinel X Dashboard. We have live data streaming directly from Supabase. You can see our total transactions processed. We are allowed to see the last 24 hours, 7 days, or 30 days through this filter, and we also have the option to export all of this data to a CSV file for compliance reporting.
+
+On the left side of the screen, you can see all our powerful features. We provide a complete operating system for Risk Teams: 
+Overview, Transactions, Risk queue, Cases, Network graph, Fraud clusters, Investigation AI, Recommendations, Policy rules, Risk models, Attack simulator, Investigations, Audit trail, Analytics, Risk impact, Developer API, and Settings."
+
+PART 5: LIVE DEMO - THE SAFE PAYMENT
+-------------------------------------------------------
+"Now, we will test our platform live. I am going to send a normal payment through our terminal directly to the live dashboard."
+
+[Action: Copy and paste Command 1 into your terminal and press Enter]
+
+"While that processes, let's look at the payload. This is a very safe user. The transaction amount is small (25 rupees). They are using a normal Gmail address, a standard Windows desktop, and their network distance is very close to their home address. 
+
+Now, I'll go over to Render and I'll show you the live backend logs catching the transaction instantly."
+
+[Action: Show the Render logs screen for a few seconds]
+
+"And then I'll go back to our dashboard. Earlier we had our previous total, but now that we sent this, the number has increased in real-time. We will go to the Transactions tab. Here you can see our sent transaction. Because the ML score was safe, and the Graph AI found no bad connections, it was safely ALLOWED."
+
+PART 6: LIVE DEMO - THE HACKER ATTACK (VELOCITY & VPN)
+-------------------------------------------------------
+"Next, we will look at a highly dangerous transaction. I will send a hacker transaction from the terminal."
+
+[Action: Copy and paste Command 2 into your terminal and press Enter]
+
+"Let's look at what the hacker just tried to do in this payload. They tried to process 8,500 rupees. They used an untraceable 'anonymous.com' email. Even more importantly, look at the 'Velocity' fields (C1 and C2). These numbers are incredibly high, meaning this single device is trying to process dozens of payments rapidly. 
+
+Furthermore, their network distance (dist1) is 500, meaning they are hiding behind a VPN."
+
+[Action: Switch back to the dashboard]
+
+"Just like before, it hits our live dashboard instantly. But this time, it was BLOCKED. 
+
+Because of the high velocity, our Graph AI instantly realized this was a single device trying to test multiple cards. 
+
+If we open this blocked transaction and go to the Investigation AI tab, you can see exactly why this is revolutionary. Instead of a human analyst spending 30 minutes trying to figure out why the system blocked this, our Gemini AI investigated the high amount, the hidden VPN, and the velocity attack. It automatically generated a complete report explaining the exact danger in plain English."
+
+PART 7: CONCLUSION
+-------------------------------------------------------
+"This is the true power of RiskSentinel X. We don't just stop the fraud before it happens; we provide total transparency. We catch velocity attacks, we map hidden networks, and we give analysts the exact reason why in seconds. 
+
+Thank you for your time!"
+
+
+=======================================================
+COMMANDS TO COPY/PASTE DURING THE VIDEO
+(Have these open in a notepad next to your terminal)
+=======================================================
+
+Command 1: The Normal Payment (Legitimate)
+-------------------------------------------------------
+Invoke-RestMethod -Uri "https://risksentinel-backend.onrender.com/api/v1/transactions/process" -Method Post -ContentType "application/json" -Body '{
+    "TransactionID": "tx_legit_001",
+    "TransactionDT": 86400,
+    "TransactionAmt": 25.50,
+    "ProductCD": "W",
+    "customer_id": "CUST-SAFE-01",
+    "entity_id": "IP-HOME",
+    "DeviceType": "desktop",
+    "DeviceInfo": "Windows",
+    "P_emaildomain": "gmail.com",
+    "card4": "visa",
+    "card6": "debit",
+    "dist1": 5.0,
+    "C1": 1.0,
+    "C2": 1.0
+}'
+
+Command 2: The Hacker Attack (High-Risk Fraud)
+-------------------------------------------------------
+Invoke-RestMethod -Uri "https://risksentinel-backend.onrender.com/api/v1/transactions/process" -Method Post -ContentType "application/json" -Body '{
+    "TransactionID": "tx_fraud_001",
+    "TransactionDT": 86400,
+    "TransactionAmt": 8500.00,
+    "ProductCD": "C",
+    "customer_id": "CUST-SUS-99",
+    "entity_id": "IP-SHARED-VPN",
+    "DeviceType": "mobile",
+    "DeviceInfo": "Unknown Device",
+    "P_emaildomain": "anonymous.com",
+    "card4": "mastercard",
+    "card6": "credit",
+    "dist1": 500.0,
+    "C1": 15.0,
+    "C2": 25.0
+}'
