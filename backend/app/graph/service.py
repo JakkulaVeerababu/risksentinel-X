@@ -64,9 +64,9 @@ class GraphRiskService:
                     "entity_type": "ip",
                     "cluster_detected": True,
                     "community_id": "9999",
-                    "graph_risk": 95.0,
+                    "graph_risk": 0.95,
                     "related_entities": 14,
-                    "signals": {"connected_customer_count": 14, "connected_device_count": 3, "shared_velocity": 50, "ip_risk_score": 95.0, "graph_degree": 18}
+                    "signals": {"connected_customer_count": 14, "connected_device_count": 3, "shared_velocity": 50, "ip_risk_score": 0.95, "graph_degree": 18}
                 }
             else:
                 logging.warning(f"Entity '{entity_id}' not found in Graph. Defaulting to empty risk.")
