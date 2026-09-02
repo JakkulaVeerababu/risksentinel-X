@@ -21,6 +21,8 @@ export default function CaseDetailPage() {
   const [retry, setRetry] = useState(0);
   const [resolvingDecision, setResolvingDecision] = useState<"ALLOW" | "BLOCK" | null>(null);
 
+  const [resolvedInSession, setResolvedInSession] = useState(false);
+
   const handleResolve = async (finalDecision: "ALLOW" | "BLOCK") => {
     setResolvingDecision(finalDecision);
     try {
@@ -28,6 +30,7 @@ export default function CaseDetailPage() {
       setData(prev => prev ? { ...prev, policy: { ...prev.policy, decision: finalDecision } } : prev);
       const audit = await fetchAuditTimeline(caseId).catch(() => ({ events: [] }));
       if (audit.events) setEvents(audit.events);
+      setResolvedInSession(true);
     } catch (err) {
       alert("Failed to resolve case.");
     } finally {
@@ -72,20 +75,22 @@ export default function CaseDetailPage() {
     {back}
     <header className="case-heading"><div><p>Case evidence</p><h1>{transaction.id || caseId}</h1></div><a href="#case-audit" className="workspace-button">View audit trail <ArrowDown size={14} /></a></header>
 
-    <section className="record-card case-action-banner" aria-labelledby="case-resolution-heading">
-      <div>
-        <h3 id="case-resolution-heading">Manual resolution</h3>
-        <p>Review the evidence below and record or override the final payment decision.</p>
-      </div>
-      <div className="case-action-buttons" aria-label="Manual resolution actions">
-        <button type="button" className="case-action-button case-action-button-approve" disabled={resolvingDecision !== null} aria-busy={resolvingDecision === "ALLOW"} onClick={() => handleResolve("ALLOW")}>
-          {resolvingDecision === "ALLOW" ? "Recording…" : "Approve payment"}
-        </button>
-        <button type="button" className="case-action-button case-action-button-decline" disabled={resolvingDecision !== null} aria-busy={resolvingDecision === "BLOCK"} onClick={() => handleResolve("BLOCK")}>
-          {resolvingDecision === "BLOCK" ? "Recording…" : "Decline payment"}
-        </button>
-      </div>
-    </section>
+    {!resolvedInSession && (
+      <section className="record-card case-action-banner" aria-labelledby="case-resolution-heading">
+        <div>
+          <h3 id="case-resolution-heading">Manual resolution</h3>
+          <p>Review the evidence below and record or override the final payment decision.</p>
+        </div>
+        <div className="case-action-buttons" aria-label="Manual resolution actions">
+          <button type="button" className="case-action-button case-action-button-approve" disabled={resolvingDecision !== null} aria-busy={resolvingDecision === "ALLOW"} onClick={() => handleResolve("ALLOW")}>
+            {resolvingDecision === "ALLOW" ? "Recording…" : "Approve payment"}
+          </button>
+          <button type="button" className="case-action-button case-action-button-decline" disabled={resolvingDecision !== null} aria-busy={resolvingDecision === "BLOCK"} onClick={() => handleResolve("BLOCK")}>
+            {resolvingDecision === "BLOCK" ? "Recording…" : "Decline payment"}
+          </button>
+        </div>
+      </section>
+    )}
 
     <section className="record-card case-decision" aria-label="Final policy outcome">
       <div className="case-decision-top">
