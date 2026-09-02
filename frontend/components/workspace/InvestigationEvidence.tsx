@@ -26,7 +26,10 @@ function evidenceItem(entry: unknown, index: number) {
 }
 
 export default function InvestigationEvidence({ evidence }: InvestigationEvidenceProps) {
-  const items = (evidence || []).map(evidenceItem);
+  const items = (evidence || [])
+    .map(evidenceItem)
+    .filter(item => item.description !== "A supporting signal was recorded without a text description.");
+    
   if (!items.length) return null;
 
   return (
