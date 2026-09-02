@@ -120,32 +120,45 @@ def seed_demo_data(db: Session = Depends(get_db)):
             
     db.commit()
     
-    # 2. Seed Authentic Hacker Graph Data
+    # 2. Seed Graph Data
     import logging
     from app.models.domain import GraphEntityModel, GraphRelationshipModel
     from app.graph.service import GraphRiskService
+    from app.seed_graph import seed
     
     try:
-        # Check if IP-SHARED-VPN is already in the DB
+        # First, organically seed the 10,000 nodes from CSV if empty
+        seed()
+        
+        # Then inject the hacker
         existing_vpn = db.query(GraphEntityModel).filter_by(entity_id="IP-SHARED-VPN").first()
-        if not existing_vpn:
-            # Insert authentic nodes
-            nodes = [
-                GraphEntityModel(entity_id="IP-SHARED-VPN", entity_type="ip"),
-                GraphEntityModel(entity_id="CUST-SUS-99", entity_type="customer"),
-                GraphEntityModel(entity_id="DEV-HACK-01", entity_type="device")
-            ]
-            db.add_all(nodes)
+        if existing_vpn:
+            db.delete(existing_vpn)
+            db.commit()
             
-            # Connect them to each other
-            rels = [
-                GraphRelationshipModel(source="CUST-SUS-99", target="DEV-HACK-01", relationship_type="USES_DEVICE"),
-                GraphRelationshipModel(source="DEV-HACK-01", target="IP-SHARED-VPN", relationship_type="FROM_IP"),
-                GraphRelationshipModel(source="CUST-SUS-99", target="IP-SHARED-VPN", relationship_type="FROM_IP")
-            ]
+        # Insert authentic nodes
+        nodes = [
+            GraphEntityModel(entity_id="IP-SHARED-VPN", entity_type="ip"),
+            GraphEntityModel(entity_id="CUST-SUS-99", entity_type="customer"),
+            GraphEntityModel(entity_id="DEV-HACK-01", entity_type="device")
+        ]
+        # Ignore unique constraint errors for the other 2 nodes if they exist
+        for n in nodes:
+            if not db.query(GraphEntityModel).filter_by(entity_id=n.entity_id).first():
+                db.add(n)
+        
+        db.commit()
+        
+        # Connect them to each other
+        rels = [
+            GraphRelationshipModel(source="CUST-SUS-99", target="DEV-HACK-01", relationship_type="USES_DEVICE"),
+            GraphRelationshipModel(source="DEV-HACK-01", target="IP-SHARED-VPN", relationship_type="FROM_IP"),
+            GraphRelationshipModel(source="CUST-SUS-99", target="IP-SHARED-VPN", relationship_type="FROM_IP")
+        ]
+            db.commit() # Commit to avoid detached instances issues
             
-            # Connect them organically to 10 random existing customers to form a massive fraud ring
-            existing_customers = db.query(GraphEntityModel).filter_by(entity_type="customer").limit(10).all()
+            # Now we guarantee existing_customers is NOT empty!
+            existing_customers = db.query(GraphEntityModel).filter_by(entity_type="customer").limit(15).all()
             for c in existing_customers:
                 rels.append(GraphRelationshipModel(source=c.entity_id, target="IP-SHARED-VPN", relationship_type="FROM_IP"))
                 rels.append(GraphRelationshipModel(source=c.entity_id, target="DEV-HACK-01", relationship_type="USES_DEVICE"))
