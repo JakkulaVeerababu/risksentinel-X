@@ -36,8 +36,9 @@ export interface AgentInvestigation {
 export interface PolicyDecision {
   decision: string;
   reason: string | null;
-  version: string;
+  version: string | null;
   triggered_rules: string[];
+  processing?: boolean;
 }
 
 export interface AuditEvent {

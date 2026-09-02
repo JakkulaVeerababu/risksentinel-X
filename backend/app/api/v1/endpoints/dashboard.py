@@ -149,6 +149,25 @@ def get_full_case(transaction_id: str, db: Session = Depends(get_db)):
     inv = db.query(InvestigationModel).filter(InvestigationModel.transaction_id == transaction_id).first()
     dec = db.query(DecisionModel).filter(DecisionModel.transaction_id == transaction_id).first()
 
+    recorded_decision = dec.decision if dec else tx.decision
+    has_final_decision = bool(recorded_decision and recorded_decision != "PENDING")
+    is_processing = not has_final_decision and tx.status != "FAILED"
+    if inv:
+        agent_status = inv.agent_state
+    elif is_processing:
+        agent_status = "IN_PROGRESS"
+    else:
+        agent_status = "NOT_RECORDED"
+
+    if dec:
+        policy_reason = dec.reason
+    elif is_processing:
+        policy_reason = "Risk processing is still in progress."
+    elif tx.status == "FAILED":
+        policy_reason = "Risk processing did not complete. Review the audit trail."
+    else:
+        policy_reason = None
+
     return {
         "transaction": {
             "id": tx.transaction_id,
@@ -168,17 +187,18 @@ def get_full_case(transaction_id: str, db: Session = Depends(get_db)):
             "connected_customers": 0
         },
         "agent": {
-            "status": inv.agent_state if inv else "SKIPPED",
+            "status": agent_status,
             "recommendation": inv.recommendation if inv else None,
             "confidence": inv.confidence if inv else None,
             "reason_codes": inv.reason_codes if inv else [],
             "evidence": inv.evidence if inv else []
         },
         "policy": {
-            "decision": dec.decision if dec else (tx.decision or "PENDING"),
-            "reason": dec.reason if dec else None,
-            "version": dec.policy_version if dec else "policy-v1",
-            "triggered_rules": dec.matched_rules if dec else []
+            "decision": recorded_decision or "PENDING",
+            "reason": policy_reason,
+            "version": dec.policy_version if dec else None,
+            "triggered_rules": dec.matched_rules if dec else [],
+            "processing": is_processing
         }
     }
 

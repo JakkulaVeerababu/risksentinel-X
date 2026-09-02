@@ -29,6 +29,9 @@ export default function TransactionDetailPage() {
 
   useEffect(() => {
     let active = true;
+    let pollTimer: number | undefined;
+    let hasLoaded = false;
+    let pollCount = 0;
     setLoading(true);
     setError(false);
     setAuditError(false);
@@ -43,11 +46,25 @@ export default function TransactionDetailPage() {
         setData(caseResult);
         setTimeline([...(auditResult.events || [])].sort((a, b) => (Date.parse(a.timestamp) || 0) - (Date.parse(b.timestamp) || 0)));
         setAuditError(auditResult.failed);
-      } catch { if (active) setError(true); }
+        hasLoaded = true;
+
+        const caseDecision = caseResult.policy?.decision?.toUpperCase();
+        const caseStatus = caseResult.transaction?.status?.toUpperCase();
+        const isTerminal = caseResult.policy?.processing === false
+          || (!!caseDecision && caseDecision !== "PENDING")
+          || caseStatus === "FAILED";
+        if (!isTerminal && pollCount < 45) {
+          pollCount += 1;
+          pollTimer = window.setTimeout(() => void loadData(), 2000);
+        }
+      } catch { if (active && !hasLoaded) setError(true); }
       finally { if (active) setLoading(false); }
     }
     void loadData();
-    return () => { active = false; };
+    return () => {
+      active = false;
+      if (pollTimer !== undefined) window.clearTimeout(pollTimer);
+    };
   }, [transactionId, retry]);
 
   const backLink = <Link href="/transactions" className="inline-flex items-center gap-2 text-[12px] font-medium text-[#728096] hover:text-[#263b5b]"><ArrowLeft className="h-3.5 w-3.5" />Back to transactions</Link>;
@@ -59,6 +76,12 @@ export default function TransactionDetailPage() {
   const graphScore = scorePercent(graph?.risk_score, 1);
   const decision = policy?.decision || "PENDING";
   const agentState = agent?.status || "NOT_RECORDED";
+  const isProcessing = policy?.processing ?? (decision.toUpperCase() === "PENDING" && transaction.status !== "FAILED");
+  const outcomeReason = isProcessing
+    ? policy?.reason || "Risk processing is still in progress."
+    : policy?.reason
+      ? reasonText(policy.reason)
+      : "No policy reason was recorded for this payment.";
   const amount = typeof transaction.amount === "number" ? `₹${transaction.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "Not recorded";
 
   return <div className="transaction-detail review-workspace min-w-0 space-y-6">
@@ -70,7 +93,7 @@ export default function TransactionDetailPage() {
 
     <section className="overflow-hidden rounded-xl border border-[#dde3ec] bg-white" aria-label="Payment decision record">
       <div className="decision-record-summary">
-        <div><p className="text-[11px] font-medium text-[#8190a3]">Final policy outcome</p><div className="mt-3 text-[28px] font-semibold leading-none tracking-tight text-[#243650]">{readableCode(decision)}</div><p className="mt-3 max-w-xl text-[13px] leading-6 text-[#758399]">{policy?.reason ? reasonText(policy.reason) : "No policy reason was recorded for this payment."}</p></div>
+        <div><p className="text-[11px] font-medium text-[#8190a3]">{isProcessing ? "Policy outcome" : "Final policy outcome"}</p><div className={`mt-3 inline-flex items-center gap-2 text-[28px] font-semibold leading-none tracking-tight ${isProcessing ? "text-[#245cff]" : "text-[#243650]"}`}>{isProcessing && <span className="h-2 w-2 animate-pulse rounded-full bg-[#245cff]" aria-hidden="true" />}{isProcessing ? "Processing" : readableCode(decision)}</div><p className="mt-3 max-w-xl text-[13px] leading-6 text-[#758399]">{outcomeReason}</p></div>
         <dl className="grid grid-cols-2 gap-x-7 gap-y-5 text-[12px]"><div><dt className="text-[#8a95a6]">Payment amount</dt><dd className="mt-1.5 text-[18px] font-medium tabular-nums text-[#34455e]">{amount}</dd></div><div><dt className="text-[#8a95a6]">Customer</dt><dd className="mt-2 break-all font-mono text-[#52627a]">{transaction.customer_id || "Not recorded"}</dd></div><div><dt className="text-[#8a95a6]">Received</dt><dd className="mt-1.5 text-[#607087]">{recordedAt(transaction.timestamp)}</dd></div><div><dt className="text-[#8a95a6]">Policy version</dt><dd className="mt-1.5 break-all font-mono text-[#607087]">{policy?.version || "Not recorded"}</dd></div></dl>
       </div>
 
@@ -80,9 +103,9 @@ export default function TransactionDetailPage() {
       </div>
 
       <section className="border-t border-[#e6ebf1] px-6 py-5 sm:px-7" aria-label="Assisted investigation">
-        <p className="record-note case-explanation mb-4">{policyExplanation(decision, agent?.recommendation, policy?.reason)}</p>
+        <p className="record-note case-explanation mb-4">{isProcessing ? "Model and graph checks are complete. Assisted investigation and policy evaluation are still running." : policyExplanation(decision, agent?.recommendation, policy?.reason)}</p>
         <div className="flex items-center justify-between gap-4"><h2 className="text-[13px] font-semibold text-[#40516b]">Assisted investigation</h2><span className="text-[12px] text-[#8490a2]">{readableCode(agentState)}</span></div>
-        {agentState === "SKIPPED" ? <p className="mt-3 text-[12px] leading-6 text-[#7b899e]">No assisted investigation was run for this payment. The outcome was determined by policy.</p> : agentState === "DEGRADED" ? <p className="mt-3 text-[12px] leading-6 text-[#8a7658]">Investigation ran in degraded mode. Review the recorded policy outcome and supporting audit events.</p> : <div className="mt-4"><div className="flex flex-wrap items-center gap-4 text-[12px]"><span className="text-[#8a95a6]">Recommendation</span><DecisionBadge decision={agent?.recommendation || "UNKNOWN"} />{agent?.confidence != null && <span className="text-[#7c899c]">{scorePercent(agent.confidence)}% confidence</span>}</div>{!!agent?.reason_codes?.length && <p className="mt-3 text-[12px] leading-6 text-[#7b899e]">{reasonText(agent.reason_codes)}</p>}</div>}
+        {agentState === "IN_PROGRESS" ? <p className="mt-3 text-[12px] leading-6 text-[#245cff]">Gemini is reviewing the recorded evidence. This page will update automatically.</p> : agentState === "SKIPPED" ? <p className="mt-3 text-[12px] leading-6 text-[#7b899e]">No assisted investigation was run for this payment. The outcome was determined by policy.</p> : agentState === "DEGRADED" ? <p className="mt-3 text-[12px] leading-6 text-[#8a7658]">Gemini was unavailable, so the investigation used the safe review fallback. Policy still produced the final outcome.</p> : agentState === "NOT_RECORDED" ? <p className="mt-3 text-[12px] leading-6 text-[#7b899e]">No investigation record is available. Review the audit timeline for the last completed stage.</p> : <div className="mt-4"><div className="flex flex-wrap items-center gap-4 text-[12px]"><span className="text-[#8a95a6]">Recommendation</span><DecisionBadge decision={agent?.recommendation || "UNKNOWN"} />{agent?.confidence != null && <span className="text-[#7c899c]">{scorePercent(agent.confidence)}% confidence</span>}</div>{!!agent?.reason_codes?.length && <p className="mt-3 text-[12px] leading-6 text-[#7b899e]">{reasonText(agent.reason_codes)}</p>}</div>}
         <InvestigationEvidence evidence={agent?.evidence} />
         {!!policy?.triggered_rules?.length && <div className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-2 border-t border-[#edf0f5] pt-4 text-[11px]"><span className="text-[#8a95a6]">Matched policy rules</span><span className="break-all font-mono text-[#65758d]">{policy.triggered_rules.join(" · ")}</span></div>}
       </section>

@@ -37,8 +37,12 @@ class InvestigationService:
             else:
                 self.provider_error = "MockProvider is only allowed in test mode (APP_ENV=test)."
         elif provider_name == "gemini":
-            from app.agent.providers.gemini import GeminiProvider
-            self.provider = GeminiProvider()
+            try:
+                from app.agent.providers.gemini import GeminiProvider
+                self.provider = GeminiProvider()
+            except Exception as e:
+                logging.error("Gemini provider could not be initialized: %s", e)
+                self.provider_error = f"Gemini provider configuration failed: {e}"
         elif not provider_name:
             self.provider_error = "AGENT_PROVIDER is missing. Provider configuration is required."
         else:

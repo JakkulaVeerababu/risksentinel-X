@@ -12,7 +12,11 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
-        value: gemini-2.5-flash
+        value: gemini-3.6-flash
+      - key: GEMINI_TIMEOUT_MS
+        value: "10000"
+      - key: GEMINI_RETRY_ATTEMPTS
+        value: "2"
       - key: DATABASE_URL
         sync: false
       - key: APP_ENV

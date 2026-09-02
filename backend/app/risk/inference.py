@@ -81,20 +81,19 @@ class RiskModelService:
         if not self.is_loaded:
             raise ModelArtifactError("Model is not loaded.")
             
-        # 1. Convert to DataFrame
-        df = pd.DataFrame([payload])
-        
-        # 2. Add missing columns with None to fulfill manifest
+        # Build every feature column in one operation. Adding columns one at a
+        # time fragments the DataFrame and creates a warning for every missing
+        # IEEE-CIS feature in production logs.
         feature_order = self.feature_manifest.get("feature_order", [])
-        for col in feature_order:
-            if col not in df.columns:
-                df[col] = None
+        df = pd.DataFrame([payload])
+        if feature_order:
+            df = df.reindex(columns=feature_order, fill_value=None)
                 
-        # 3. Transform using preprocessor
+        # 2. Transform using preprocessor
         X_trans = self.preprocessor.transform(df)
         
-        # 4. Predict
+        # 3. Predict
         proba = self.model.predict_proba(X_trans)[0, 1]
         
-        # 5. Guarantee [0,1] bounding
+        # 4. Guarantee [0,1] bounding
         return float(max(0.0, min(1.0, proba)))

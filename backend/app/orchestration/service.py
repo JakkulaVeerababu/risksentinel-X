@@ -219,6 +219,7 @@ class RiskOrchestrator:
             }, latency=agent_latency)
         else:
             # Run agent
+            self._update_status(tx, LifecycleState.INVESTIGATING)
             self._record_audit(transaction_id, "AGENT_STARTED", {
                 "ml_score": ml_score, 
                 "graph_score": graph_score,
@@ -253,7 +254,11 @@ class RiskOrchestrator:
             
             if agent_response.status == "DEGRADED":
                 self._update_status(tx, LifecycleState.DEGRADED)
-                self._record_audit(transaction_id, "AGENT_DEGRADED", {"error": "Agent execution degraded"}, latency=agent_latency)
+                self._record_audit(transaction_id, "AGENT_DEGRADED", {
+                    "recommendation": str(agent_response.investigation.recommendation),
+                    "confidence": agent_response.investigation.confidence,
+                    "reason_codes": [str(code) for code in agent_response.investigation.reason_codes],
+                }, latency=agent_latency)
             else:
                 self._update_status(tx, LifecycleState.INVESTIGATING)
                 self._record_audit(transaction_id, "AGENT_COMPLETED", {"recommendation": str(agent_response.investigation.recommendation), "confidence": agent_response.investigation.confidence}, latency=agent_latency)
