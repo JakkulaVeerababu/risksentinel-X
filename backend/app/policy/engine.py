@@ -45,23 +45,12 @@ class PolicyEngine:
         matched_rule = "SAFE_FALLBACK_ALLOW"
         reason = "NO_MATCHING_POLICY"
         
-        if active_policies:
-            for policy in active_policies:
-                if self._evaluate_conditions(policy.conditions, context):
-                    final_decision = policy.action
-                    matched_rule = policy.policy_id
-                    reason = policy.reason_code
-                    break
-        else:
-            # DEMO FALLBACK: If database was wiped and has no policies, use hardcoded demo rules
-            if inputs.ml_score >= 0.75 and inputs.graph_score >= 0.3:
-                final_decision = "BLOCK"
-                matched_rule = "P-V1-004"
-                reason = "HIGH_ML_AND_GRAPH"
-            elif inputs.agent_recommendation == "REVIEW":
-                final_decision = "REVIEW"
-                matched_rule = "AGENT_RECOMMENDS_REVIEW"
-                reason = "AGENT_ESCALATION"
+        for policy in active_policies:
+            if self._evaluate_conditions(policy.conditions, context):
+                final_decision = policy.action
+                matched_rule = policy.policy_id
+                reason = policy.reason_code
+                break
 
         return PolicyDecisionResult(
             final_decision=final_decision,

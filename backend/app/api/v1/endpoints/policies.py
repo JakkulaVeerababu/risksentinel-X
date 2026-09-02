@@ -63,3 +63,71 @@ def toggle_policy(policy_id: str, db: Session = Depends(get_db)):
     policy.enabled = not policy.enabled
     db.commit()
     return {"status": "success", "enabled": policy.enabled, "policy_id": policy_id}
+
+@router.post("/seed_demo_data")
+def seed_demo_data(db: Session = Depends(get_db)):
+    """
+    Seeds the live database with demo policies and graph data.
+    """
+    # 1. Seed Policies
+    from app.policy.config import POLICY_VERSION
+    policies_to_seed = [
+        {
+            "policy_id": "P-V1-001",
+            "name": "Low Machine Risk -> ALLOW",
+            "priority": 100,
+            "conditions": {"operator": "AND", "rules": [{"field": "ml_score", "operator": "<", "value": 0.4}]},
+            "action": "ALLOW",
+            "reason_code": "LOW_MACHINE_RISK",
+            "enabled": True,
+        },
+        {
+            "policy_id": "P-V1-004",
+            "name": "ML High AND Graph High -> BLOCK",
+            "priority": 90,
+            "conditions": {"operator": "AND", "rules": [{"field": "ml_score", "operator": ">=", "value": 0.75}, {"field": "graph_score", "operator": ">=", "value": 0.3}]},
+            "action": "BLOCK",
+            "reason_code": "HIGH_ML_AND_GRAPH",
+            "enabled": True,
+        },
+        {
+            "policy_id": "AGENT_RECOMMENDS_REVIEW",
+            "name": "Agent REVIEW -> REVIEW",
+            "priority": 80,
+            "conditions": {"operator": "AND", "rules": [{"field": "agent_recommendation", "operator": "==", "value": "REVIEW"}]},
+            "action": "REVIEW",
+            "reason_code": "AGENT_ESCALATION",
+            "enabled": True,
+        }
+    ]
+    
+    seeded_policies = 0
+    for p in policies_to_seed:
+        existing = db.query(PolicyModel).filter_by(policy_id=p["policy_id"]).first()
+        if not existing:
+            new_policy = PolicyModel(
+                policy_id=p["policy_id"],
+                name=p["name"],
+                priority=p["priority"],
+                conditions=p["conditions"],
+                action=p["action"],
+                reason_code=p["reason_code"],
+                enabled=p["enabled"],
+                version=POLICY_VERSION
+            )
+            db.add(new_policy)
+            seeded_policies += 1
+            
+    db.commit()
+    
+    # 2. Seed Graph Data
+    import logging
+    try:
+        from app.seed_graph import seed
+        seed()
+        graph_status = "success"
+    except Exception as e:
+        logging.error(f"Graph seed failed: {e}")
+        graph_status = f"failed: {e}"
+        
+    return {"status": "success", "policies_seeded": seeded_policies, "graph_status": graph_status}
