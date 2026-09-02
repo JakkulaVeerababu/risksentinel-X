@@ -27,7 +27,7 @@ def get_policy_metadata():
             {"rule_id": "P-V1-004", "description": "ML High AND Graph High -> BLOCK"},
             {"rule_id": "AGENT_BLOCK_WITHOUT_STRONG_MACHINE_EVIDENCE", "description": "Agent BLOCK with Low Machine Risk -> REVIEW"},
             {"rule_id": "AGENT_RECOMMENDS_REVIEW", "description": "Agent REVIEW -> REVIEW"},
-            {"rule_id": "SAFE_FALLBACK_REVIEW", "description": "Unknown Input Combination -> REVIEW (Safe Fallback)"}
+            {"rule_id": "SAFE_FALLBACK_ALLOW", "description": "Unknown Input Combination -> ALLOW (Safe Fallback)"}
         ]
     )
 @router.get("")
