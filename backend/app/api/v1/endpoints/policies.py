@@ -154,17 +154,16 @@ def seed_demo_data(db: Session = Depends(get_db)):
             GraphRelationshipModel(source="DEV-HACK-01", target="IP-SHARED-VPN", relationship_type="FROM_IP"),
             GraphRelationshipModel(source="CUST-SUS-99", target="IP-SHARED-VPN", relationship_type="FROM_IP")
         ]
-            db.commit() # Commit to avoid detached instances issues
+        
+        # Now we guarantee existing_customers is NOT empty!
+        existing_customers = db.query(GraphEntityModel).filter_by(entity_type="customer").limit(15).all()
+        for c in existing_customers:
+            rels.append(GraphRelationshipModel(source=c.entity_id, target="IP-SHARED-VPN", relationship_type="FROM_IP"))
+            rels.append(GraphRelationshipModel(source=c.entity_id, target="DEV-HACK-01", relationship_type="USES_DEVICE"))
             
-            # Now we guarantee existing_customers is NOT empty!
-            existing_customers = db.query(GraphEntityModel).filter_by(entity_type="customer").limit(15).all()
-            for c in existing_customers:
-                rels.append(GraphRelationshipModel(source=c.entity_id, target="IP-SHARED-VPN", relationship_type="FROM_IP"))
-                rels.append(GraphRelationshipModel(source=c.entity_id, target="DEV-HACK-01", relationship_type="USES_DEVICE"))
-                
-            db.add_all(rels)
-            db.commit()
-            
+        db.add_all(rels)
+        db.commit()
+        
         # Force the Graph Engine to reload from the authentic database
         GraphRiskService.get_instance().load_graph()
         graph_status = "success"
