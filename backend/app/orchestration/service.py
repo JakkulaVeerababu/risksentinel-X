@@ -245,8 +245,8 @@ class RiskOrchestrator:
                     investigation=InvestigationResult(
                         recommendation="BLOCK",
                         confidence=0.9,
-                        reasoning=f"Agent analysis failed: {str(e)}",
-                        supporting_evidence=[]
+                        reason_codes=["AGENT_UNAVAILABLE"],
+                        evidence=[]
                     )
                 )
             agent_latency = (time.perf_counter() - agent_start) * 1000

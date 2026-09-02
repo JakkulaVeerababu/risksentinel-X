@@ -144,7 +144,7 @@ class InvestigationService:
             # 5. Strict Deterministic Validation
             validated_result = DeterministicValidator.validate_and_filter(raw_result, context)
             
-        except (TimeoutError, ValueError, RuntimeError) as e:
+        except Exception as e:
             logging.error(f"Agent Provider Failed: {e}")
             investigation_status = "DEGRADED"
             validated_result = InvestigationResult(
