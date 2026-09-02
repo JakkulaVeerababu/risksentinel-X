@@ -110,8 +110,8 @@ class InvestigationService:
                 provider_info="none",
                 tool_calls=[],
                 investigation=InvestigationResult(
-                    recommendation=RecommendationEnum.ALLOW,
-                    confidence=1.0,
+                    recommendation=None,
+                    confidence=None,
                     reason_codes=[],
                     evidence=[]
                 )

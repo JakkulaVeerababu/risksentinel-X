@@ -291,6 +291,9 @@ def test_persistence_logic():
     saved_model = db_mock.add.call_args[0][0]
     assert isinstance(saved_model, InvestigationModel)
     assert saved_model.agent_state == "SKIPPED"
+    assert resp.status == "SKIPPED"
+    assert resp.investigation.recommendation is None
+    assert resp.investigation.confidence is None
 
 # A-25, A-26 BLOCK 0.99 Advisory
 def test_block_advisory():
