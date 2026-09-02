@@ -225,16 +225,30 @@ class RiskOrchestrator:
                 "gate_version": gate_result.gate_version,
                 "gate_result": gate_result.decision
             })
-            agent_response = self.agent_service.investigate(
-                InvestigationRequest(
+            try:
+                agent_response = self.agent_service.investigate(
+                    InvestigationRequest(
+                        transaction_id=transaction_id,
+                        ml_risk_score=ml_score,
+                        graph_risk_score=graph_score,
+                        customer_id=request.customer_id,
+                        graph_entity_id=entity_id
+                    ), 
+                    self.db
+                )
+            except Exception as e:
+                logging.error(f"Agent Service Failed: {e}")
+                from app.agent.schemas import InvestigationResponse, InvestigationResult
+                agent_response = InvestigationResponse(
                     transaction_id=transaction_id,
-                    ml_risk_score=ml_score,
-                    graph_risk_score=graph_score,
-                    customer_id=request.customer_id,
-                    graph_entity_id=entity_id
-                ), 
-                self.db
-            )
+                    status="DEGRADED",
+                    investigation=InvestigationResult(
+                        recommendation="BLOCK",
+                        confidence=0.9,
+                        reasoning=f"Agent analysis failed: {str(e)}",
+                        supporting_evidence=[]
+                    )
+                )
             agent_latency = (time.perf_counter() - agent_start) * 1000
             
             if agent_response.status == "DEGRADED":
