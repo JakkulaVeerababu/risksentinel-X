@@ -71,11 +71,13 @@ export default function CaseDetailPage() {
   const modelScore = scorePercent(ml?.risk_score, 1);
   const graphScore = scorePercent(graph?.risk_score, 1);
   const rules = policy?.triggered_rules || [];
+  const hasManualResolution = events.some(e => e.event_type === "MANUAL_RESOLUTION");
+  
   return <div className="review-workspace case-evidence">
     {back}
     <header className="case-heading"><div><p>Case evidence</p><h1>{transaction.id || caseId}</h1></div><a href="#case-audit" className="workspace-button">View audit trail <ArrowDown size={14} /></a></header>
 
-    {!resolvedInSession && (
+    {!hasManualResolution && !resolvedInSession && (
       <section className="record-card case-action-banner" aria-labelledby="case-resolution-heading">
         <div>
           <h3 id="case-resolution-heading">Manual resolution</h3>
