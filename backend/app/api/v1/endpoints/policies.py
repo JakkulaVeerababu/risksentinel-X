@@ -127,16 +127,15 @@ def seed_demo_data(db: Session = Depends(get_db)):
     from app.seed_graph import seed
     
     try:
-        # First, organically seed the 10,000 nodes from CSV if empty
+        # First, WIPE the graph database so we can cleanly insert the 10,000 nodes
+        db.query(GraphRelationshipModel).delete()
+        db.query(GraphEntityModel).delete()
+        db.commit()
+        
+        # Organically seed the 10,000 nodes from CSV
         seed()
         
         # Then inject the hacker
-        existing_vpn = db.query(GraphEntityModel).filter_by(entity_id="IP-SHARED-VPN").first()
-        if existing_vpn:
-            db.delete(existing_vpn)
-            db.commit()
-            
-        # Insert authentic nodes
         nodes = [
             GraphEntityModel(entity_id="IP-SHARED-VPN", entity_type="ip"),
             GraphEntityModel(entity_id="CUST-SUS-99", entity_type="customer"),
