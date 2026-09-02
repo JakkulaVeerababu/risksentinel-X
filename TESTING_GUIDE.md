@@ -1,4 +1,4 @@
-# 🧪 RiskSentinel X - Live Testing Guide
+# RiskSentinel X - Live Testing Guide
 
 Welcome to RiskSentinel X! If you are evaluating or testing this project for the hackathon, follow these steps to simulate real-time transactions and see our 4-Stage AI Pipeline in action.
 
@@ -6,18 +6,18 @@ You do **NOT** need to run the project locally to test it. You can send test dat
 
 ---
 
-## 🖥️ Step 1: Open the Live Dashboard
+## Step 1: Open the Live Dashboard
 
 Before you start testing, open the live dashboard so you can watch your transactions appear in real-time:
-👉 **[Open RiskSentinel X Dashboard](https://risksentinel-x.vercel.app/dashboard)**
+**[Open RiskSentinel X Dashboard](https://risksentinel-x.vercel.app/dashboard)**
 
 ---
 
-## 🚀 Step 2: Send a Test Transaction
+## Step 2: Send a Test Transaction
 
 You can send a transaction using either **cURL** (Mac/Linux) or **PowerShell** (Windows). Open your terminal and copy-paste one of the commands below.
 
-### 🟢 Scenario A: Legitimate Transaction (Should be ALLOWED)
+### Scenario A: Legitimate Transaction (Should be ALLOWED)
 This simulates a normal transaction with a low amount and trusted device footprint.
 
 **Windows (PowerShell):**
@@ -65,7 +65,7 @@ curl --request POST \
 
 ---
 
-### 🔴 Scenario B: High-Risk Fraudulent Transaction (Should be BLOCKED or REVIEWED)
+### Scenario B: High-Risk Fraudulent Transaction (Should be BLOCKED or REVIEWED)
 This simulates a suspicious transaction with a high amount, an anonymous email domain, and a shared suspicious IP address.
 
 **Windows (PowerShell):**
@@ -113,7 +113,7 @@ curl --request POST \
 
 ---
 
-## 📊 Step 3: Verify the Results
+## Step 3: Verify the Results
 1. Refresh the Live Dashboard.
 2. Click on the **"24H"** dropdown and change it to **"All Time"** if needed.
 3. You will instantly see the metrics update.
@@ -121,4 +121,4 @@ curl --request POST \
 5. Click on the `TransactionID` you just sent (e.g., `tx_fraud_001`) to open the **Investigation AI Case**.
 6. Witness the **Gemini AI Agent** provide a detailed explanation of exactly *why* it allowed or blocked your transaction!
 
-Happy Testing! 🛡️
+Happy Testing!
