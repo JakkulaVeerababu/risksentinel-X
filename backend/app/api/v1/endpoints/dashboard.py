@@ -11,12 +11,19 @@ from app.models.domain import TransactionModel
 router = APIRouter()
 
 @router.get("/metrics")
-def get_dashboard_metrics(db: Session = Depends(get_db)):
+def get_dashboard_metrics(period: str = "24H", db: Session = Depends(get_db)):
     """Aggregates metrics for the Risk Overview dashboard from the database."""
-    # 24H time window
-    time_threshold = datetime.utcnow() - timedelta(days=1)
+    now = datetime.utcnow()
+    
+    if period == "24H":
+        time_threshold = now - timedelta(days=1)
+    elif period == "7D":
+        time_threshold = now - timedelta(days=7)
+    elif period == "30D":
+        time_threshold = now - timedelta(days=30)
+    else:
+        time_threshold = datetime.min
 
-    # Base query for last 24h
     base_query = db.query(TransactionModel).filter(TransactionModel.timestamp >= time_threshold)
 
     total_tx = base_query.count()
@@ -24,56 +31,70 @@ def get_dashboard_metrics(db: Session = Depends(get_db)):
     review_tx = base_query.filter(TransactionModel.decision == "REVIEW").count()
     blocked_tx = base_query.filter(TransactionModel.decision == "BLOCK").count()
 
-    # Fraud Prevented (sum of blocked amounts)
     fraud_prevented = db.query(func.sum(TransactionModel.amount))\
         .filter(TransactionModel.timestamp >= time_threshold)\
         .filter(TransactionModel.decision == "BLOCK").scalar() or 0.0
 
-    # Critical Action (Exposure in REVIEW)
     review_exposure = db.query(func.sum(TransactionModel.amount))\
         .filter(TransactionModel.timestamp >= time_threshold)\
         .filter(TransactionModel.decision == "REVIEW").scalar() or 0.0
 
-    # Risk Distribution
     low_risk = base_query.filter(TransactionModel.ml_risk_score < 0.3).count()
     medium_risk = base_query.filter(TransactionModel.ml_risk_score >= 0.3, TransactionModel.ml_risk_score < 0.7).count()
     high_risk = base_query.filter(TransactionModel.ml_risk_score >= 0.7, TransactionModel.ml_risk_score < 0.9).count()
     critical_risk = base_query.filter(TransactionModel.ml_risk_score >= 0.9).count()
 
-    # Group actual persisted transactions by hour for the chart
-    now = datetime.utcnow()
-    transactions_24h = base_query.all()
-
-    # Initialize 24-hour buckets
-    buckets = {i: {"time": (now - timedelta(hours=i)).strftime("%H:00"), "volume": 0, "blocked": 0, "reviewed": 0, "risk_sum": 0.0} for i in range(23, -1, -1)}
-
-    for t in transactions_24h:
-        if not t.timestamp:
-            continue
-        # Calculate hours ago
-        delta = now - t.timestamp
-        hours_ago = int(delta.total_seconds() // 3600)
-        if 0 <= hours_ago <= 23:
-            bucket = buckets[hours_ago]
-            bucket["volume"] += 1
-            if t.decision == "BLOCK":
-                bucket["blocked"] += 1
-            elif t.decision == "REVIEW":
-                bucket["reviewed"] += 1
-            bucket["risk_sum"] += t.ml_risk_score if t.ml_risk_score else 0.0
-
+    transactions = base_query.all()
+    
+    # Chart buckets
     chart_data = []
-    for i in range(23, -1, -1):
-        b = buckets[i]
-        vol = b["volume"]
-        avg_risk = b["risk_sum"] / vol if vol > 0 else 0.0
-        chart_data.append({
-            "time": b["time"],
-            "volume": vol,
-            "blocked": b["blocked"],
-            "reviewed": b["reviewed"],
-            "risk_score": round(avg_risk, 2)
-        })
+    if period == "24H":
+        buckets = {i: {"time": (now - timedelta(hours=i)).strftime("%H:00"), "volume": 0, "blocked": 0, "reviewed": 0, "risk_sum": 0.0} for i in range(23, -1, -1)}
+        for t in transactions:
+            if not t.timestamp: continue
+            hours_ago = int((now - t.timestamp).total_seconds() // 3600)
+            if 0 <= hours_ago <= 23:
+                b = buckets[hours_ago]
+                b["volume"] += 1
+                if t.decision == "BLOCK": b["blocked"] += 1
+                elif t.decision == "REVIEW": b["reviewed"] += 1
+                b["risk_sum"] += (t.ml_risk_score or 0.0)
+                
+        for i in range(23, -1, -1):
+            b = buckets[i]
+            vol = b["volume"]
+            chart_data.append({
+                "time": b["time"],
+                "volume": vol,
+                "blocked": b["blocked"],
+                "reviewed": b["reviewed"],
+                "risk_score": round(b["risk_sum"] / vol, 2) if vol > 0 else 0.0
+            })
+    else:
+        # For 7D, 30D, ALL: Bucket by day (up to 30 days max for UI)
+        days_range = 7 if period == "7D" else (30 if period == "30D" else min(30, (now - min((t.timestamp for t in transactions if t.timestamp), default=now)).days + 1))
+        days_range = max(1, days_range)
+        buckets = {i: {"time": (now - timedelta(days=i)).strftime("%b %d"), "volume": 0, "blocked": 0, "reviewed": 0, "risk_sum": 0.0} for i in range(days_range - 1, -1, -1)}
+        for t in transactions:
+            if not t.timestamp: continue
+            days_ago = (now.date() - t.timestamp.date()).days
+            if 0 <= days_ago < days_range:
+                b = buckets[days_ago]
+                b["volume"] += 1
+                if t.decision == "BLOCK": b["blocked"] += 1
+                elif t.decision == "REVIEW": b["reviewed"] += 1
+                b["risk_sum"] += (t.ml_risk_score or 0.0)
+        
+        for i in range(days_range - 1, -1, -1):
+            b = buckets[i]
+            vol = b["volume"]
+            chart_data.append({
+                "time": b["time"],
+                "volume": vol,
+                "blocked": b["blocked"],
+                "reviewed": b["reviewed"],
+                "risk_score": round(b["risk_sum"] / vol, 2) if vol > 0 else 0.0
+            })
 
     return {
         "kpis": {

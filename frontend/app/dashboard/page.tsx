@@ -45,7 +45,7 @@ export default function DashboardPage() {
       try {
         setLoading(true);
         const [mRes, tRes] = await Promise.all([
-          fetchDashboardMetrics(),
+          fetchDashboardMetrics(period),
           fetchRecentTransactions()
         ]);
         setMetricsData(mRes);
@@ -60,7 +60,24 @@ export default function DashboardPage() {
       }
     }
     loadData();
-  }, []);
+  }, [period]);
+
+  const handleExportCsv = () => {
+    if (transactionsData.length === 0) return;
+    const headers = ["transaction_id", "customer_id", "amount", "ml_risk", "graph_risk", "decision", "timestamp"];
+    const rows = transactionsData.map(t => 
+      [t.transaction_id, t.customer_id, t.amount, t.ml_risk, t.graph_risk, t.decision, t.timestamp].join(",")
+    );
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `risksentinel_export_${period}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    announce("Export downloaded successfully");
+  };
 
   const announce = (message: string) => {
     setNotice(message);
@@ -79,7 +96,7 @@ export default function DashboardPage() {
 
   const m = metricsData.kpis;
   const metrics = [
-    { label: "Transactions", value: m.transactions_analysed.toLocaleString(), helper: "Last 24h", tone: "blue" },
+    { label: "Transactions", value: m.transactions_analysed.toLocaleString(), helper: period === "ALL" ? "All time" : `Last ${period.toLowerCase()}`, tone: "blue" },
     { label: "Review", value: m.under_review.toLocaleString(), helper: "Requires analyst", tone: "amber" },
     { label: "Blocked", value: m.blocked.toLocaleString(), helper: `₹${m.fraud_prevented.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} exposure stopped`, tone: "red" },
     { label: "High Risk", value: metricsData.distribution.high + metricsData.distribution.critical, helper: "Critical & High", tone: "amber" },
@@ -100,13 +117,25 @@ export default function DashboardPage() {
           <p className="mt-1 text-[14px] text-text-secondary">Payment risk, coordinated fraud and automated decisions across Acme Payments.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-label-sm font-medium text-text-primary shadow-sm hover:bg-surface-secondary transition-all">
-            <CalendarDays className="h-4 w-4 text-text-muted" />
-            24H <ChevronDown className="h-4 w-4 text-text-muted" />
-          </button>
-          <button className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-label-sm font-medium text-text-primary shadow-sm hover:bg-surface-secondary transition-all opacity-75 cursor-not-allowed" disabled>
+          <div className="relative">
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value)}
+              className="appearance-none flex items-center gap-2 rounded-lg border border-border bg-surface pl-4 pr-10 py-2 text-label-sm font-medium text-text-primary shadow-sm hover:bg-surface-secondary transition-all outline-none"
+            >
+              <option value="24H">Last 24H</option>
+              <option value="7D">Last 7 Days</option>
+              <option value="30D">Last 30 Days</option>
+              <option value="ALL">All Time</option>
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+          </div>
+          <button 
+            onClick={handleExportCsv}
+            className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-label-sm font-medium text-text-primary shadow-sm hover:bg-surface-secondary transition-all"
+          >
             <Download className="h-4 w-4 text-text-muted" />
-            Preview Export
+            Export CSV
           </button>
           <div className="hidden sm:block mx-1 h-6 w-px bg-border"></div>
           <Link href="/simulator" className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-label-sm font-semibold text-white shadow-sm hover:bg-primary-hover hover:premium-shadow-hover transition-all duration-200">

@@ -134,8 +134,8 @@ export async function fetchApiHealth(): Promise<{ status: string; database: stri
   return await response.json();
 }
 
-export async function fetchDashboardMetrics(): Promise<DashboardMetrics> {
-  const response = await apiFetch("/dashboard/metrics");
+export async function fetchDashboardMetrics(period: string = "24H"): Promise<DashboardMetrics> {
+  const response = await apiFetch(`/dashboard/metrics?period=${period}`);
   return await response.json();
 }
 
