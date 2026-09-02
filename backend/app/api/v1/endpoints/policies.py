@@ -120,13 +120,44 @@ def seed_demo_data(db: Session = Depends(get_db)):
             
     db.commit()
     
-    # 2. Seed Graph Data
+    # 2. Seed Authentic Hacker Graph Data
     import logging
+    from app.models.domain import GraphEntityModel, GraphRelationshipModel
+    from app.graph.service import GraphRiskService
+    
     try:
-        from app.seed_graph import seed
-        seed()
+        # Check if IP-SHARED-VPN is already in the DB
+        existing_vpn = db.query(GraphEntityModel).filter_by(entity_id="IP-SHARED-VPN").first()
+        if not existing_vpn:
+            # Insert authentic nodes
+            nodes = [
+                GraphEntityModel(entity_id="IP-SHARED-VPN", entity_type="ip"),
+                GraphEntityModel(entity_id="CUST-SUS-99", entity_type="customer"),
+                GraphEntityModel(entity_id="DEV-HACK-01", entity_type="device")
+            ]
+            db.add_all(nodes)
+            
+            # Connect them to each other
+            rels = [
+                GraphRelationshipModel(source="CUST-SUS-99", target="DEV-HACK-01", relationship_type="USES_DEVICE"),
+                GraphRelationshipModel(source="DEV-HACK-01", target="IP-SHARED-VPN", relationship_type="FROM_IP"),
+                GraphRelationshipModel(source="CUST-SUS-99", target="IP-SHARED-VPN", relationship_type="FROM_IP")
+            ]
+            
+            # Connect them organically to 10 random existing customers to form a massive fraud ring
+            existing_customers = db.query(GraphEntityModel).filter_by(entity_type="customer").limit(10).all()
+            for c in existing_customers:
+                rels.append(GraphRelationshipModel(source=c.entity_id, target="IP-SHARED-VPN", relationship_type="FROM_IP"))
+                rels.append(GraphRelationshipModel(source=c.entity_id, target="DEV-HACK-01", relationship_type="USES_DEVICE"))
+                
+            db.add_all(rels)
+            db.commit()
+            
+        # Force the Graph Engine to reload from the authentic database
+        GraphRiskService.get_instance().load_graph()
         graph_status = "success"
     except Exception as e:
+        db.rollback()
         logging.error(f"Graph seed failed: {e}")
         graph_status = f"failed: {e}"
         
