@@ -72,22 +72,20 @@ export default function CaseDetailPage() {
     {back}
     <header className="case-heading"><div><p>Case evidence</p><h1>{transaction.id || caseId}</h1></div><a href="#case-audit" className="workspace-button">View audit trail <ArrowDown size={14} /></a></header>
 
-    {(decision === "PENDING" || decision === "REVIEW") && (
-      <section className="record-card case-action-banner" aria-labelledby="case-resolution-heading">
-        <div>
-          <h3 id="case-resolution-heading">Manual resolution required</h3>
-          <p>Review the evidence below and record the final payment decision.</p>
-        </div>
-        <div className="case-action-buttons" aria-label="Manual resolution actions">
-          <button type="button" className="case-action-button case-action-button-approve" disabled={resolvingDecision !== null} aria-busy={resolvingDecision === "ALLOW"} onClick={() => handleResolve("ALLOW")}>
-            {resolvingDecision === "ALLOW" ? "Recording…" : "Approve payment"}
-          </button>
-          <button type="button" className="case-action-button case-action-button-decline" disabled={resolvingDecision !== null} aria-busy={resolvingDecision === "BLOCK"} onClick={() => handleResolve("BLOCK")}>
-            {resolvingDecision === "BLOCK" ? "Recording…" : "Decline payment"}
-          </button>
-        </div>
-      </section>
-    )}
+    <section className="record-card case-action-banner" aria-labelledby="case-resolution-heading">
+      <div>
+        <h3 id="case-resolution-heading">Manual resolution</h3>
+        <p>Review the evidence below and record or override the final payment decision.</p>
+      </div>
+      <div className="case-action-buttons" aria-label="Manual resolution actions">
+        <button type="button" className="case-action-button case-action-button-approve" disabled={resolvingDecision !== null} aria-busy={resolvingDecision === "ALLOW"} onClick={() => handleResolve("ALLOW")}>
+          {resolvingDecision === "ALLOW" ? "Recording…" : "Approve payment"}
+        </button>
+        <button type="button" className="case-action-button case-action-button-decline" disabled={resolvingDecision !== null} aria-busy={resolvingDecision === "BLOCK"} onClick={() => handleResolve("BLOCK")}>
+          {resolvingDecision === "BLOCK" ? "Recording…" : "Decline payment"}
+        </button>
+      </div>
+    </section>
 
     <section className="record-card case-decision" aria-label="Final policy outcome">
       <div className="case-decision-top">
