@@ -1,6 +1,6 @@
 # RiskSentinel X - Live Testing Guide
 
-Welcome to RiskSentinel X! If you are evaluating or testing this project for the hackathon, follow these steps to simulate real-time transactions and see our 4-Stage AI Pipeline in action.
+Welcome to RiskSentinel X! If you are evaluating or testing this project, follow these steps to simulate real-time transactions and see our Agentic AI Pipeline in action.
 
 You do **NOT** need to run the project locally to test it. You can send test data directly to our live production backend and watch it appear on the live dashboard.
 
@@ -17,13 +17,18 @@ Before you start testing, open the live dashboard so you can watch your transact
 
 You can send a transaction using either **cURL** (Mac/Linux) or **PowerShell** (Windows). Open your terminal and copy-paste one of the commands below.
 
-### Scenario A: Legitimate Transaction (Should be ALLOWED)
-This simulates a normal transaction with a low amount and trusted device footprint.
+> **Note:** The Render free-tier backend may take 30–60 seconds to cold-start on the first request. If it times out, wait a moment and retry.
+
+---
+
+### Scenario A: Legitimate Transaction (Expected: ALLOW)
+This simulates a normal, low-risk transaction with a trusted device footprint and a small amount.
+The ML score will be LOW, the Investigation Agent will be **skipped** to avoid unnecessary LLM cost, and the Policy Engine will issue an **ALLOW** decision.
 
 **Windows (PowerShell):**
 ```powershell
 Invoke-RestMethod -Uri "https://risksentinel-backend.onrender.com/api/v1/transactions/process" -Method Post -ContentType "application/json" -Body '{
-    "TransactionID": "tx_legit_001",
+    "TransactionID": "TX-LEGIT-100",
     "TransactionDT": 86400,
     "TransactionAmt": 25.50,
     "ProductCD": "W",
@@ -46,7 +51,7 @@ curl --request POST \
   --url "https://risksentinel-backend.onrender.com/api/v1/transactions/process" \
   --header "Content-Type: application/json" \
   --data '{
-    "TransactionID": "tx_legit_001",
+    "TransactionID": "TX-LEGIT-100",
     "TransactionDT": 86400,
     "TransactionAmt": 25.50,
     "ProductCD": "W",
@@ -65,13 +70,14 @@ curl --request POST \
 
 ---
 
-### Scenario B: High-Risk Fraudulent Transaction (Should be BLOCKED or REVIEWED)
-This simulates a suspicious transaction with a high amount, an anonymous email domain, and a shared suspicious IP address.
+### Scenario B: High-Risk Fraudulent Transaction (Expected: BLOCK or REVIEW)
+This simulates a suspicious transaction — high amount, anonymous email domain, shared VPN IP, and unknown device.
+The ML score will be HIGH, Graph Intelligence will detect suspicious connections, the **Gemini AI Agent will activate** and perform a Structured RAG investigation, and the Policy Engine will issue a **BLOCK or REVIEW** decision.
 
 **Windows (PowerShell):**
 ```powershell
 Invoke-RestMethod -Uri "https://risksentinel-backend.onrender.com/api/v1/transactions/process" -Method Post -ContentType "application/json" -Body '{
-    "TransactionID": "tx_fraud_001",
+    "TransactionID": "TX-FRAUD-101",
     "TransactionDT": 86400,
     "TransactionAmt": 8500.00,
     "ProductCD": "C",
@@ -94,7 +100,7 @@ curl --request POST \
   --url "https://risksentinel-backend.onrender.com/api/v1/transactions/process" \
   --header "Content-Type: application/json" \
   --data '{
-    "TransactionID": "tx_fraud_001",
+    "TransactionID": "TX-FRAUD-101",
     "TransactionDT": 86400,
     "TransactionAmt": 8500.00,
     "ProductCD": "C",
@@ -114,11 +120,12 @@ curl --request POST \
 ---
 
 ## Step 3: Verify the Results
+
 1. Refresh the Live Dashboard.
 2. Click on the **"24H"** dropdown and change it to **"All Time"** if needed.
-3. You will instantly see the metrics update.
+3. You will instantly see the metrics update — analysed count, blocked count, and financial exposure.
 4. Scroll down to the **Recent Transactions** table.
-5. Click on the `TransactionID` you just sent (e.g., `tx_fraud_001`) to open the **Investigation AI Case**.
-6. Witness the **Gemini AI Agent** provide a detailed explanation of exactly *why* it allowed or blocked your transaction!
+5. Click on the `TransactionID` you just sent (e.g., `TX-FRAUD-101`) to open the **Investigation AI Case**.
+6. Witness the **Gemini AI Agent** provide a detailed, evidence-backed explanation of exactly *why* it allowed or blocked your transaction, including reason codes, confidence score, and a full audit timeline.
 
 Happy Testing!
